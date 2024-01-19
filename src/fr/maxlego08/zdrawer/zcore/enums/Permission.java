@@ -2,7 +2,8 @@ package fr.maxlego08.zdrawer.zcore.enums;
 
 public enum Permission {
 	
-	EXAMPLE_PERMISSION
+	ZDRAWER_USE,
+	ZDRAWER_RELOAD,
 
 	;
 

@@ -4,7 +4,7 @@ import fr.maxlego08.zdrawer.zcore.enums.Message;
 import fr.maxlego08.zdrawer.zcore.enums.MessageType;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
-import fr.maxlego08.zdrawer.zcore.utils.storage.Savable;
+import fr.maxlego08.zdrawer.api.storage.Savable;
 import fr.maxlego08.zdrawer.zcore.utils.yaml.YamlUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;

@@ -1,11 +1,15 @@
 package fr.maxlego08.zdrawer;
 
+import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
+import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.Barrel;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
@@ -16,19 +20,24 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
-public class Drawer extends ZUtils {
+public class ZDrawer extends ZUtils implements Drawer {
 
     private final Location location;
     private final BlockFace blockFace;
-    private Material material; // Use Material for the DEMO, but the real will use ItemStack
-    private int amount;
+    private ItemStack itemStack; // Use Material for the DEMO, but the real will use ItemStack
+    private long amount;
     private ItemDisplay itemDisplay;
     private TextDisplay textDisplay;
 
-    public Drawer(Location location, BlockFace blockFace) {
+    public ZDrawer(Location location, BlockFace blockFace) {
         this.location = location;
         this.blockFace = blockFace;
         this.spawnDisplay();
+
+        Block block = location.getBlock();
+        block.setType(Material.BARREL);
+        Barrel barrel = (Barrel) block.getBlockData();
+        barrel.setFacing(blockFace);
     }
 
     private void spawnDisplay() {
@@ -90,19 +99,67 @@ public class Drawer extends ZUtils {
         location.setYaw(yaw);
     }
 
+    @Override
+    public Location getLocation() {
+        return this.location;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return this.blockFace;
+    }
+
+    @Override
+    public ItemStack getItemStack() {
+        return this.itemStack;
+    }
+
+    @Override
+    public void setItemStack(ItemStack itemStack) {
+        this.itemStack = itemStack;
+        this.itemDisplay.setItemStack(itemStack);
+    }
+
+    @Override
+    public String getItemStackAsString() {
+        return ItemStackUtils.serializeItemStack(this.itemStack);
+    }
+
+    @Override
+    public long getAmount() {
+        return this.amount;
+    }
+
+    @Override
+    public void setAmount(long amount) {
+        this.amount = amount;
+        this.textDisplay.text(Component.text(String.valueOf(amount), NamedTextColor.WHITE));
+    }
+
+    @Override
+    public ItemDisplay getItemDisplay() {
+        return this.itemDisplay;
+    }
+
+    @Override
+    public TextDisplay getTextDisplay() {
+        return this.textDisplay;
+    }
+
+    @Override
     public void addItem(Player player, ItemStack itemStack, EquipmentSlot hand) {
 
         // If the item does not exist, then we will create it
-        if (this.material == null) {
+        if (this.itemStack == null) {
 
-            this.material = itemStack.getType();
+            this.itemStack = itemStack;
             this.amount = itemStack.getAmount();
             this.itemDisplay.setItemStack(itemStack);
 
             textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
             player.getInventory().setItem(hand, new ItemStack(Material.AIR));
 
-        } else if (material == itemStack.getType()) {
+        } else if (itemStack.isSimilar(itemStack)) {
 
             // We will retrieve all the items that are similar to add them
             if (player.isSneaking()) {
@@ -111,7 +168,7 @@ public class Drawer extends ZUtils {
                 for (int slot = 0; slot != 36; slot++) {
 
                     ItemStack currentItemStack = inventory.getItem(slot);
-                    if (currentItemStack != null && itemStack.getType() == currentItemStack.getType()) {
+                    if (currentItemStack != null && this.itemStack.isSimilar(currentItemStack)) {
                         this.amount += currentItemStack.getAmount();
                         inventory.setItem(slot, new ItemStack(Material.AIR));
                     }
@@ -128,21 +185,24 @@ public class Drawer extends ZUtils {
         }
     }
 
+    @Override
     public void removeItem(Player player) {
 
-        if (this.material == null) return;
+        if (this.itemStack == null) return;
 
         if (player.isSneaking()) {
 
-            int itemStackAmount = Math.min(this.amount, 64);
-            ItemStack itemStack = new ItemStack(this.material, itemStackAmount);
+            int itemStackAmount = (int) Math.min(this.amount, 64);
+            ItemStack itemStack = this.itemStack.clone();
+            itemStack.setAmount(itemStackAmount);
             this.amount -= itemStackAmount;
 
             give(player, itemStack);
 
         } else {
 
-            ItemStack itemStack = new ItemStack(this.material, 1);
+            ItemStack itemStack = this.itemStack.clone();
+            itemStack.setAmount(1);
             this.amount -= 1;
 
             give(player, itemStack);
@@ -151,13 +211,24 @@ public class Drawer extends ZUtils {
         // If there is no more item, then it is deleted
         if (this.amount <= 0) {
 
-            this.material = null;
+            this.itemStack = null;
             this.amount = 0;
-            itemDisplay.setItemStack(new ItemStack(Material.AIR));
-            textDisplay.text(Component.text("", NamedTextColor.WHITE));
+            this.itemDisplay.setItemStack(new ItemStack(Material.AIR));
+            this.textDisplay.text(Component.text("", NamedTextColor.WHITE));
 
         } else {
-            textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
+            this.textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
         }
+    }
+
+    @Override
+    public void onDisable() {
+        this.textDisplay.remove();
+        this.itemDisplay.remove();
+    }
+
+    @Override
+    public boolean hasItemStack() {
+        return this.itemStack != null;
     }
 }

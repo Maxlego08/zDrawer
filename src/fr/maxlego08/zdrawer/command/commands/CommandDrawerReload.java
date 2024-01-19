@@ -6,11 +6,11 @@ import fr.maxlego08.zdrawer.zcore.enums.Message;
 import fr.maxlego08.zdrawer.zcore.enums.Permission;
 import fr.maxlego08.zdrawer.zcore.utils.commands.CommandType;
 
-public class CommandTemplateReload extends VCommand {
+public class CommandDrawerReload extends VCommand {
 
-	public CommandTemplateReload(DrawerPlugin plugin) {
+	public CommandDrawerReload(DrawerPlugin plugin) {
 		super(plugin);
-		this.setPermission(Permission.EXAMPLE_PERMISSION);
+		this.setPermission(Permission.ZDRAWER_RELOAD);
 		this.addSubCommand("reload", "rl");
 		this.setDescription(Message.DESCRIPTION_RELOAD);
 	}

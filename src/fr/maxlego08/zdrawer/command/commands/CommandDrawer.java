@@ -5,12 +5,12 @@ import fr.maxlego08.zdrawer.command.VCommand;
 import fr.maxlego08.zdrawer.zcore.enums.Permission;
 import fr.maxlego08.zdrawer.zcore.utils.commands.CommandType;
 
-public class CommandTemplate extends VCommand {
+public class CommandDrawer extends VCommand {
 
-	public CommandTemplate(DrawerPlugin plugin) {
+	public CommandDrawer(DrawerPlugin plugin) {
 		super(plugin);
-		this.setPermission(Permission.EXAMPLE_PERMISSION);
-		this.addSubCommand(new CommandTemplateReload(plugin));
+		this.setPermission(Permission.ZDRAWER_USE);
+		this.addSubCommand(new CommandDrawerReload(plugin));
 	}
 
 	@Override

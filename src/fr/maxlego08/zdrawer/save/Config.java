@@ -1,13 +1,19 @@
 package fr.maxlego08.zdrawer.save;
 
 import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
-import fr.maxlego08.zdrawer.zcore.utils.storage.Savable;
+import fr.maxlego08.zdrawer.api.storage.Savable;
+import org.bukkit.Material;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Config implements Savable {
 
 	public static boolean enableDebug = true;
 	public static boolean enableDebugTime = false;
-	
+
+	public static List<Material> breakMaterials = Arrays.asList(Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE);
+
 	/**
 	 * static Singleton instance.
 	 */
