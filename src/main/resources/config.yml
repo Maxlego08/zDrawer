@@ -1,0 +1,62 @@
+drawer:
+  limit: 2048
+  item:
+    material: BARREL
+    name: "#22f54cᴅʀᴀᴡᴇʀ"
+    lore:
+      - "&8&oStore a large number of the same item"
+      - ""
+      - "#e3e3e3Content&8: #baffff%zdrawer_content%"
+      - "#e3e3e3Amount&8: #baffff%zdrawer_amount%"
+  craft:
+    shade:
+      - "ABA"
+      - "BCB"
+      - "ABA"
+    ingredients:
+      A:
+        material: SPRUCE_WOOD
+      B:
+        material: SPRUCE_PLANKS
+      C:
+        material: CHEST
+
+customCrafts:
+  upgradeDisplay:
+    result:
+      url: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQxNDlkYzRkNzFmOWE0N2I3MTRhZDgxN2YxNmYzYjU1N2QzMzUzZTBhZTNiY2M0ODExMmFlMmFjZDgyNyJ9fX0="
+      name: "#54b2e8Upgrade Frame"
+      lore:
+        - "&8Upgrade frame for craft Drawer Upgrade"
+    shade:
+      - "AAA"
+      - "BCB"
+      - "AAA"
+    ingredients:
+      A:
+        material: STICK
+      B:
+        material: SPRUCE_PLANKS
+      C:
+        material: BARREL
+
+upgrades:
+  woodUpgrade:
+    displayItem:
+      url: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmM3NjI4ZTg5N2NiNGM5MzEyZjgwMmYyOGMyZWM0NjZkN2U3MjFlYzM3MDEwMzc4Y2M0NWRkMmRjNjg4MTBjMyJ9fX0="
+    limit: 4096
+    craft:
+      result:
+        url: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmM3NjI4ZTg5N2NiNGM5MzEyZjgwMmYyOGMyZWM0NjZkN2U3MjFlYzM3MDEwMzc4Y2M0NWRkMmRjNjg4MTBjMyJ9fX0="
+        name: "#cc7727Upgrade Wood"
+      shade:
+        - "AAA"
+        - "BCB"
+        - "AAA"
+      ingredients:
+        A:
+          material: STICK
+        B:
+          material: BARREL
+        C:
+          customCraft: upgradeDisplay

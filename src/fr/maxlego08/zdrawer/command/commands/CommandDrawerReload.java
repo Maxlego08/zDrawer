@@ -17,7 +17,8 @@ public class CommandDrawerReload extends VCommand {
 
 	@Override
 	protected CommandType perform(DrawerPlugin plugin) {
-		
+
+		plugin.reloadConfig();
 		plugin.reloadFiles();
 		message(sender, Message.RELOAD);
 		

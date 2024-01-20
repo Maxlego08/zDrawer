@@ -18,6 +18,7 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -27,6 +28,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Recipe;
 
 @SuppressWarnings("deprecation")
 public abstract class ListenerAdapter extends ZUtils {
@@ -101,5 +103,9 @@ public abstract class ListenerAdapter extends ZUtils {
 	}
 
 	protected void onPlayerWalk(PlayerMoveEvent event, Player player, int i) {
+	}
+
+	protected void onPrepareItemCraft(PrepareItemCraftEvent event, Recipe recipe) {
+
 	}
 }

@@ -1,42 +1,114 @@
 package fr.maxlego08.zdrawer;
 
+import fr.maxlego08.menu.MenuItemStack;
+import fr.maxlego08.menu.api.InventoryManager;
+import fr.maxlego08.menu.exceptions.InventoryException;
+import fr.maxlego08.menu.loader.MenuItemStackLoader;
+import fr.maxlego08.menu.zcore.utils.loader.Loader;
 import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.DrawerManager;
+import fr.maxlego08.zdrawer.api.DrawerUpgrade;
+import fr.maxlego08.zdrawer.api.craft.Craft;
+import fr.maxlego08.zdrawer.api.craft.Ingredient;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
+import fr.maxlego08.zdrawer.craft.ZCraft;
 import fr.maxlego08.zdrawer.listener.ListenerAdapter;
+import fr.maxlego08.zdrawer.placeholder.LocalPlaceholder;
 import fr.maxlego08.zdrawer.save.Config;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
+import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Barrel;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.RecipeChoice;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
 
     private final DrawerPlugin plugin;
+    private final NamespacedKey DATA_KEY_DRAWER;
+    private final NamespacedKey DATA_KEY_CRAFT;
     private final NamespacedKey DATA_KEY_ITEMSTACK;
     private final NamespacedKey DATA_KEY_AMOUNT;
+    private final NamespacedKey DATA_KEY_UPGRADE;
+    private final Map<UUID, Drawer> currentPlayerDrawer = new HashMap<>();
+    private final List<Craft> crafts = new ArrayList<>();
+    private final List<DrawerUpgrade> drawerUpgrades = new ArrayList<>();
+    private MenuItemStack drawerItemStack;
+    private Map<String, MenuItemStack> ingredients = new HashMap<>();
+    private List<String> shade;
+    private long drawerLimit;
 
     public ZDrawerManager(DrawerPlugin plugin) {
         this.plugin = plugin;
+        this.DATA_KEY_DRAWER = new NamespacedKey(plugin, "zdrawerContent");
         this.DATA_KEY_ITEMSTACK = new NamespacedKey(plugin, "zdrawerItemstack");
         this.DATA_KEY_AMOUNT = new NamespacedKey(plugin, "zdrawerAmount");
+        this.DATA_KEY_CRAFT = new NamespacedKey(this.plugin, "drawerCraft");
+        this.DATA_KEY_UPGRADE = new NamespacedKey(this.plugin, "drawerUpgrade");
+
+        LocalPlaceholder placeholder = LocalPlaceholder.getInstance();
+        placeholder.register("content", (player, string) -> {
+            if (this.currentPlayerDrawer.containsKey(player.getUniqueId())) {
+                Drawer drawer = this.currentPlayerDrawer.get(player.getUniqueId());
+                if (drawer.hasItemStack()) {
+                    return getItemName(drawer.getItemStack());
+                }
+            }
+            return "Vide";
+        });
+        placeholder.register("amount", (player, string) -> {
+            if (this.currentPlayerDrawer.containsKey(player.getUniqueId())) {
+                Drawer drawer = this.currentPlayerDrawer.get(player.getUniqueId());
+                return String.valueOf(drawer.getAmount());
+            }
+            return "0";
+        });
+    }
+
+    private static boolean isCraftMatching(ItemStack[] shadeConfig, ItemStack[] craftTable) {
+        System.out.println(shadeConfig.length + " - " + craftTable.length);
+        if (shadeConfig.length != craftTable.length) return false;
+        for (int i = 0; i < shadeConfig.length; i++) {
+            System.out.println(i + " - " + shadeConfig[i].isSimilar(craftTable[i]) + " -> " + shadeConfig[i] + " - " + craftTable[i]);
+            if (!shadeConfig[i].isSimilar(craftTable[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    protected void onQuit(PlayerQuitEvent event, Player player) {
+        this.currentPlayerDrawer.remove(player.getUniqueId());
     }
 
     @Override
@@ -51,12 +123,12 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         BlockFace blockFace = barrel.getFacing().getOppositeFace();
         Location location = block.getLocation().clone();
 
-        Drawer drawer = new ZDrawer(location, blockFace);
+        Drawer drawer = new ZDrawer(plugin, location, blockFace);
 
         ItemStack itemStack = event.getItemInHand();
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
-        System.out.println(persistentDataContainer.has(DATA_KEY_AMOUNT) + " - " + persistentDataContainer.has(DATA_KEY_ITEMSTACK));
+
         if (persistentDataContainer.has(DATA_KEY_AMOUNT) && persistentDataContainer.has(DATA_KEY_ITEMSTACK)) {
             String itemStackAsString = persistentDataContainer.getOrDefault(DATA_KEY_ITEMSTACK, PersistentDataType.STRING, "null");
             long amount = persistentDataContainer.getOrDefault(DATA_KEY_AMOUNT, PersistentDataType.LONG, 0L);
@@ -85,6 +157,8 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         if (itemStack != null && Config.breakMaterials.contains(itemStack.getType()) && event.getAction() == Action.LEFT_CLICK_BLOCK) {
             return;
         }
+
+        if (itemStack != null && Config.blacklistMaterials.contains(itemStack.getType())) return;
 
         Drawer drawer = optional.get();
         event.setCancelled(true);
@@ -116,7 +190,6 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         ItemStack itemInMainHand = inventory.getItemInMainHand();
         ItemStack itemInOffHand = inventory.getItemInOffHand();
 
-        System.out.println(Config.breakMaterials.contains(itemInMainHand.getType()) + " - " + Config.breakMaterials.contains(itemInOffHand.getType()));
         if (Config.breakMaterials.contains(itemInMainHand.getType()) || Config.breakMaterials.contains(itemInOffHand.getType())) {
 
             event.setCancelled(false);
@@ -126,9 +199,10 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
             drawer.onDisable();
             getStorage().removeDrawer(block.getLocation());
 
-            ItemStack itemStack = new ItemStack(Material.BARREL);
+            this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
+
+            ItemStack itemStack = buildDrawer(player);
             ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.displayName(Component.text("Drawer", TextColor.fromHexString("#20d68d")));
             PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
 
             persistentDataContainer.set(DATA_KEY_ITEMSTACK, PersistentDataType.STRING, drawer.hasItemStack() ? drawer.getItemStackAsString() : "null");
@@ -145,5 +219,156 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
 
     private IStorage getStorage() {
         return this.plugin.getStorage().getStorage();
+    }
+
+    @Override
+    public void save(Persist persist) {
+    }
+
+    @Override
+    public void load(Persist persist) {
+
+        InventoryManager inventoryManager = this.plugin.getInventoryManager();
+        Loader<MenuItemStack> loader = new MenuItemStackLoader(inventoryManager);
+        YamlConfiguration configuration = (YamlConfiguration) plugin.getConfig();
+
+        this.drawerLimit = configuration.getLong("drawer.limit", 0);
+
+        File file = new File(this.plugin.getDataFolder(), "config.yml");
+        try {
+            this.drawerItemStack = loader.load(configuration, "drawer.item.", file);
+            loadCraft(configuration, loader, file);
+
+            // Load custom crafts
+            this.loadCustomCrafts(file, configuration);
+
+            // Load upgrades
+            this.loadUpgrades(file, configuration, loader);
+        } catch (InventoryException exception) {
+            exception.printStackTrace();
+        }
+
+        ItemStack resultItemStack = this.buildDrawer(null);
+
+        ShapedRecipe recipe = new ShapedRecipe(this.DATA_KEY_CRAFT, resultItemStack);
+        recipe.shape(this.shade.toArray(new String[0]));
+
+        ingredients.forEach((identifier, ingredient) -> {
+            recipe.setIngredient(identifier.charAt(0), new RecipeChoice.ExactChoice(ingredient.build(null)));
+        });
+
+        Server server = this.plugin.getServer();
+        server.removeRecipe(this.DATA_KEY_CRAFT, false);
+        server.addRecipe(recipe);
+        server.updateRecipes();
+    }
+
+    private void loadCraft(YamlConfiguration configuration, Loader<MenuItemStack> loader, File file) throws InventoryException {
+
+        this.shade = configuration.getStringList("drawer.craft.shade");
+        this.ingredients = new HashMap<>();
+        for (String ingredientKey : configuration.getConfigurationSection("drawer.craft.ingredients.").getKeys(false)) {
+            this.ingredients.put(ingredientKey, loader.load(configuration, "drawer.craft.ingredients." + ingredientKey + ".", file));
+        }
+    }
+
+    @Override
+    protected void onPrepareItemCraft(PrepareItemCraftEvent event, Recipe recipe) {
+        event.getViewers().stream().findFirst().ifPresent(viewer -> {
+            if (viewer instanceof Player) {
+                if (recipe == null) {
+                    // handleCustomCraft(event, event.getInventory(), (Player) viewer);
+                    return;
+                }
+                ItemStack itemStack = recipe.getResult();
+                if (itemStack.hasItemMeta() && itemStack.getItemMeta().getPersistentDataContainer().has(this.DATA_KEY_DRAWER)) {
+                    event.getInventory().setItem(0, buildDrawer((Player) viewer));
+                }
+            }
+        });
+    }
+
+    private void handleCustomCraft(PrepareItemCraftEvent event, CraftingInventory inventory, Player player) {
+        ItemStack[] itemStacks = inventory.getContents();
+        ItemStack[] copiedArray = Arrays.copyOfRange(itemStacks, 1, itemStacks.length);
+
+        for (Craft craft : this.crafts) {
+
+            System.out.println("Test " + this.crafts);
+
+            ItemStack[] ingredients = toShadeIngredients(craft.getShade(), craft.getIngredients(), player);
+            if (isCraftMatching(copiedArray, ingredients)) {
+                inventory.setResult(craft.getResultItemStack(player));
+                return;
+            }
+        }
+    }
+
+    private ItemStack[] toShadeIngredients(String[] shade, Map<Character, Ingredient> ingredients, Player player) {
+        ItemStack[] itemStacks = new ItemStack[shade.length * 3];
+        for (int i = 0; i != shade.length; i++) {
+            for (int j = 0; j != shade[i].length(); j++) {
+                char currentChar = shade[i].charAt(j);
+                itemStacks[(i * 3) + j] = ingredients.get(currentChar).build(player);
+            }
+        }
+        return itemStacks;
+    }
+
+    private ItemStack buildDrawer(Player player) {
+        ItemStack itemStackDrawer = this.drawerItemStack.build(player, false);
+        ItemMeta itemMeta = itemStackDrawer.getItemMeta();
+        PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
+        persistentDataContainer.set(DATA_KEY_DRAWER, PersistentDataType.BOOLEAN, true);
+        itemStackDrawer.setItemMeta(itemMeta);
+        return itemStackDrawer;
+    }
+
+    private void loadCustomCrafts(File file, YamlConfiguration configuration) throws InventoryException {
+
+        this.crafts.forEach(Craft::unregister);
+        this.crafts.clear();
+
+        for (String craftName : configuration.getConfigurationSection("customCrafts.").getKeys(false)) {
+            String path = "customCrafts." + craftName + ".";
+            Craft craft = new ZCraft(this.plugin, path, configuration, craftName, file);
+            craft.register();
+            this.crafts.add(craft);
+        }
+    }
+
+    private void loadUpgrades(File file, YamlConfiguration configuration, Loader<MenuItemStack> loader) throws InventoryException {
+
+        this.drawerUpgrades.clear();
+
+        for (String upgradeName : configuration.getConfigurationSection("upgrades.").getKeys(false)) {
+
+            String path = "upgrades." + upgradeName + ".";
+            Craft craft = new ZCraft(this.plugin, path + "craft.", configuration, upgradeName, file);
+            this.crafts.add(craft);
+            craft.register();
+
+            long limit = configuration.getLong(path + "limit", 0);
+
+            ItemStack displayItemStack = loader.load(configuration, path + "displayItem", file).build(null);
+
+            ItemMeta itemMeta = displayItemStack.getItemMeta();
+            PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
+            persistentDataContainer.set(this.DATA_KEY_UPGRADE, PersistentDataType.STRING, upgradeName);
+            displayItemStack.setItemMeta(itemMeta);
+
+            DrawerUpgrade drawerUpgrade = new ZDrawerUpgrade(upgradeName, craft, limit, displayItemStack);
+            this.drawerUpgrades.add(drawerUpgrade);
+        }
+    }
+
+    @Override
+    public long getDrawerLimit() {
+        return drawerLimit;
+    }
+
+    @Override
+    public Optional<Craft> getCraft(String craftName) {
+        return this.crafts.stream().filter(craft -> craft.getName().equals(craftName)).findFirst();
     }
 }

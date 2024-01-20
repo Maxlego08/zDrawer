@@ -1,5 +1,6 @@
 package fr.maxlego08.zdrawer.storage;
 
+import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.api.enums.StorageType;
 import fr.maxlego08.zdrawer.api.storage.DrawerStorage;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
@@ -8,8 +9,15 @@ import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
 
 public class StorageManager implements DrawerStorage {
 
+    private final DrawerPlugin plugin;
+
     private final StorageType storageType = StorageType.JSON;
-    private IStorage storage = new JsonStorage();
+    private IStorage storage;
+
+    public StorageManager(DrawerPlugin plugin) {
+        this.plugin = plugin;
+        this.storage = new JsonStorage(plugin);
+    }
 
     @Override
     public void save(Persist persist) {

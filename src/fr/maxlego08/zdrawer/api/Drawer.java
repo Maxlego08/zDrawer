@@ -35,4 +35,12 @@ public interface Drawer {
     void onDisable();
 
     boolean hasItemStack();
+
+    long getLimit();
+
+    boolean hasLimit();
+
+    DrawerUpgrade getUpgrade();
+
+    void setUpgrade(DrawerUpgrade drawerUpgrade);
 }

@@ -1,5 +1,6 @@
 package fr.maxlego08.zdrawer.storage.storages;
 
+import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.ZDrawer;
 import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
@@ -17,8 +18,13 @@ import java.util.Optional;
 
 public class JsonStorage implements IStorage {
 
+    private final transient DrawerPlugin plugin;
     private transient Map<String, Drawer> drawerMap = new HashMap<>();
     private List<DrawerContainer> drawers = new ArrayList<>();
+
+    public JsonStorage(DrawerPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public Optional<Drawer> getDrawer(Location location) {
@@ -49,7 +55,7 @@ public class JsonStorage implements IStorage {
         this.drawerMap = new HashMap<>();
         this.drawers.forEach(drawerContainer -> {
             Location location = stringToLocation(drawerContainer.getLocation());
-            Drawer drawer = new ZDrawer(location, drawerContainer.getBlockFace());
+            Drawer drawer = new ZDrawer(plugin, location, drawerContainer.getBlockFace());
             if (drawerContainer.hasItemStack()) {
                 ItemStack itemStack = ItemStackUtils.deserializeItemStack(drawerContainer.getItemStack());
                 drawer.setItemStack(itemStack);

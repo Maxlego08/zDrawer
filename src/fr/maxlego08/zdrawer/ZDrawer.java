@@ -1,6 +1,7 @@
 package fr.maxlego08.zdrawer;
 
 import fr.maxlego08.zdrawer.api.Drawer;
+import fr.maxlego08.zdrawer.api.DrawerUpgrade;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import net.kyori.adventure.text.Component;
@@ -22,14 +23,17 @@ import org.joml.Vector3f;
 
 public class ZDrawer extends ZUtils implements Drawer {
 
+    private final DrawerPlugin plugin;
     private final Location location;
     private final BlockFace blockFace;
     private ItemStack itemStack; // Use Material for the DEMO, but the real will use ItemStack
     private long amount;
     private ItemDisplay itemDisplay;
     private TextDisplay textDisplay;
+    private DrawerUpgrade drawerUpgrade;
 
-    public ZDrawer(Location location, BlockFace blockFace) {
+    public ZDrawer(DrawerPlugin plugin, Location location, BlockFace blockFace) {
+        this.plugin = plugin;
         this.location = location;
         this.blockFace = blockFace;
         this.spawnDisplay();
@@ -65,14 +69,14 @@ public class ZDrawer extends ZUtils implements Drawer {
             case DOWN:
                 location.add(0.5, 1.01, 0.5);
                 locationTextDisplay.add(0.03, 1.02, 0.5);
-                location.setPitch(-90f);
-                locationTextDisplay.setPitch(-90f);
+                location.setPitch(90f);
+                locationTextDisplay.setPitch(90f);
                 break;
             case UP:
                 location.add(0.5, -0.01, 0.5);
                 locationTextDisplay.add(0.97, -0.02, 0.5);
-                location.setPitch(90f);
-                locationTextDisplay.setPitch(90f);
+                location.setPitch(-90f);
+                locationTextDisplay.setPitch(-90f);
                 break;
             default:
                 location.add(0.5, 0.5, -0.01);
@@ -185,15 +189,25 @@ public class ZDrawer extends ZUtils implements Drawer {
         if (this.itemStack == null) {
 
             this.itemStack = itemStack;
-            this.amount = itemStack.getAmount();
             this.itemDisplay.setItemStack(itemStack);
 
+            if (this.hasLimit()) {
+
+                this.amount = Math.min(itemStack.getAmount(), this.getLimit());
+                if (this.amount == itemStack.getAmount()) {
+                    player.getInventory().setItem(hand, new ItemStack(Material.AIR));
+                } else itemStack.setAmount((int) (itemStack.getAmount() - this.amount));
+            } else {
+
+                this.amount = itemStack.getAmount();
+                player.getInventory().setItem(hand, new ItemStack(Material.AIR));
+            }
+
             textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
-            player.getInventory().setItem(hand, new ItemStack(Material.AIR));
 
         } else if (itemStack.isSimilar(itemStack)) {
 
-            // We will retrieve all the items that are similar to add them
+            /// We will retrieve all the items that are similar to add them
             if (player.isSneaking()) {
 
                 PlayerInventory inventory = player.getInventory();
@@ -201,18 +215,31 @@ public class ZDrawer extends ZUtils implements Drawer {
 
                     ItemStack currentItemStack = inventory.getItem(slot);
                     if (currentItemStack != null && this.itemStack.isSimilar(currentItemStack)) {
-                        this.amount += currentItemStack.getAmount();
-                        inventory.setItem(slot, new ItemStack(Material.AIR));
+                        int addAmount = (int) Math.min(currentItemStack.getAmount(), this.getLimit() - this.amount);
+                        this.amount += addAmount;
+                        if (addAmount < currentItemStack.getAmount()) {
+                            currentItemStack.setAmount(currentItemStack.getAmount() - addAmount);
+                            inventory.setItem(slot, currentItemStack);
+                            break; // Stop the loop if maxAmount is reached
+                        } else {
+                            inventory.setItem(slot, new ItemStack(Material.AIR));
+                        }
                     }
 
-                    textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
                 }
+                textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
 
             } else {
 
-                this.amount += itemStack.getAmount();
+                int addAmount = (int) Math.min(itemStack.getAmount(), this.getLimit() - this.amount);
+                this.amount += addAmount;
                 textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
-                player.getInventory().setItem(hand, new ItemStack(Material.AIR));
+                if (addAmount < itemStack.getAmount()) {
+                    itemStack.setAmount(itemStack.getAmount() - addAmount);
+                    player.getInventory().setItem(hand, itemStack);
+                } else {
+                    player.getInventory().setItem(hand, new ItemStack(Material.AIR));
+                }
             }
         }
     }
@@ -262,5 +289,26 @@ public class ZDrawer extends ZUtils implements Drawer {
     @Override
     public boolean hasItemStack() {
         return this.itemStack != null;
+    }
+
+    @Override
+    public long getLimit() {
+        return this.drawerUpgrade == null ? this.plugin.getManager().getDrawerLimit() : this.drawerUpgrade.getLimit();
+    }
+
+    @Override
+    public boolean hasLimit() {
+        return this.getLimit() > 0;
+    }
+
+    @Override
+    public DrawerUpgrade getUpgrade() {
+        return this.drawerUpgrade;
+    }
+
+    @Override
+    public void setUpgrade(DrawerUpgrade drawerUpgrade) {
+        this.drawerUpgrade = drawerUpgrade;
+        // ToDo - Set drawer upgrade display Item
     }
 }

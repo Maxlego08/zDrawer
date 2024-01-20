@@ -13,6 +13,7 @@ public class Config implements Savable {
 	public static boolean enableDebugTime = false;
 
 	public static List<Material> breakMaterials = Arrays.asList(Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE);
+	public static List<Material> blacklistMaterials = Arrays.asList(Material.BARREL, Material.BEDROCK);
 
 	/**
 	 * static Singleton instance.

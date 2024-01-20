@@ -3,6 +3,8 @@ package fr.maxlego08.zdrawer.zcore;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import fr.maxlego08.zdrawer.DrawerPlugin;
+import fr.maxlego08.zdrawer.api.storage.NoReloadable;
+import fr.maxlego08.zdrawer.api.storage.Savable;
 import fr.maxlego08.zdrawer.command.CommandManager;
 import fr.maxlego08.zdrawer.command.VCommand;
 import fr.maxlego08.zdrawer.exceptions.ListenerNullException;
@@ -11,14 +13,13 @@ import fr.maxlego08.zdrawer.inventory.ZInventoryManager;
 import fr.maxlego08.zdrawer.listener.AdapterListener;
 import fr.maxlego08.zdrawer.listener.ListenerAdapter;
 import fr.maxlego08.zdrawer.placeholder.LocalPlaceholder;
+import fr.maxlego08.zdrawer.placeholder.Placeholder;
 import fr.maxlego08.zdrawer.zcore.enums.EnumInventory;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import fr.maxlego08.zdrawer.zcore.utils.gson.LocationAdapter;
 import fr.maxlego08.zdrawer.zcore.utils.gson.PotionEffectAdapter;
 import fr.maxlego08.zdrawer.zcore.utils.plugins.Plugins;
-import fr.maxlego08.zdrawer.api.storage.NoReloadable;
 import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
-import fr.maxlego08.zdrawer.api.storage.Savable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.Listener;
@@ -40,17 +41,16 @@ public abstract class ZPlugin extends JavaPlugin {
     private final Logger log = new Logger(this.getDescription().getFullName());
     private final List<Savable> savers = new ArrayList<>();
     private final List<ListenerAdapter> listenerAdapters = new ArrayList<>();
-
+    protected CommandManager commandManager;
+    protected ZInventoryManager inventoryManager;
     private Gson gson;
     private Persist persist;
     private long enableTime;
 
-    protected CommandManager commandManager;
-    protected ZInventoryManager inventoryManager;
-
     protected void preEnable() {
 
         LocalPlaceholder.getInstance().setPlugin((DrawerPlugin) this);
+        Placeholder.getPlaceholder();
 
         this.enableTime = System.currentTimeMillis();
 
@@ -125,10 +125,8 @@ public abstract class ZPlugin extends JavaPlugin {
      * @param adapter
      */
     public void addListener(ListenerAdapter adapter) {
-        if (adapter == null)
-            throw new ListenerNullException("Warning, your listener is null");
-        if (adapter instanceof Savable)
-            this.addSave((Savable) adapter);
+        if (adapter == null) throw new ListenerNullException("Warning, your listener is null");
+        if (adapter instanceof Savable) this.addSave((Savable) adapter);
         this.listenerAdapters.add(adapter);
     }
 
@@ -202,7 +200,7 @@ public abstract class ZPlugin extends JavaPlugin {
     /**
      * @return the inventoryManager
      */
-    public ZInventoryManager getInventoryManager() {
+    public ZInventoryManager getZInventoryManager() {
         return inventoryManager;
     }
 

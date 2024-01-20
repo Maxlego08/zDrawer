@@ -104,5 +104,11 @@
             <artifactId>XSeries</artifactId>
             <version>9.4.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.Maxlego08</groupId>
+            <artifactId>zMenu-API</artifactId>
+            <version>6655d3298d</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>
