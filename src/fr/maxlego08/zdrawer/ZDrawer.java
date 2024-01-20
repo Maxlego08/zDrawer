@@ -37,18 +37,48 @@ public class ZDrawer extends ZUtils implements Drawer {
         Block block = location.getBlock();
         block.setType(Material.BARREL);
         Barrel barrel = (Barrel) block.getBlockData();
-        barrel.setFacing(blockFace);
+        barrel.setFacing(blockFace.getOppositeFace());
+        block.setBlockData(barrel, false);
     }
 
     private void spawnDisplay() {
 
         Location location = this.location.clone();
         Location locationTextDisplay = this.location.clone();
-        location.add(0.5, 0.5, -0.01);
-        locationTextDisplay.add(0.5, 0.05, -0.02);
 
         location.setPitch(0f);
         locationTextDisplay.setPitch(0f);
+
+        switch (blockFace) {
+            case NORTH:
+                location.add(0.5, 0.5, 1.01);
+                locationTextDisplay.add(0.5, 0.05, 1.02);
+                break;
+            case WEST:
+                location.add(1.01, 0.5, 0.5);
+                locationTextDisplay.add(1.02, 0.05, 0.5);
+                break;
+            case EAST:
+                location.add(-0.01, 0.5, 0.5);
+                locationTextDisplay.add(-0.02, 0.05, 0.5);
+                break;
+            case DOWN:
+                location.add(0.5, 1.01, 0.5);
+                locationTextDisplay.add(0.03, 1.02, 0.5);
+                location.setPitch(-90f);
+                locationTextDisplay.setPitch(-90f);
+                break;
+            case UP:
+                location.add(0.5, -0.01, 0.5);
+                locationTextDisplay.add(0.97, -0.02, 0.5);
+                location.setPitch(90f);
+                locationTextDisplay.setPitch(90f);
+                break;
+            default:
+                location.add(0.5, 0.5, -0.01);
+                locationTextDisplay.add(0.5, 0.05, -0.02);
+                break;
+        }
 
         updateYaw(location, blockFace);
         updateYaw(locationTextDisplay, blockFace.getOppositeFace());
@@ -88,6 +118,8 @@ public class ZDrawer extends ZUtils implements Drawer {
                 yaw = -180f;
                 break;
             case WEST:
+            case UP:
+            case DOWN:
                 yaw = 90f;
                 break;
             case EAST:
