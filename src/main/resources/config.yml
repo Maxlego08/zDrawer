@@ -43,7 +43,7 @@ customCrafts:
 upgrades:
   woodUpgrade:
     displayItem:
-      url: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmM3NjI4ZTg5N2NiNGM5MzEyZjgwMmYyOGMyZWM0NjZkN2U3MjFlYzM3MDEwMzc4Y2M0NWRkMmRjNjg4MTBjMyJ9fX0="
+      material: "IRON_BLOCK"
     limit: 4096
     craft:
       result:
