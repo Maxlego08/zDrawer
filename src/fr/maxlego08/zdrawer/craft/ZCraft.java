@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class ZCraft implements Craft {
 
-    private final DrawerPlugin plugin;
+    protected final DrawerPlugin plugin;
     private final String name;
     private final NamespacedKey namespacedKey;
     private final String[] shade;
@@ -44,6 +44,8 @@ public class ZCraft implements Craft {
             Ingredient ingredient;
             if (configuration.contains(path + ".ingredients." + ingredientKey + ".customCraft")) {
                 ingredient = new ZIngredient(plugin, configuration.getString(path + ".ingredients." + ingredientKey + ".customCraft"));
+            } else if (configuration.contains(path + ".ingredients." + ingredientKey + ".upgrade")) {
+                ingredient = new ZIngredient(configuration.getString(path + ".ingredients." + ingredientKey + ".upgrade"), plugin);
             } else {
                 ingredient = new ZIngredient(plugin, loader.load(configuration, path + ".ingredients." + ingredientKey + ".", file));
             }

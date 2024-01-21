@@ -1,6 +1,6 @@
 package fr.maxlego08.zdrawer.zcore.utils.builder;
 
-import fr.maxlego08.zdrawer.zcore.enums.Message;
+import fr.maxlego08.zdrawer.api.enums.Message;
 
 public class TimerBuilder {
 

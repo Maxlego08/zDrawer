@@ -42,5 +42,7 @@ public interface Drawer {
 
     DrawerUpgrade getUpgrade();
 
+    String getUpgradeName();
+
     void setUpgrade(DrawerUpgrade drawerUpgrade);
 }

@@ -11,7 +11,7 @@ import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.exceptions.InventoryAlreadyExistException;
 import fr.maxlego08.zdrawer.exceptions.InventoryOpenException;
 import fr.maxlego08.zdrawer.zcore.enums.EnumInventory;
-import fr.maxlego08.zdrawer.zcore.enums.Message;
+import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import fr.maxlego08.zdrawer.zcore.utils.inventory.ItemButton;
 import org.bukkit.Bukkit;

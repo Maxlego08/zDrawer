@@ -11,4 +11,6 @@ public interface DrawerManager extends Savable {
 
     Optional<Craft> getCraft(String craftName);
 
+    Optional<DrawerUpgrade> getUpgrade(String upgradeName);
+
 }

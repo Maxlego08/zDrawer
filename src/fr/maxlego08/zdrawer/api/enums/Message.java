@@ -1,5 +1,6 @@
-package fr.maxlego08.zdrawer.zcore.enums;
+package fr.maxlego08.zdrawer.api.enums;
 
+import fr.maxlego08.zdrawer.zcore.enums.MessageType;
 import fr.maxlego08.zdrawer.zcore.utils.nms.NMSUtils;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,6 +45,10 @@ public enum Message {
     RELOAD("§aYou have just reloaded the configuration files."),
 
     DESCRIPTION_RELOAD("Reload configuration files"),
+
+    UPGRADE_ERROR_LIMIT("§cThe drawer already has a larger limit, you can not add this limit."),
+
+    UPGRADE_SUCCESS("§aYou just put the upgrade §f%name%§a on the drawer."),
 
     ;
 

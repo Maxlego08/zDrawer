@@ -6,6 +6,7 @@ import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.storage.DrawerContainer;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
+import org.apache.logging.log4j.util.SystemPropertiesPropertySource;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
@@ -18,12 +19,13 @@ import java.util.Optional;
 
 public class JsonStorage implements IStorage {
 
-    private final transient DrawerPlugin plugin;
+    private transient DrawerPlugin plugin;
     private transient Map<String, Drawer> drawerMap = new HashMap<>();
     private List<DrawerContainer> drawers = new ArrayList<>();
 
     public JsonStorage(DrawerPlugin plugin) {
         this.plugin = plugin;
+        System.out.println("Json Storage: " + this.plugin);
     }
 
     @Override
@@ -37,7 +39,7 @@ public class JsonStorage implements IStorage {
         String stringLocation = locationToString(drawer.getLocation());
         this.drawerMap.put(stringLocation, drawer);
 
-        DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getItemStackAsString(), drawer.getAmount());
+        DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getItemStackAsString(), drawer.getUpgradeName(), drawer.getAmount());
         this.drawers.add(drawerContainer);
     }
 
@@ -55,11 +57,14 @@ public class JsonStorage implements IStorage {
         this.drawerMap = new HashMap<>();
         this.drawers.forEach(drawerContainer -> {
             Location location = stringToLocation(drawerContainer.getLocation());
-            Drawer drawer = new ZDrawer(plugin, location, drawerContainer.getBlockFace());
+            Drawer drawer = new ZDrawer(this.plugin, location, drawerContainer.getBlockFace());
             if (drawerContainer.hasItemStack()) {
                 ItemStack itemStack = ItemStackUtils.deserializeItemStack(drawerContainer.getItemStack());
                 drawer.setItemStack(itemStack);
                 drawer.setAmount(drawerContainer.getAmount());
+            }
+            if (drawerContainer.hasUpgrade()) {
+                this.plugin.getManager().getUpgrade(drawerContainer.getUpgrade()).ifPresent(drawer::setUpgrade);
             }
             drawerMap.put(drawerContainer.getLocation(), drawer);
         });
@@ -70,8 +75,7 @@ public class JsonStorage implements IStorage {
         this.drawers = new ArrayList<>();
         this.drawerMap.forEach((stringLocation, drawer) -> {
             drawer.onDisable();
-            DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getItemStackAsString(), drawer.getAmount());
-            System.out.println(drawerContainer);
+            DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getItemStackAsString(), drawer.getUpgradeName(), drawer.getAmount());
             this.drawers.add(drawerContainer);
         });
     }
@@ -83,5 +87,9 @@ public class JsonStorage implements IStorage {
     private Location stringToLocation(String string) {
         String[] locationArray = string.split(",");
         return new Location(Bukkit.getServer().getWorld(locationArray[0]), Integer.parseInt(locationArray[1]), Integer.parseInt(locationArray[2]), Integer.parseInt(locationArray[3]));
+    }
+
+    public void setPlugin(DrawerPlugin plugin) {
+        this.plugin = plugin;
     }
 }

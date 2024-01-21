@@ -26,6 +26,8 @@ public class DrawerPlugin extends ZPlugin {
     private final DrawerStorage storage = new StorageManager(this);
     private InventoryManager inventoryManager;
     private NamespacedKey namespacedKeyCraft;
+    private NamespacedKey namespacedKeyUpgrade;
+    private boolean isSuccessfullyLoaded = false;
 
     @Override
     public void onEnable() {
@@ -37,6 +39,7 @@ public class DrawerPlugin extends ZPlugin {
         this.saveDefaultConfig();
 
         this.namespacedKeyCraft = new NamespacedKey(this, "zdrawerCraft");
+        this.namespacedKeyUpgrade = new NamespacedKey(this, "zdrawerUpgrade");
 
         ServicesManager servicesManager = this.getServer().getServicesManager();
         servicesManager.register(DrawerStorage.class, this.storage, this, ServicePriority.High);
@@ -46,17 +49,19 @@ public class DrawerPlugin extends ZPlugin {
 
         this.registerCommand("zdrawer", new CommandDrawer(this));
 
+        this.addListener(this.manager);
+
         this.addSave(Config.getInstance());
         this.addSave(new MessageLoader(this));
         this.addSave(this.storage);
-
-        this.addListener(this.manager);
 
         this.loadFiles();
 
         new Metrics(this, 20791);
 
         this.postEnable();
+
+        this.isSuccessfullyLoaded = true;
     }
 
     @Override
@@ -64,7 +69,9 @@ public class DrawerPlugin extends ZPlugin {
 
         this.preDisable();
 
-        this.saveFiles();
+        if (this.isSuccessfullyLoaded) {
+            this.saveFiles();
+        }
 
         this.postDisable();
     }
@@ -83,5 +90,9 @@ public class DrawerPlugin extends ZPlugin {
 
     public NamespacedKey getNamespacedKeyCraft() {
         return namespacedKeyCraft;
+    }
+
+    public NamespacedKey getNamespacedKeyUpgrade() {
+        return namespacedKeyUpgrade;
     }
 }

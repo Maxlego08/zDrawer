@@ -10,7 +10,11 @@ public interface Ingredient {
 
     String getCraftName();
 
+    String getUpgradeName();
+
     boolean isCraftName();
+
+    boolean isUpgradeName();
 
     ItemStack build(Player player);
 

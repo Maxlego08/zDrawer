@@ -10,8 +10,10 @@ import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
 import fr.maxlego08.zdrawer.api.craft.Craft;
 import fr.maxlego08.zdrawer.api.craft.Ingredient;
+import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.craft.ZCraft;
+import fr.maxlego08.zdrawer.craft.ZCraftUpgrade;
 import fr.maxlego08.zdrawer.listener.ListenerAdapter;
 import fr.maxlego08.zdrawer.placeholder.LocalPlaceholder;
 import fr.maxlego08.zdrawer.save.Config;
@@ -58,7 +60,6 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
     private final NamespacedKey DATA_KEY_CRAFT;
     private final NamespacedKey DATA_KEY_ITEMSTACK;
     private final NamespacedKey DATA_KEY_AMOUNT;
-    private final NamespacedKey DATA_KEY_UPGRADE;
     private final Map<UUID, Drawer> currentPlayerDrawer = new HashMap<>();
     private final List<Craft> crafts = new ArrayList<>();
     private final List<DrawerUpgrade> drawerUpgrades = new ArrayList<>();
@@ -73,7 +74,6 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         this.DATA_KEY_ITEMSTACK = new NamespacedKey(plugin, "zdrawerItemstack");
         this.DATA_KEY_AMOUNT = new NamespacedKey(plugin, "zdrawerAmount");
         this.DATA_KEY_CRAFT = new NamespacedKey(this.plugin, "drawerCraft");
-        this.DATA_KEY_UPGRADE = new NamespacedKey(this.plugin, "drawerUpgrade");
 
         LocalPlaceholder placeholder = LocalPlaceholder.getInstance();
         placeholder.register("content", (player, string) -> {
@@ -119,13 +119,15 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         Block block = event.getBlock();
         if (block.getType() != Material.BARREL) return;
 
+        ItemStack itemStack = event.getItemInHand();
+        if (!itemStack.hasItemMeta() || !itemStack.getItemMeta().getPersistentDataContainer().has(this.DATA_KEY_DRAWER))
+            return;
+
         Barrel barrel = (Barrel) block.getBlockData();
         BlockFace blockFace = barrel.getFacing().getOppositeFace();
         Location location = block.getLocation().clone();
 
         Drawer drawer = new ZDrawer(plugin, location, blockFace);
-
-        ItemStack itemStack = event.getItemInHand();
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
 
@@ -162,6 +164,33 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
 
         Drawer drawer = optional.get();
         event.setCancelled(true);
+
+        // Check for upgrade
+        System.out.println((itemStack != null) + " && " + itemStack.hasItemMeta());
+        if (itemStack != null && itemStack.hasItemMeta()) {
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
+            System.out.println("> " + persistentDataContainer.has(this.plugin.getNamespacedKeyUpgrade()));
+            if (persistentDataContainer.has(this.plugin.getNamespacedKeyUpgrade())) {
+                String drawerUpgradeName = persistentDataContainer.get(this.plugin.getNamespacedKeyUpgrade(), PersistentDataType.STRING);
+                this.getUpgrade(drawerUpgradeName).ifPresent(drawerUpgrade -> {
+
+                    if (drawer.getLimit() >= drawerUpgrade.getLimit()) {
+                        message(player, Message.UPGRADE_ERROR_LIMIT);
+                        return;
+                    }
+
+                    drawer.setUpgrade(drawerUpgrade);
+
+                    if (itemStack.getAmount() > 1) itemStack.setAmount(itemStack.getAmount() - 1);
+                    else player.getInventory().setItem(event.getHand(), new ItemStack(Material.AIR));
+
+                    message(player, Message.UPGRADE_SUCCESS, "%name%", drawerUpgradeName);
+                });
+                return;
+            }
+
+        }
 
         Action action = event.getAction();
 
@@ -344,19 +373,13 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         for (String upgradeName : configuration.getConfigurationSection("upgrades.").getKeys(false)) {
 
             String path = "upgrades." + upgradeName + ".";
-            Craft craft = new ZCraft(this.plugin, path + "craft.", configuration, upgradeName, file);
+            Craft craft = new ZCraftUpgrade(this.plugin, path + "craft.", configuration, upgradeName, file);
             this.crafts.add(craft);
             craft.register();
 
             long limit = configuration.getLong(path + "limit", 0);
 
-            ItemStack displayItemStack = loader.load(configuration, path + "displayItem", file).build(null);
-
-            ItemMeta itemMeta = displayItemStack.getItemMeta();
-            PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
-            persistentDataContainer.set(this.DATA_KEY_UPGRADE, PersistentDataType.STRING, upgradeName);
-            displayItemStack.setItemMeta(itemMeta);
-
+            ItemStack displayItemStack = loader.load(configuration, path + "displayItem.", file).build(null);
             DrawerUpgrade drawerUpgrade = new ZDrawerUpgrade(upgradeName, craft, limit, displayItemStack);
             this.drawerUpgrades.add(drawerUpgrade);
         }
@@ -370,5 +393,10 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
     @Override
     public Optional<Craft> getCraft(String craftName) {
         return this.crafts.stream().filter(craft -> craft.getName().equals(craftName)).findFirst();
+    }
+
+    @Override
+    public Optional<DrawerUpgrade> getUpgrade(String upgradeName) {
+        return this.drawerUpgrades.stream().filter(drawerUpgrade -> drawerUpgrade.getName().equals(upgradeName)).findFirst();
     }
 }

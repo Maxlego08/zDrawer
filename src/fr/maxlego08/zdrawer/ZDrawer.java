@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Barrel;
@@ -29,6 +30,7 @@ public class ZDrawer extends ZUtils implements Drawer {
     private ItemStack itemStack; // Use Material for the DEMO, but the real will use ItemStack
     private long amount;
     private ItemDisplay itemDisplay;
+    private ItemDisplay upgradeDisplay;
     private TextDisplay textDisplay;
     private DrawerUpgrade drawerUpgrade;
 
@@ -48,48 +50,59 @@ public class ZDrawer extends ZUtils implements Drawer {
     private void spawnDisplay() {
 
         Location location = this.location.clone();
+        Location locationUpgradeDisplay = this.location.clone();
         Location locationTextDisplay = this.location.clone();
 
         location.setPitch(0f);
         locationTextDisplay.setPitch(0f);
+        locationUpgradeDisplay.setPitch(0f);
 
         switch (blockFace) {
             case NORTH:
                 location.add(0.5, 0.5, 1.01);
                 locationTextDisplay.add(0.5, 0.05, 1.02);
+                locationUpgradeDisplay.add(0.5, 0.9, 1.03);
                 break;
             case WEST:
                 location.add(1.01, 0.5, 0.5);
                 locationTextDisplay.add(1.02, 0.05, 0.5);
+                locationUpgradeDisplay.add(1.03, 0.9, 0.5);
                 break;
             case EAST:
                 location.add(-0.01, 0.5, 0.5);
                 locationTextDisplay.add(-0.02, 0.05, 0.5);
+                locationUpgradeDisplay.add(-0.02, 0.9, 0.5);
                 break;
             case DOWN:
                 location.add(0.5, 1.01, 0.5);
                 locationTextDisplay.add(0.03, 1.02, 0.5);
+                locationUpgradeDisplay.add(0.8, 1.02, 0.5);
                 location.setPitch(90f);
                 locationTextDisplay.setPitch(90f);
+                locationUpgradeDisplay.setPitch(90f);
                 break;
             case UP:
                 location.add(0.5, -0.01, 0.5);
                 locationTextDisplay.add(0.97, -0.02, 0.5);
+                locationUpgradeDisplay.add(-0.8, -0.02, 0.5);
                 location.setPitch(-90f);
                 locationTextDisplay.setPitch(-90f);
+                locationUpgradeDisplay.setPitch(-90f);
                 break;
             default:
                 location.add(0.5, 0.5, -0.01);
                 locationTextDisplay.add(0.5, 0.05, -0.02);
+                locationUpgradeDisplay.add(0.5, 0.9, -0.03);
                 break;
         }
 
         updateYaw(location, blockFace);
+        updateYaw(locationUpgradeDisplay, blockFace);
         updateYaw(locationTextDisplay, blockFace.getOppositeFace());
 
-        this.itemDisplay = location.getWorld().spawn(location, ItemDisplay.class, display -> {
+        World world = location.getWorld();
 
-            // display.setItemStack(new ItemStack(Material.STONE));
+        this.itemDisplay = world.spawn(location, ItemDisplay.class, display -> {
             display.setBillboard(Display.Billboard.FIXED);
             display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
             Transformation transformation = display.getTransformation();
@@ -99,18 +112,26 @@ public class ZDrawer extends ZUtils implements Drawer {
             display.setInvulnerable(true);
         });
 
-        this.textDisplay = location.getWorld().spawn(locationTextDisplay, TextDisplay.class, display -> {
+        this.upgradeDisplay = world.spawn(locationUpgradeDisplay, ItemDisplay.class, display -> {
+            display.setBillboard(Display.Billboard.FIXED);
+            display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
+            Transformation transformation = display.getTransformation();
+            Vector3f scale = transformation.getScale();
+            scale.set(0.15f, 0.15f, 0.0f);
+            display.setTransformation(transformation);
+            display.setInvulnerable(true);
+        });
+
+        this.textDisplay = world.spawn(locationTextDisplay, TextDisplay.class, display -> {
 
             display.setInvulnerable(true);
             display.setBillboard(Display.Billboard.FIXED);
             display.setAlignment(TextDisplay.TextAlignment.CENTER);
-            // display.text(Component.text("0", NamedTextColor.WHITE));
             Transformation transformation = display.getTransformation();
             Vector3f scale = transformation.getScale();
             double size = 0.6;
             scale.set(size, size, size);
             display.setTransformation(transformation);
-
         });
 
     }
@@ -284,6 +305,7 @@ public class ZDrawer extends ZUtils implements Drawer {
     public void onDisable() {
         this.textDisplay.remove();
         this.itemDisplay.remove();
+        this.upgradeDisplay.remove();
     }
 
     @Override
@@ -309,6 +331,11 @@ public class ZDrawer extends ZUtils implements Drawer {
     @Override
     public void setUpgrade(DrawerUpgrade drawerUpgrade) {
         this.drawerUpgrade = drawerUpgrade;
-        // ToDo - Set drawer upgrade display Item
+        this.upgradeDisplay.setItemStack(drawerUpgrade.getDisplayItemStack());
+    }
+
+    @Override
+    public String getUpgradeName() {
+        return this.drawerUpgrade == null ? null : this.drawerUpgrade.getName();
     }
 }

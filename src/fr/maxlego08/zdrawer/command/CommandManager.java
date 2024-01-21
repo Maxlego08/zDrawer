@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import fr.maxlego08.zdrawer.DrawerPlugin;
-import fr.maxlego08.zdrawer.zcore.enums.Message;
+import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
 import org.bukkit.Bukkit;

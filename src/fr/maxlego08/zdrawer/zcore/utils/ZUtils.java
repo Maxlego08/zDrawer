@@ -5,7 +5,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.zcore.enums.EnumInventory;
-import fr.maxlego08.zdrawer.zcore.enums.Message;
+import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.zcore.enums.Permission;
 import fr.maxlego08.zdrawer.zcore.utils.builder.CooldownBuilder;
 import fr.maxlego08.zdrawer.zcore.utils.builder.TimerBuilder;

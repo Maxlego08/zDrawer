@@ -37,6 +37,7 @@ public class StorageManager implements DrawerStorage {
         switch (this.storageType) {
             case JSON:
                 this.storage = persist.loadOrSaveDefault((JsonStorage) this.storage, JsonStorage.class, "drawers");
+                ((JsonStorage) this.storage).setPlugin(this.plugin);
                 break;
         }
 

@@ -1,5 +1,7 @@
 # ToDo
 
-- Système de craft
-- Système d'amélioration
-- Gérer les hopper en entrée et sorti
+- Manage HOPPER
+- Create admin commands
+- SQL and SQLite storage
+
+Any idea ?
