@@ -45,4 +45,6 @@ public interface Drawer {
     String getUpgradeName();
 
     void setUpgrade(DrawerUpgrade drawerUpgrade);
+
+    boolean hasUpgrade();
 }

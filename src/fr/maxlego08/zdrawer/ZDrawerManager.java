@@ -59,6 +59,7 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
     private final NamespacedKey DATA_KEY_DRAWER;
     private final NamespacedKey DATA_KEY_CRAFT;
     private final NamespacedKey DATA_KEY_ITEMSTACK;
+    private final NamespacedKey DATA_KEY_UPGRADE;
     private final NamespacedKey DATA_KEY_AMOUNT;
     private final Map<UUID, Drawer> currentPlayerDrawer = new HashMap<>();
     private final List<Craft> crafts = new ArrayList<>();
@@ -73,7 +74,8 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         this.DATA_KEY_DRAWER = new NamespacedKey(plugin, "zdrawerContent");
         this.DATA_KEY_ITEMSTACK = new NamespacedKey(plugin, "zdrawerItemstack");
         this.DATA_KEY_AMOUNT = new NamespacedKey(plugin, "zdrawerAmount");
-        this.DATA_KEY_CRAFT = new NamespacedKey(this.plugin, "drawerCraft");
+        this.DATA_KEY_CRAFT = new NamespacedKey(this.plugin, "zdrawerCraft");
+        this.DATA_KEY_UPGRADE = new NamespacedKey(this.plugin, "zdrawerUpgradeName");
 
         LocalPlaceholder placeholder = LocalPlaceholder.getInstance();
         placeholder.register("content", (player, string) -> {
@@ -138,6 +140,10 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
             if (drawerItemStack != null) {
                 drawer.setItemStack(drawerItemStack);
                 drawer.setAmount(amount);
+            }
+
+            if (persistentDataContainer.has(DATA_KEY_UPGRADE)) {
+                getUpgrade(persistentDataContainer.get(DATA_KEY_UPGRADE, PersistentDataType.STRING)).ifPresent(drawer::setUpgrade);
             }
         }
 
@@ -236,6 +242,9 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
 
             persistentDataContainer.set(DATA_KEY_ITEMSTACK, PersistentDataType.STRING, drawer.hasItemStack() ? drawer.getItemStackAsString() : "null");
             persistentDataContainer.set(DATA_KEY_AMOUNT, PersistentDataType.LONG, drawer.getAmount());
+            if (drawer.hasUpgrade()) {
+                persistentDataContainer.set(DATA_KEY_UPGRADE, PersistentDataType.STRING, drawer.getUpgradeName());
+            }
 
             itemStack.setItemMeta(itemMeta);
 

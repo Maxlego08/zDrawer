@@ -76,18 +76,18 @@ public class ZDrawer extends ZUtils implements Drawer {
             case DOWN:
                 location.add(0.5, 1.01, 0.5);
                 locationTextDisplay.add(0.03, 1.02, 0.5);
-                locationUpgradeDisplay.add(0.8, 1.02, 0.5);
+                locationUpgradeDisplay.add(0.9, 1.02, 0.5);
                 location.setPitch(90f);
-                locationTextDisplay.setPitch(90f);
                 locationUpgradeDisplay.setPitch(90f);
+                locationTextDisplay.setPitch(-90f);
                 break;
             case UP:
                 location.add(0.5, -0.01, 0.5);
                 locationTextDisplay.add(0.97, -0.02, 0.5);
-                locationUpgradeDisplay.add(-0.8, -0.02, 0.5);
+                locationUpgradeDisplay.add(0.1, -0.02, 0.5);
                 location.setPitch(-90f);
-                locationTextDisplay.setPitch(-90f);
                 locationUpgradeDisplay.setPitch(-90f);
+                locationTextDisplay.setPitch(90f);
                 break;
             default:
                 location.add(0.5, 0.5, -0.01);
@@ -332,6 +332,11 @@ public class ZDrawer extends ZUtils implements Drawer {
     public void setUpgrade(DrawerUpgrade drawerUpgrade) {
         this.drawerUpgrade = drawerUpgrade;
         this.upgradeDisplay.setItemStack(drawerUpgrade.getDisplayItemStack());
+    }
+
+    @Override
+    public boolean hasUpgrade() {
+        return this.drawerUpgrade != null;
     }
 
     @Override
