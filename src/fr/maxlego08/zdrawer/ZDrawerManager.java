@@ -9,7 +9,6 @@ import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
 import fr.maxlego08.zdrawer.api.craft.Craft;
-import fr.maxlego08.zdrawer.api.craft.Ingredient;
 import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.craft.ZCraft;
@@ -34,7 +33,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.Recipe;
@@ -46,7 +44,6 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,18 +91,6 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
             }
             return "0";
         });
-    }
-
-    private static boolean isCraftMatching(ItemStack[] shadeConfig, ItemStack[] craftTable) {
-        System.out.println(shadeConfig.length + " - " + craftTable.length);
-        if (shadeConfig.length != craftTable.length) return false;
-        for (int i = 0; i < shadeConfig.length; i++) {
-            System.out.println(i + " - " + shadeConfig[i].isSimilar(craftTable[i]) + " -> " + shadeConfig[i] + " - " + craftTable[i]);
-            if (!shadeConfig[i].isSimilar(craftTable[i])) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override
@@ -172,11 +157,9 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         event.setCancelled(true);
 
         // Check for upgrade
-        System.out.println((itemStack != null) + " && " + itemStack.hasItemMeta());
         if (itemStack != null && itemStack.hasItemMeta()) {
             ItemMeta itemMeta = itemStack.getItemMeta();
             PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
-            System.out.println("> " + persistentDataContainer.has(this.plugin.getNamespacedKeyUpgrade()));
             if (persistentDataContainer.has(this.plugin.getNamespacedKeyUpgrade())) {
                 String drawerUpgradeName = persistentDataContainer.get(this.plugin.getNamespacedKeyUpgrade(), PersistentDataType.STRING);
                 this.getUpgrade(drawerUpgradeName).ifPresent(drawerUpgrade -> {
@@ -320,37 +303,11 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
                 }
                 ItemStack itemStack = recipe.getResult();
                 if (itemStack.hasItemMeta() && itemStack.getItemMeta().getPersistentDataContainer().has(this.DATA_KEY_DRAWER)) {
+                    this.currentPlayerDrawer.remove(viewer.getUniqueId());
                     event.getInventory().setItem(0, buildDrawer((Player) viewer));
                 }
             }
         });
-    }
-
-    private void handleCustomCraft(PrepareItemCraftEvent event, CraftingInventory inventory, Player player) {
-        ItemStack[] itemStacks = inventory.getContents();
-        ItemStack[] copiedArray = Arrays.copyOfRange(itemStacks, 1, itemStacks.length);
-
-        for (Craft craft : this.crafts) {
-
-            System.out.println("Test " + this.crafts);
-
-            ItemStack[] ingredients = toShadeIngredients(craft.getShade(), craft.getIngredients(), player);
-            if (isCraftMatching(copiedArray, ingredients)) {
-                inventory.setResult(craft.getResultItemStack(player));
-                return;
-            }
-        }
-    }
-
-    private ItemStack[] toShadeIngredients(String[] shade, Map<Character, Ingredient> ingredients, Player player) {
-        ItemStack[] itemStacks = new ItemStack[shade.length * 3];
-        for (int i = 0; i != shade.length; i++) {
-            for (int j = 0; j != shade[i].length(); j++) {
-                char currentChar = shade[i].charAt(j);
-                itemStacks[(i * 3) + j] = ingredients.get(currentChar).build(player);
-            }
-        }
-        return itemStacks;
     }
 
     private ItemStack buildDrawer(Player player) {
