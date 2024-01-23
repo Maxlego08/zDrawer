@@ -23,4 +23,8 @@ public interface DrawerManager extends Savable {
     ItemStack buildDrawer(Player player, Drawer drawer);
 
     List<String> getUpgradeNames();
+
+    void giveCraft(CommandSender sender, Player player, String craftName);
+
+    List<String> getCraftNames();
 }

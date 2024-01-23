@@ -12,6 +12,7 @@ public class CommandDrawerGive extends VCommand {
         super(plugin);
         this.addSubCommand("give");
         this.addSubCommand(new CommandDrawerGiveDrawer(plugin));
+        this.addSubCommand(new CommandDrawerGiveCraft(plugin));
         this.setPermission(Permission.ZDRAWER_GIVE);
         this.setDescription(Message.DESCRIPTION_GIVE_USE);
     }

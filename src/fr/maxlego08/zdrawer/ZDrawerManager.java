@@ -415,4 +415,26 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         names.addAll(this.drawerUpgrades.stream().map(DrawerUpgrade::getName).collect(Collectors.toList()));
         return names;
     }
+
+    @Override
+    public void giveCraft(CommandSender sender, Player player, String craftName) {
+
+        Optional<Craft> optional = getCraft(craftName);
+        if (!optional.isPresent()) {
+            message(this.plugin, sender, Message.CRAFT_GIVE_ERROR);
+            return;
+        }
+
+        Craft craft = optional.get();
+        ItemStack itemStack = craft.getResultItemStack(player);
+        give(player, itemStack);
+        
+        message(this.plugin, sender, Message.CRAFT_GIVE_SENDER, "%player%", player.getName(), "%name%", craft.getName());
+        message(this.plugin, player, Message.CRAFT_GIVE_RECEIVE, "%name%", craft.getName());
+    }
+
+    @Override
+    public List<String> getCraftNames() {
+        return this.crafts.stream().map(Craft::getName).collect(Collectors.toList());
+    }
 }

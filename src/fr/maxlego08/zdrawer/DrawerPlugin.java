@@ -47,7 +47,7 @@ public class DrawerPlugin extends ZPlugin {
 
         this.inventoryManager = getProvider(InventoryManager.class);
 
-        this.registerCommand("zdrawer", new CommandDrawer(this));
+        this.registerCommand("zdrawer", new CommandDrawer(this), "drawer");
 
         this.addListener(this.manager);
 

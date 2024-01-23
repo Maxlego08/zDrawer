@@ -59,6 +59,10 @@ public enum Message {
     DRAWER_GIVE_RECEIVE("§aYou just got a drawer."),
     DRAWER_GIVE_SENDER("§aYou just gave a Drawer to §f%player%§a."),
 
+    CRAFT_GIVE_ERROR("§cCraft §f%name%§c not found."),
+    CRAFT_GIVE_RECEIVE("§aYou just got a §f%name%§a."),
+    CRAFT_GIVE_SENDER("§aYou just gave a §b%name%§a to §f%player%§a."),
+
     ;
 
     private List<String> messages;
