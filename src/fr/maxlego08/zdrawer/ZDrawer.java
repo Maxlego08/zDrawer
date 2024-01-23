@@ -45,6 +45,8 @@ public class ZDrawer extends ZUtils implements Drawer {
         Barrel barrel = (Barrel) block.getBlockData();
         barrel.setFacing(blockFace.getOppositeFace());
         block.setBlockData(barrel, false);
+        org.bukkit.block.Barrel blockBarrel = (org.bukkit.block.Barrel) block.getState();
+        blockBarrel.getInventory().setItem(0, new ItemStack(Material.STONE, 2));
     }
 
     public ZDrawer(Material material, long amount, DrawerUpgrade drawerUpgrade) {
@@ -283,23 +285,26 @@ public class ZDrawer extends ZUtils implements Drawer {
 
         if (player.isSneaking()) {
 
-            int itemStackAmount = (int) Math.min(this.amount, 64);
+            int itemStackAmount = (int) Math.min(this.amount, itemStack.getMaxStackSize());
             ItemStack itemStack = this.itemStack.clone();
             itemStack.setAmount(itemStackAmount);
-            this.amount -= itemStackAmount;
-
+            remove(itemStack.getMaxStackSize());
             give(player, itemStack);
 
         } else {
 
             ItemStack itemStack = this.itemStack.clone();
             itemStack.setAmount(1);
-            this.amount -= 1;
+            remove(1);
 
             give(player, itemStack);
         }
+    }
 
-        // If there is no more item, then it is deleted
+    @Override
+    public void remove(long amount) {
+        setAmount(this.amount - amount);
+
         if (this.amount <= 0) {
 
             this.itemStack = null;
@@ -310,6 +315,11 @@ public class ZDrawer extends ZUtils implements Drawer {
         } else {
             this.textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
         }
+    }
+
+    @Override
+    public void add(long amount) {
+        setAmount(this.amount + amount);
     }
 
     @Override
@@ -353,5 +363,10 @@ public class ZDrawer extends ZUtils implements Drawer {
     @Override
     public String getUpgradeName() {
         return this.drawerUpgrade == null ? null : this.drawerUpgrade.getName();
+    }
+
+    @Override
+    public boolean isFull() {
+        return this.hasLimit() && this.amount >= this.getLimit();
     }
 }

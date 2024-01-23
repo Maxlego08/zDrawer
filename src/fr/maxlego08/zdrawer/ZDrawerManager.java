@@ -28,10 +28,14 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Barrel;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -155,7 +159,8 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         if (inventory.getHolder() instanceof org.bukkit.block.Barrel) {
             org.bukkit.block.Barrel barrel = (org.bukkit.block.Barrel) inventory.getHolder();
             this.getStorage().getDrawer(barrel.getLocation()).ifPresent(drawer -> {
-                event.setCancelled(true);
+                // event.setCancelled(true);
+                System.out.println("ON PEUT OPEN C NORMAL ON TEST");
             });
         }
     }
@@ -326,6 +331,81 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
                 }
             }
         });
+    }
+
+    @Override
+    public void onExplode(EntityExplodeEvent event, List<Block> blocks, Entity entity) {
+        onExplode(blocks);
+    }
+
+    @Override
+    public void onExplode(BlockExplodeEvent event, List<Block> blocks, Block block) {
+        onExplode(blocks);
+    }
+
+    private void onExplode(List<Block> blocks) {
+        blocks.removeIf(block -> getStorage().getDrawer(block.getLocation()).isPresent());
+    }
+
+    @Override
+    public void onInventoryMove(InventoryMoveItemEvent event, Inventory destination, ItemStack item, Inventory source, Inventory initiator) {
+
+        if (event.isCancelled()) return;
+
+        IStorage storage = this.getStorage();
+        // Si la source est un barrel, alors l'item qui va partir vert un autre inventaire
+        if (source.getHolder() instanceof org.bukkit.block.Barrel) {
+
+            org.bukkit.block.Barrel barrel = (org.bukkit.block.Barrel) source.getHolder();
+            Optional<Drawer> optional = storage.getDrawer(barrel.getLocation());
+            if (!optional.isPresent()) return;
+            Drawer drawer = optional.get();
+
+            event.setCancelled(true);
+
+            if (drawer.getAmount() <= 0) return;
+
+            ItemStack newItemStack = drawer.getItemStack().clone();
+            newItemStack.setAmount(1);
+            destination.addItem(newItemStack);
+
+            drawer.remove(1);
+
+            return;
+        }
+
+        // Si la destination est un barrel, alors l'item va dans le drawer
+        if (destination.getHolder() instanceof org.bukkit.block.Barrel) {
+
+            org.bukkit.block.Barrel barrel = (org.bukkit.block.Barrel) destination.getHolder();
+            Optional<Drawer> optional = storage.getDrawer(barrel.getLocation());
+            if (!optional.isPresent()) return;
+            Drawer drawer = optional.get();
+
+            ItemStack newItemStack = item.clone();
+
+            // Si le drawer n'a aucun item, alors on va ajouter l'item du hopper
+            if (!drawer.hasItemStack()) {
+
+                drawer.setAmount(newItemStack.getAmount());
+                drawer.setItemStack(newItemStack);
+                event.setItem(new ItemStack(Material.AIR));
+
+            } else if (drawer.getItemStack().isSimilar(newItemStack)) {
+
+                if (drawer.isFull()){
+                    event.setCancelled(true);
+                    return;
+                }
+
+                int addAmount = (int) Math.min(newItemStack.getAmount(), drawer.getLimit() - drawer.getAmount());
+                drawer.add(addAmount);
+                event.setItem(new ItemStack(Material.AIR));
+
+            } else {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @Override

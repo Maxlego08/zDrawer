@@ -47,4 +47,10 @@ public interface Drawer {
     void setUpgrade(DrawerUpgrade drawerUpgrade);
 
     boolean hasUpgrade();
+
+    void remove(long amount);
+
+    void add(long amount);
+
+    boolean isFull();
 }
