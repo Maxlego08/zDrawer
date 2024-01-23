@@ -3,6 +3,8 @@ package fr.maxlego08.zdrawer.api;
 import fr.maxlego08.zdrawer.api.craft.Craft;
 import fr.maxlego08.zdrawer.api.storage.Savable;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -27,4 +29,6 @@ public interface DrawerManager extends Savable {
     void giveCraft(CommandSender sender, Player player, String craftName);
 
     List<String> getCraftNames();
+
+    void placeDrawer(CommandSender sender, World world, double x, double y, double z, BlockFace blockFace, DrawerUpgrade drawerUpgrade, Material material, long amount);
 }

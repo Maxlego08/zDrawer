@@ -13,6 +13,7 @@ public class CommandDrawer extends VCommand {
 		this.setPermission(Permission.ZDRAWER_USE);
 		this.addSubCommand(new CommandDrawerReload(plugin));
 		this.addSubCommand(new CommandDrawerGive(plugin));
+		this.addSubCommand(new CommandDrawerPlace(plugin));
 	}
 
 	@Override

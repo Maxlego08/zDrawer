@@ -8,7 +8,7 @@ public enum Permission {
 	ZDRAWER_GIVE_CRAFT,
 	ZDRAWER_RELOAD,
 
-	;
+	ZDRAWER_PLACE;
 
 	private String permission;
 

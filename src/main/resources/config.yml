@@ -11,8 +11,9 @@
 # - /zdrawer » Main command (Alaises: /drawer) - zdrawer.use
 # - /zdrawer reload » Reload config files - zdrawer.reload
 # - /zdrawer craft » Craft commands - zdrawer.craft.use
-# - /zdrawer craft drawer <player> [<upgrade name>] [<material>] [<amount>] » Give a draw - zdrawer.craft.drawer
-# - /zdrawer craft craft <player> [<craft name>] » Give a craft item - zdrawer.craft.craft
+# - /zdrawer give drawer <player> [<upgrade name>] [<material>] [<amount>] » Give a drawer - zdrawer.craft.drawer
+# - /zdrawer give craft <player> [<craft name>] » Give a craft item - zdrawer.craft.craft
+# - /zdrawer place <world name> <x> <y> <z> <block face> [<upgrade name>] [<material>] [<amount>] » Place a drawer - zdrawer.place
 #
 #########################################################################################################################################################
 

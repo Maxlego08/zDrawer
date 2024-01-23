@@ -22,6 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Barrel;
@@ -47,7 +48,6 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -411,9 +411,15 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
 
     @Override
     public List<String> getUpgradeNames() {
-        List<String> names = Arrays.asList("none");
+        List<String> names = new ArrayList<>();
+        names.add("none");
         names.addAll(this.drawerUpgrades.stream().map(DrawerUpgrade::getName).collect(Collectors.toList()));
         return names;
+    }
+
+    @Override
+    public List<String> getCraftNames() {
+        return this.crafts.stream().map(Craft::getName).collect(Collectors.toList());
     }
 
     @Override
@@ -428,13 +434,34 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         Craft craft = optional.get();
         ItemStack itemStack = craft.getResultItemStack(player);
         give(player, itemStack);
-        
+
         message(this.plugin, sender, Message.CRAFT_GIVE_SENDER, "%player%", player.getName(), "%name%", craft.getName());
         message(this.plugin, player, Message.CRAFT_GIVE_RECEIVE, "%name%", craft.getName());
     }
 
     @Override
-    public List<String> getCraftNames() {
-        return this.crafts.stream().map(Craft::getName).collect(Collectors.toList());
+    public void placeDrawer(CommandSender sender, World world, double x, double y, double z, BlockFace blockFace, DrawerUpgrade drawerUpgrade, Material material, long amount) {
+
+        Location location = new Location(world, x, y, z);
+        Optional<Drawer> optional = this.getStorage().getDrawer(location);
+        if (optional.isPresent()) {
+            message(this.plugin, sender, Message.DRAWER_PLACE_ERROR);
+            return;
+        }
+
+        Drawer drawer = new ZDrawer(this.plugin, location, blockFace);
+
+        if (drawerUpgrade != null) {
+            drawer.setUpgrade(drawerUpgrade);
+        }
+
+        if (material != null) {
+            drawer.setAmount(amount);
+            drawer.setItemStack(new ItemStack(material));
+        }
+
+        this.getStorage().storeDrawer(drawer);
+
+        message(this.plugin, sender, Message.DRAWER_PLACE_SUCCESS, "%world%", world.getName(), "%x%", format(x), "%y%", format(y), "%z%", format(z));
     }
 }
