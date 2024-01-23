@@ -50,6 +50,9 @@ public enum Message {
 
     UPGRADE_SUCCESS("§aYou just put the upgrade §f%name%§a on the drawer."),
 
+    EMPTY_DRAWER("Empty"),
+    EMPTY_UPGRADE("#e32f1b✘"),
+
     ;
 
     private List<String> messages;

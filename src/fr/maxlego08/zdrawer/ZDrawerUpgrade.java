@@ -7,12 +7,14 @@ import org.bukkit.inventory.ItemStack;
 public class ZDrawerUpgrade implements DrawerUpgrade {
 
     private final String name;
+    private final String displayName;
     private final Craft craft;
     private final long limit;
     private final ItemStack displayItemStack;
 
-    public ZDrawerUpgrade(String name, Craft craft, long limit, ItemStack displayItemStack) {
+    public ZDrawerUpgrade(String name, String displayName, Craft craft, long limit, ItemStack displayItemStack) {
         this.name = name;
+        this.displayName = displayName;
         this.craft = craft;
         this.limit = limit;
         this.displayItemStack = displayItemStack;
@@ -31,6 +33,11 @@ public class ZDrawerUpgrade implements DrawerUpgrade {
     @Override
     public long getLimit() {
         return limit;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
     }
 
     @Override

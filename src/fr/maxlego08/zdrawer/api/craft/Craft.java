@@ -26,4 +26,6 @@ public interface Craft {
 
     ItemStack getResultItemStack(Player player);
 
+    boolean isEnable();
+
 }

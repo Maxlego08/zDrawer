@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -107,6 +108,12 @@ public class AdapterListener extends ZUtils implements Listener {
 	public void onClose(InventoryCloseEvent event) {
 		this.plugin.getListenerAdapters()
 				.forEach(adapter -> adapter.onInventoryClose(event, (Player) event.getPlayer()));
+	}
+
+	@EventHandler
+	public void onClose(InventoryOpenEvent event) {
+		this.plugin.getListenerAdapters()
+				.forEach(adapter -> adapter.onInventoryOpen(event, (Player) event.getPlayer(), event.getInventory()));
 	}
 
 	@EventHandler

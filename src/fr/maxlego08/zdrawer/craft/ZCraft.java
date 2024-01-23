@@ -30,12 +30,14 @@ public class ZCraft implements Craft {
     private final String[] shade;
     private final Map<Character, Ingredient> ingredients;
     private final MenuItemStack result;
+    private final boolean isEnable;
 
     public ZCraft(DrawerPlugin plugin, String path, YamlConfiguration configuration, String name, File file) throws InventoryException {
         this.plugin = plugin;
         this.name = name;
         this.namespacedKey = new NamespacedKey(plugin, name);
         this.shade = configuration.getStringList(path + "shade").toArray(new String[0]);
+        this.isEnable = configuration.getBoolean(path + "enable", true);
 
         Loader<MenuItemStack> loader = new MenuItemStackLoader(plugin.getInventoryManager());
         this.result = loader.load(configuration, path + "result.", file);
@@ -61,6 +63,8 @@ public class ZCraft implements Craft {
     @Override
     public void register() {
 
+        if (!this.isEnable()) return;
+
         this.unregister();
 
         ItemStack resultItemStack = getResultItemStack(null);
@@ -68,11 +72,7 @@ public class ZCraft implements Craft {
         ShapedRecipe recipe = new ShapedRecipe(this.namespacedKey, resultItemStack);
         recipe.shape(this.shade);
 
-        ingredients.forEach((identifier, ingredient) -> {
-            ItemStack itemStack = ingredient.build(null);
-            System.out.println(identifier + " - " + itemStack);
-            recipe.setIngredient(identifier, new RecipeChoice.ExactChoice(itemStack));
-        });
+        ingredients.forEach((identifier, ingredient) -> recipe.setIngredient(identifier, new RecipeChoice.ExactChoice(ingredient.build(null))));
 
         Server server = this.plugin.getServer();
         server.addRecipe(recipe);
@@ -110,6 +110,11 @@ public class ZCraft implements Craft {
         persistentDataContainer.set(this.plugin.getNamespacedKeyCraft(), PersistentDataType.BOOLEAN, true);
         resultItemStack.setItemMeta(itemMeta);
         return resultItemStack;
+    }
+
+    @Override
+    public boolean isEnable() {
+        return this.isEnable;
     }
 
     @Override

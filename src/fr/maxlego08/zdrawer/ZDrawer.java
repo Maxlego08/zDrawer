@@ -107,7 +107,7 @@ public class ZDrawer extends ZUtils implements Drawer {
             display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
             Transformation transformation = display.getTransformation();
             Vector3f scale = transformation.getScale();
-            scale.set(0.6f, 0.6f, 0.0f);
+            scale.set(0.6f, 0.6f, 0.01f);
             display.setTransformation(transformation);
             display.setInvulnerable(true);
         });
@@ -117,7 +117,7 @@ public class ZDrawer extends ZUtils implements Drawer {
             display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
             Transformation transformation = display.getTransformation();
             Vector3f scale = transformation.getScale();
-            scale.set(0.15f, 0.15f, 0.0f);
+            scale.set(0.15f, 0.15f, 0.01f);
             display.setTransformation(transformation);
             display.setInvulnerable(true);
         });
@@ -226,7 +226,7 @@ public class ZDrawer extends ZUtils implements Drawer {
 
             textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
 
-        } else if (itemStack.isSimilar(itemStack)) {
+        } else if (itemStack.isSimilar(this.itemStack)) {
 
             /// We will retrieve all the items that are similar to add them
             if (player.isSneaking()) {

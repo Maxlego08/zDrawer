@@ -13,4 +13,6 @@ public interface DrawerUpgrade {
 
     long getLimit();
 
+    String getDisplayName();
+
 }

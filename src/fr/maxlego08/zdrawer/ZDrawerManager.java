@@ -25,14 +25,17 @@ import org.bukkit.Server;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Barrel;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.Recipe;
@@ -82,7 +85,7 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
                     return getItemName(drawer.getItemStack());
                 }
             }
-            return "Vide";
+            return Message.EMPTY_DRAWER.getMessage();
         });
         placeholder.register("amount", (player, string) -> {
             if (this.currentPlayerDrawer.containsKey(player.getUniqueId())) {
@@ -90,6 +93,16 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
                 return String.valueOf(drawer.getAmount());
             }
             return "0";
+        });
+        placeholder.register("upgrade", (player, string) -> {
+            if (this.currentPlayerDrawer.containsKey(player.getUniqueId())) {
+                Drawer drawer = this.currentPlayerDrawer.get(player.getUniqueId());
+                DrawerUpgrade drawerUpgrade = drawer.getUpgrade();
+                if (drawerUpgrade != null) {
+
+                }
+            }
+            return Message.EMPTY_UPGRADE.getMessage();
         });
     }
 
@@ -136,6 +149,16 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
     }
 
     @Override
+    public void onInventoryOpen(InventoryOpenEvent event, Player player, Inventory inventory) {
+        if (inventory.getHolder() instanceof org.bukkit.block.Barrel) {
+            org.bukkit.block.Barrel barrel = (org.bukkit.block.Barrel) inventory.getHolder();
+            this.getStorage().getDrawer(barrel.getLocation()).ifPresent(drawer -> {
+                event.setCancelled(true);
+            });
+        }
+    }
+
+    @Override
     protected void onInteract(PlayerInteractEvent event, Player player) {
 
         Block block = event.getClickedBlock();
@@ -145,6 +168,13 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
 
         if (!optional.isPresent()) return;
 
+        Drawer drawer = optional.get();
+
+        // The player will type another face than the one in front, so he wants to perform another action, like placing a block. We stop the code here.
+        if (event.getBlockFace().getOppositeFace() != drawer.getBlockFace()) return;
+
+        event.setCancelled(true);
+
         ItemStack itemStack = event.getItem();
 
         if (itemStack != null && Config.breakMaterials.contains(itemStack.getType()) && event.getAction() == Action.LEFT_CLICK_BLOCK) {
@@ -152,9 +182,6 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         }
 
         if (itemStack != null && Config.blacklistMaterials.contains(itemStack.getType())) return;
-
-        Drawer drawer = optional.get();
-        event.setCancelled(true);
 
         // Check for upgrade
         if (itemStack != null && itemStack.hasItemMeta()) {
@@ -174,7 +201,7 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
                     if (itemStack.getAmount() > 1) itemStack.setAmount(itemStack.getAmount() - 1);
                     else player.getInventory().setItem(event.getHand(), new ItemStack(Material.AIR));
 
-                    message(player, Message.UPGRADE_SUCCESS, "%name%", drawerUpgradeName);
+                    message(player, Message.UPGRADE_SUCCESS, "%name%", drawerUpgrade.getDisplayName());
                 });
                 return;
             }
@@ -346,7 +373,8 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
             long limit = configuration.getLong(path + "limit", 0);
 
             ItemStack displayItemStack = loader.load(configuration, path + "displayItem.", file).build(null);
-            DrawerUpgrade drawerUpgrade = new ZDrawerUpgrade(upgradeName, craft, limit, displayItemStack);
+            String displayName = configuration.getString(path + "displayName");
+            DrawerUpgrade drawerUpgrade = new ZDrawerUpgrade(upgradeName, displayName, craft, limit, displayItemStack);
             this.drawerUpgrades.add(drawerUpgrade);
         }
     }
@@ -364,5 +392,12 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
     @Override
     public Optional<DrawerUpgrade> getUpgrade(String upgradeName) {
         return this.drawerUpgrades.stream().filter(drawerUpgrade -> drawerUpgrade.getName().equals(upgradeName)).findFirst();
+    }
+
+    @Override
+    public void giveDrawer(CommandSender sender, Player player, DrawerUpgrade drawerUpgrade, Material material, Integer amount) {
+
+        this.drawerItemStack.build(player);
+
     }
 }
