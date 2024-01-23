@@ -464,4 +464,12 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
 
         message(this.plugin, sender, Message.DRAWER_PLACE_SUCCESS, "%world%", world.getName(), "%x%", format(x), "%y%", format(y), "%z%", format(z));
     }
+
+    @Override
+    public void purgeWorld(CommandSender sender, World world) {
+
+        getStorage().purge(world);
+        message(this.plugin, sender, Message.DRAWER_PURGE, "%world%", world.getName());
+
+    }
 }

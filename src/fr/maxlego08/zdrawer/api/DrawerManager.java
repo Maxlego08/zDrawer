@@ -31,4 +31,6 @@ public interface DrawerManager extends Savable {
     List<String> getCraftNames();
 
     void placeDrawer(CommandSender sender, World world, double x, double y, double z, BlockFace blockFace, DrawerUpgrade drawerUpgrade, Material material, long amount);
+
+    void purgeWorld(CommandSender sender, World world);
 }

@@ -14,6 +14,7 @@
 # - /zdrawer give drawer <player> [<upgrade name>] [<material>] [<amount>] » Give a drawer - zdrawer.craft.drawer
 # - /zdrawer give craft <player> [<craft name>] » Give a craft item - zdrawer.craft.craft
 # - /zdrawer place <world name> <x> <y> <z> <block face> [<upgrade name>] [<material>] [<amount>] » Place a drawer - zdrawer.place
+# - /zdrawer purge <world name> » Delete all the drawer in a specific world - zdrawer.purge
 #
 #########################################################################################################################################################
 

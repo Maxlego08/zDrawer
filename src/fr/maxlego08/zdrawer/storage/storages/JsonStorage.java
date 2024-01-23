@@ -6,9 +6,9 @@ import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.storage.DrawerContainer;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
-import org.apache.logging.log4j.util.SystemPropertiesPropertySource;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -25,7 +25,6 @@ public class JsonStorage implements IStorage {
 
     public JsonStorage(DrawerPlugin plugin) {
         this.plugin = plugin;
-        System.out.println("Json Storage: " + this.plugin);
     }
 
     @Override
@@ -77,6 +76,16 @@ public class JsonStorage implements IStorage {
             drawer.onDisable();
             DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getItemStackAsString(), drawer.getUpgradeName(), drawer.getAmount());
             this.drawers.add(drawerContainer);
+        });
+    }
+
+    @Override
+    public void purge(World world) {
+        this.drawers.removeIf(drawerContainer -> stringToLocation(drawerContainer.getLocation()).getWorld().getName().equals(world.getName()));
+        this.drawerMap.entrySet().removeIf(entry -> {
+            boolean needToDelete = stringToLocation(entry.getKey()).getWorld().getName().equals(world.getName());
+            if (needToDelete) entry.getValue().onDisable();
+            return needToDelete;
         });
     }
 

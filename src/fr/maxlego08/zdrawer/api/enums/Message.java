@@ -48,6 +48,7 @@ public enum Message {
     DESCRIPTION_GIVE_USE("Show give commands"),
     DESCRIPTION_GIVE_DRAWER("Give a drawer to a player"),
     DESCRIPTION_PLACE("Place a drawer"),
+    DESCRIPTION_PURGE("Delete all the drawer in a specific world"),
     DESCRIPTION_GIVE_CRAFT("Give a custom craft item to a player"),
 
     UPGRADE_ERROR_LIMIT("§cThe drawer already has a larger limit, you can not add this limit."),
@@ -66,6 +67,7 @@ public enum Message {
 
     DRAWER_PLACE_ERROR("§cA drawer is already in this position."),
     DRAWER_PLACE_SUCCESS("§aYou have just placed a drawer in the world §f§n%world%§r §aat §f%x%§7, §f%y%§7, §f%z%§a."),
+    DRAWER_PURGE("§aYou just purged the world §f%world%§a."),
 
     ;
 

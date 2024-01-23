@@ -2,6 +2,7 @@ package fr.maxlego08.zdrawer.api.storage;
 
 import fr.maxlego08.zdrawer.api.Drawer;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.Optional;
 
@@ -16,4 +17,6 @@ public interface IStorage {
     void load();
 
     void save();
+
+    void purge(World world);
 }

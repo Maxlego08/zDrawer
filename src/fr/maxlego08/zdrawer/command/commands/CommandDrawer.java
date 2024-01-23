@@ -14,6 +14,7 @@ public class CommandDrawer extends VCommand {
 		this.addSubCommand(new CommandDrawerReload(plugin));
 		this.addSubCommand(new CommandDrawerGive(plugin));
 		this.addSubCommand(new CommandDrawerPlace(plugin));
+		this.addSubCommand(new CommandDrawerPurge(plugin));
 	}
 
 	@Override
