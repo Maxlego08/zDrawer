@@ -11,7 +11,7 @@ import java.util.Map;
 
 public enum Message {
 
-    PREFIX("§8(§6Drawer§8) "),
+    PREFIX("#4ae0b6zDrawer #575757• &f"),
 
     TELEPORT_MOVE("§cYou must not move!"),
     TELEPORT_MESSAGE("§7Teleportation in §3%second% §7seconds!"),
@@ -45,6 +45,9 @@ public enum Message {
     RELOAD("§aYou have just reloaded the configuration files."),
 
     DESCRIPTION_RELOAD("Reload configuration files"),
+    DESCRIPTION_GIVE_USE("Show give commands"),
+    DESCRIPTION_GIVE_DRAWER("Give a drawer to a player"),
+    DESCRIPTION_GIVE_CRAFT("Give a custom craft item to a player"),
 
     UPGRADE_ERROR_LIMIT("§cThe drawer already has a larger limit, you can not add this limit."),
 
@@ -52,6 +55,9 @@ public enum Message {
 
     EMPTY_DRAWER("Empty"),
     EMPTY_UPGRADE("#e32f1b✘"),
+
+    DRAWER_GIVE_RECEIVE("§aYou just got a drawer."),
+    DRAWER_GIVE_SENDER("§aYou just gave a Drawer to §f%player%§a."),
 
     ;
 
@@ -213,5 +219,18 @@ public enum Message {
         this.itemStack = itemStack;
     }
 
+    public boolean isValid() {
+
+        switch (type){
+            case ACTION:
+                return this.message != null;
+            case CENTER:
+            case TCHAT: return this.message != null || !this.messages.isEmpty();
+            case TITLE:
+            case NONE: return true;
+        }
+
+        return true;
+    }
 }
 

@@ -47,6 +47,17 @@ public class ZDrawer extends ZUtils implements Drawer {
         block.setBlockData(barrel, false);
     }
 
+    public ZDrawer(Material material, long amount, DrawerUpgrade drawerUpgrade) {
+
+        this.plugin = null;
+        this.location = null;
+        this.blockFace = null;
+
+        this.itemStack = material == null ? null : new ItemStack(material);
+        this.amount = amount;
+        this.drawerUpgrade = drawerUpgrade;
+    }
+
     private void spawnDisplay() {
 
         Location location = this.location.clone();

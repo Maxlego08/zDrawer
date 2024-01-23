@@ -47,11 +47,13 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
 
@@ -192,7 +194,7 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
                 this.getUpgrade(drawerUpgradeName).ifPresent(drawerUpgrade -> {
 
                     if (drawer.getLimit() >= drawerUpgrade.getLimit()) {
-                        message(player, Message.UPGRADE_ERROR_LIMIT);
+                        message(this.plugin, player, Message.UPGRADE_ERROR_LIMIT);
                         return;
                     }
 
@@ -201,7 +203,7 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
                     if (itemStack.getAmount() > 1) itemStack.setAmount(itemStack.getAmount() - 1);
                     else player.getInventory().setItem(event.getHand(), new ItemStack(Material.AIR));
 
-                    message(player, Message.UPGRADE_SUCCESS, "%name%", drawerUpgrade.getDisplayName());
+                    message(this.plugin, player, Message.UPGRADE_SUCCESS, "%name%", drawerUpgrade.getDisplayName());
                 });
                 return;
             }
@@ -246,18 +248,7 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
 
             this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
 
-            ItemStack itemStack = buildDrawer(player);
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
-
-            persistentDataContainer.set(DATA_KEY_ITEMSTACK, PersistentDataType.STRING, drawer.hasItemStack() ? drawer.getItemStackAsString() : "null");
-            persistentDataContainer.set(DATA_KEY_AMOUNT, PersistentDataType.LONG, drawer.getAmount());
-            if (drawer.hasUpgrade()) {
-                persistentDataContainer.set(DATA_KEY_UPGRADE, PersistentDataType.STRING, drawer.getUpgradeName());
-            }
-
-            itemStack.setItemMeta(itemMeta);
-
+            ItemStack itemStack = buildDrawer(player, drawer);
             block.getWorld().dropItem(block.getLocation().add(0.5, 0.1, 0.5), itemStack);
         } else {
 
@@ -296,7 +287,7 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
             exception.printStackTrace();
         }
 
-        ItemStack resultItemStack = this.buildDrawer(null);
+        ItemStack resultItemStack = this.buildDrawer(null, null);
 
         ShapedRecipe recipe = new ShapedRecipe(this.DATA_KEY_CRAFT, resultItemStack);
         recipe.shape(this.shade.toArray(new String[0]));
@@ -331,17 +322,29 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
                 ItemStack itemStack = recipe.getResult();
                 if (itemStack.hasItemMeta() && itemStack.getItemMeta().getPersistentDataContainer().has(this.DATA_KEY_DRAWER)) {
                     this.currentPlayerDrawer.remove(viewer.getUniqueId());
-                    event.getInventory().setItem(0, buildDrawer((Player) viewer));
+                    event.getInventory().setItem(0, buildDrawer((Player) viewer, null));
                 }
             }
         });
     }
 
-    private ItemStack buildDrawer(Player player) {
+    @Override
+    public ItemStack buildDrawer(Player player, Drawer drawer) {
         ItemStack itemStackDrawer = this.drawerItemStack.build(player, false);
         ItemMeta itemMeta = itemStackDrawer.getItemMeta();
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
         persistentDataContainer.set(DATA_KEY_DRAWER, PersistentDataType.BOOLEAN, true);
+
+        if (drawer != null) {
+            if (player != null) this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
+
+            persistentDataContainer.set(DATA_KEY_ITEMSTACK, PersistentDataType.STRING, drawer.hasItemStack() ? drawer.getItemStackAsString() : "null");
+            persistentDataContainer.set(DATA_KEY_AMOUNT, PersistentDataType.LONG, drawer.getAmount());
+            if (drawer.getUpgrade() != null) {
+                persistentDataContainer.set(DATA_KEY_UPGRADE, PersistentDataType.STRING, drawer.getUpgradeName());
+            }
+        }
+
         itemStackDrawer.setItemMeta(itemMeta);
         return itemStackDrawer;
     }
@@ -395,9 +398,21 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
     }
 
     @Override
-    public void giveDrawer(CommandSender sender, Player player, DrawerUpgrade drawerUpgrade, Material material, Integer amount) {
+    public void giveDrawer(CommandSender sender, Player player, DrawerUpgrade drawerUpgrade, Material material, Long amount) {
 
-        this.drawerItemStack.build(player);
+        Drawer drawer = new ZDrawer(material, amount, drawerUpgrade);
+        ItemStack itemStack = buildDrawer(player, drawer);
 
+        give(player, itemStack);
+
+        message(this.plugin, sender, Message.DRAWER_GIVE_SENDER, "%player%", player.getName());
+        message(this.plugin, player, Message.DRAWER_GIVE_RECEIVE);
+    }
+
+    @Override
+    public List<String> getUpgradeNames() {
+        List<String> names = Arrays.asList("none");
+        names.addAll(this.drawerUpgrades.stream().map(DrawerUpgrade::getName).collect(Collectors.toList()));
+        return names;
     }
 }

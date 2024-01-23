@@ -20,7 +20,7 @@ public class CommandDrawerReload extends VCommand {
 
 		plugin.reloadConfig();
 		plugin.reloadFiles();
-		message(sender, Message.RELOAD);
+		message(plugin, sender, Message.RELOAD);
 		
 		return CommandType.SUCCESS;
 	}
