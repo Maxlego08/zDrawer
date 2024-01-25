@@ -322,6 +322,11 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         this.itemDisplaySize = new DisplaySize(configuration, "drawer.sizes.itemDisplay.");
         this.upgradeDisplaySize = new DisplaySize(configuration, "drawer.sizes.upgradeDisplay.");
         this.textDisplaySize = new DisplaySize(configuration, "drawer.sizes.textDisplay.");
+
+        Config.enableDebug = configuration.getBoolean("enableDebug");
+        Config.enableDebugTime = configuration.getBoolean("enableDebugTime");
+        Config.blacklistMaterials = configuration.getStringList("drawer.blacklistMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
+        Config.breakMaterials = configuration.getStringList("drawer.breakMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
     }
 
     private void loadNumberFormat(YamlConfiguration configuration) {
