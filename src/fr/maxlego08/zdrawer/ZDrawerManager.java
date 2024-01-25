@@ -11,11 +11,13 @@ import fr.maxlego08.zdrawer.api.DrawerUpgrade;
 import fr.maxlego08.zdrawer.api.craft.Craft;
 import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
+import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import fr.maxlego08.zdrawer.craft.ZCraft;
 import fr.maxlego08.zdrawer.craft.ZCraftUpgrade;
 import fr.maxlego08.zdrawer.listener.ListenerAdapter;
 import fr.maxlego08.zdrawer.placeholder.LocalPlaceholder;
 import fr.maxlego08.zdrawer.save.Config;
+import fr.maxlego08.zdrawer.zcore.utils.FormatConfig;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
 import org.bukkit.Location;
@@ -27,6 +29,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Barrel;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -70,10 +73,13 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
     private final Map<UUID, Drawer> currentPlayerDrawer = new HashMap<>();
     private final List<Craft> crafts = new ArrayList<>();
     private final List<DrawerUpgrade> drawerUpgrades = new ArrayList<>();
+    private final List<FormatConfig> formatConfigs = new ArrayList<>();
+    private final Map<BlockFace, DrawerPosition> drawerPositions = new HashMap<>();
     private MenuItemStack drawerItemStack;
     private Map<String, MenuItemStack> ingredients = new HashMap<>();
     private List<String> shade;
     private long drawerLimit;
+    private boolean enableFormatting = false;
 
     public ZDrawerManager(DrawerPlugin plugin) {
         this.plugin = plugin;
@@ -305,6 +311,36 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         server.removeRecipe(this.DATA_KEY_CRAFT, false);
         server.addRecipe(recipe);
         server.updateRecipes();
+
+        this.loadNumberFormat(configuration);
+        this.loadPosition(configuration);
+    }
+
+    private void loadNumberFormat(YamlConfiguration configuration) {
+
+        enableFormatting = configuration.getBoolean("numberFormat.enable", false);
+        this.formatConfigs.clear();
+
+        List<Map<?, ?>> maps = configuration.getMapList("numberFormat.formats");
+        maps.forEach(map -> {
+            String format = (String) map.get("format");
+            long maxAmount = ((Number) map.get("maxAmount")).longValue();
+            this.formatConfigs.add(new FormatConfig(format, maxAmount));
+        });
+    }
+
+    private void loadPosition(YamlConfiguration configuration) {
+
+        this.drawerPositions.clear();
+
+        ConfigurationSection section = configuration.getConfigurationSection("drawer.entitiesPosition.");
+        if (section == null) return;
+        for (String key : section.getKeys(false)) {
+
+            BlockFace blockFace = BlockFace.valueOf(key);
+            DrawerPosition drawerPosition = new DrawerPosition(configuration, "drawer.entitiesPosition." + key + ".", blockFace);
+            this.drawerPositions.put(blockFace, drawerPosition);
+        }
     }
 
     private void loadCraft(YamlConfiguration configuration, Loader<MenuItemStack> loader, File file) throws InventoryException {
@@ -393,7 +429,7 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
 
             } else if (drawer.getItemStack().isSimilar(newItemStack)) {
 
-                if (drawer.isFull()){
+                if (drawer.isFull()) {
                     event.setCancelled(true);
                     return;
                 }
@@ -551,5 +587,26 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
         getStorage().purge(world);
         message(this.plugin, sender, Message.DRAWER_PURGE, "%world%", world.getName());
 
+    }
+
+    @Override
+    public String numberFormat(long number) {
+
+        if (!this.enableFormatting) return String.valueOf(number);
+
+        for (FormatConfig config : this.formatConfigs) {
+            if (number < config.getMaxAmount()) {
+                if (config.getFormat().isEmpty()) return String.valueOf(number);
+
+                double divisor = config.getMaxAmount() == 1000 ? 1000.0 : config.getMaxAmount() / 1000.0;
+                return String.format(config.getFormat(), number / divisor);
+            }
+        }
+        return String.valueOf(number);
+    }
+
+    @Override
+    public DrawerPosition getDrawerPosition(BlockFace blockFace) {
+        return this.drawerPositions.get(blockFace);
     }
 }

@@ -43,8 +43,8 @@ public enum Message {
     COMMAND_SYNTAXE_HELP("§f%syntax% §7» §7%description%"),
 
     RELOAD("§aYou have just reloaded the configuration files."),
-
     DESCRIPTION_RELOAD("Reload configuration files"),
+    DESCRIPTION_CLEAR("Allows to remove all entities that come from the plugin. In case of a crash of your server or other it is possible that entities are duplicated. This command deletes them."),
     DESCRIPTION_GIVE_USE("Show give commands"),
     DESCRIPTION_GIVE_DRAWER("Give a drawer to a player"),
     DESCRIPTION_PLACE("Place a drawer"),
@@ -68,6 +68,8 @@ public enum Message {
     DRAWER_PLACE_ERROR("§cA drawer is already in this position."),
     DRAWER_PLACE_SUCCESS("§aYou have just placed a drawer in the world §f§n%world%§r §aat §f%x%§7, §f%y%§7, §f%z%§a."),
     DRAWER_PURGE("§aYou just purged the world §f%world%§a."),
+
+    CLEAR_DISPLAY("§aYou just removed all the entities that come from the plugin. §7Entities deleted§8: §f%amount%"),
 
     ;
 

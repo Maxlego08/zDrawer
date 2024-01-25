@@ -15,6 +15,7 @@
 # - /zdrawer give craft <player> [<craft name>] » Give a craft item - zdrawer.craft.craft
 # - /zdrawer place <world name> <x> <y> <z> <block face> [<upgrade name>] [<material>] [<amount>] » Place a drawer - zdrawer.place
 # - /zdrawer purge <world name> » Delete all the drawer in a specific world - zdrawer.purge
+# - /zdrawer clear » Allows to remove all entities that come from the plugin. In case of a crash of your server or other it is possible that entities are duplicated. This command deletes them. - zdrawer.clear
 #
 #########################################################################################################################################################
 
@@ -40,6 +41,123 @@ drawer:
         material: SPRUCE_PLANKS
       C:
         material: CHEST
+    # Allows you to change the investment details of the entities, do not touch it if you do not know how.
+    # Even a small change can break the plugin display. Please be very careful.
+  entitiesPosition:
+    NORTH:
+      itemDisplay:
+        x: 0.5
+        y: 0.5
+        z: 1.01
+        yaw: -180
+        pitch: 0
+      upgradeDisplay:
+        x: 0.5
+        y: 0.9
+        z: 1.02
+        yaw: -180
+        pitch: 0
+      textDisplay:
+        x: 0.5
+        y: 0.05
+        z: 1.02
+        yaw: 0
+        pitch: 0
+    EAST:
+      itemDisplay:
+        x: -0.01
+        y: 0.5
+        z: 0.5
+        yaw: -90
+        pitch: 0
+      upgradeDisplay:
+        x: -0.02
+        y: 0.9
+        z: 0.5
+        yaw: -90
+        pitch: 0
+      textDisplay:
+        x: -0.02
+        y: 0.05
+        z: 0.5
+        yaw: 90
+        pitch: 0
+    SOUTH:
+      itemDisplay:
+        x: 0.5
+        y: 0.5
+        z: -0.01
+        yaw: 0
+        pitch: 0
+      upgradeDisplay:
+        x: 0.5
+        y: 0.9
+        z: -0.03
+        yaw: 0
+        pitch: 0
+      textDisplay:
+        x: 0.5
+        y: 0.05
+        z: -0.02
+        yaw: 180
+        pitch: 0
+    WEST:
+      itemDisplay:
+        x: 1.01
+        y: 0.5
+        z: 0.5
+        yaw: 90
+        pitch: 0
+      upgradeDisplay:
+        x: -1.03
+        y: 0.9
+        z: 0.5
+        yaw: 90
+        pitch: 0
+      textDisplay:
+        x: 1.02
+        y: 0.05
+        z: 0.5
+        yaw: -90
+        pitch: 0
+    UP:
+      itemDisplay:
+        x: 0.5
+        y: -0.02
+        z: 0.5
+        yaw: 180
+        pitch: -90
+      upgradeDisplay:
+        x: 0.5
+        y: -0.03
+        z: 0.9
+        yaw: 180
+        pitch: -90
+      textDisplay:
+        x: 0.5
+        y: -0.03
+        z: 0.05
+        yaw: 0
+        pitch: 90
+    DOWN:
+      itemDisplay:
+        x: 0.5
+        y: 1.01
+        z: 0.5
+        yaw: 180
+        pitch: 90
+      upgradeDisplay:
+        x: 0.5
+        y: 1.02
+        z: 0.11
+        yaw: 180
+        pitch: 90
+      textDisplay:
+        x: 0.5
+        y: 1.02
+        z: 0.97
+        yaw: 0
+        pitch: -90
 
 customCrafts:
   upgradeDisplay:
@@ -80,3 +198,19 @@ upgrades:
           material: BARREL
         C:
           customCraft: upgradeDisplay
+
+numberFormat:
+  enable: false
+  formats:
+    - format: ""
+      maxAmount: 1000
+    - format: "%.1fK"
+      maxAmount: 1000000
+    - format: "%.1fM"
+      maxAmount: 1000000000
+    - format: "%.1fB"
+      maxAmount: 1000000000000
+    - format: "%.2fT"
+      maxAmount: 1000000000000000
+    - format: "%.2fQ"
+      maxAmount: 1000000000000000000

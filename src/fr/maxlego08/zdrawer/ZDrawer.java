@@ -2,10 +2,9 @@ package fr.maxlego08.zdrawer;
 
 import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
+import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -19,6 +18,7 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
@@ -66,107 +66,39 @@ public class ZDrawer extends ZUtils implements Drawer {
         Location locationUpgradeDisplay = this.location.clone();
         Location locationTextDisplay = this.location.clone();
 
-        location.setPitch(0f);
-        locationTextDisplay.setPitch(0f);
-        locationUpgradeDisplay.setPitch(0f);
-
-        switch (blockFace) {
-            case NORTH:
-                location.add(0.5, 0.5, 1.01);
-                locationTextDisplay.add(0.5, 0.05, 1.02);
-                locationUpgradeDisplay.add(0.5, 0.9, 1.03);
-                break;
-            case WEST:
-                location.add(1.01, 0.5, 0.5);
-                locationTextDisplay.add(1.02, 0.05, 0.5);
-                locationUpgradeDisplay.add(1.03, 0.9, 0.5);
-                break;
-            case EAST:
-                location.add(-0.01, 0.5, 0.5);
-                locationTextDisplay.add(-0.02, 0.05, 0.5);
-                locationUpgradeDisplay.add(-0.02, 0.9, 0.5);
-                break;
-            case DOWN:
-                location.add(0.5, 1.01, 0.5);
-                locationTextDisplay.add(0.03, 1.02, 0.5);
-                locationUpgradeDisplay.add(0.9, 1.02, 0.5);
-                location.setPitch(90f);
-                locationUpgradeDisplay.setPitch(90f);
-                locationTextDisplay.setPitch(-90f);
-                break;
-            case UP:
-                location.add(0.5, -0.01, 0.5);
-                locationTextDisplay.add(0.97, -0.02, 0.5);
-                locationUpgradeDisplay.add(0.1, -0.02, 0.5);
-                location.setPitch(-90f);
-                locationUpgradeDisplay.setPitch(-90f);
-                locationTextDisplay.setPitch(90f);
-                break;
-            default:
-                location.add(0.5, 0.5, -0.01);
-                locationTextDisplay.add(0.5, 0.05, -0.02);
-                locationUpgradeDisplay.add(0.5, 0.9, -0.03);
-                break;
-        }
-
-        updateYaw(location, blockFace);
-        updateYaw(locationUpgradeDisplay, blockFace);
-        updateYaw(locationTextDisplay, blockFace.getOppositeFace());
+        DrawerPosition drawerPosition = this.plugin.getManager().getDrawerPosition(blockFace);
+        drawerPosition.getItemDisplay().apply(location);
+        drawerPosition.getTextDisplay().apply(locationTextDisplay);
+        drawerPosition.getUpgradeDisplay().apply(locationUpgradeDisplay);
 
         World world = location.getWorld();
 
         this.itemDisplay = world.spawn(location, ItemDisplay.class, display -> {
-            display.setBillboard(Display.Billboard.FIXED);
             display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
-            Transformation transformation = display.getTransformation();
-            Vector3f scale = transformation.getScale();
-            scale.set(0.6f, 0.6f, 0.01f);
-            display.setTransformation(transformation);
-            display.setInvulnerable(true);
+            setSize(display, 0.6f, 0.6f, 0.01f);
         });
 
         this.upgradeDisplay = world.spawn(locationUpgradeDisplay, ItemDisplay.class, display -> {
-            display.setBillboard(Display.Billboard.FIXED);
             display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
-            Transformation transformation = display.getTransformation();
-            Vector3f scale = transformation.getScale();
-            scale.set(0.15f, 0.15f, 0.01f);
-            display.setTransformation(transformation);
-            display.setInvulnerable(true);
+            setSize(display, 0.15f, 0.15f, 0.01f);
         });
 
         this.textDisplay = world.spawn(locationTextDisplay, TextDisplay.class, display -> {
-
-            display.setInvulnerable(true);
-            display.setBillboard(Display.Billboard.FIXED);
             display.setAlignment(TextDisplay.TextAlignment.CENTER);
-            Transformation transformation = display.getTransformation();
-            Vector3f scale = transformation.getScale();
-            double size = 0.6;
-            scale.set(size, size, size);
-            display.setTransformation(transformation);
+            setSize(display, 0.6, 0.6, 0.6);
         });
 
+        updateText();
     }
 
-    private void updateYaw(Location location, BlockFace blockFace) {
-        float yaw;
-        switch (blockFace) {
-            case NORTH:
-                yaw = -180f;
-                break;
-            case WEST:
-            case UP:
-            case DOWN:
-                yaw = 90f;
-                break;
-            case EAST:
-                yaw = -90f;
-                break;
-            default:
-                yaw = 0f;
-        }
-        location.setYaw(yaw);
+    private void setSize(Display display, double x, double y, double z) {
+        Transformation transformation = display.getTransformation();
+        Vector3f scale = transformation.getScale();
+        scale.set(x, y, z);
+        display.setBillboard(Display.Billboard.FIXED);
+        display.setInvulnerable(true);
+        display.setTransformation(transformation);
+        display.setMetadata("zdrawer-entity", new FixedMetadataValue(this.plugin, true));
     }
 
     @Override
@@ -203,7 +135,12 @@ public class ZDrawer extends ZUtils implements Drawer {
     @Override
     public void setAmount(long amount) {
         this.amount = amount;
-        this.textDisplay.text(Component.text(String.valueOf(amount), NamedTextColor.WHITE));
+        updateText();
+    }
+
+    @Override
+    public void updateText() {
+        this.textDisplay.setText(this.plugin.getManager().numberFormat(amount));
     }
 
     @Override
@@ -218,6 +155,8 @@ public class ZDrawer extends ZUtils implements Drawer {
 
     @Override
     public void addItem(Player player, ItemStack itemStack, EquipmentSlot hand) {
+
+        if (isFull()) return;
 
         // If the item does not exist, then we will create it
         if (this.itemStack == null) {
@@ -237,7 +176,7 @@ public class ZDrawer extends ZUtils implements Drawer {
                 player.getInventory().setItem(hand, new ItemStack(Material.AIR));
             }
 
-            textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
+            updateText();
 
         } else if (itemStack.isSimilar(this.itemStack)) {
 
@@ -261,13 +200,13 @@ public class ZDrawer extends ZUtils implements Drawer {
                     }
 
                 }
-                textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
+                updateText();
 
             } else {
 
                 int addAmount = (int) Math.min(itemStack.getAmount(), this.getLimit() - this.amount);
                 this.amount += addAmount;
-                textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
+                updateText();
                 if (addAmount < itemStack.getAmount()) {
                     itemStack.setAmount(itemStack.getAmount() - addAmount);
                     player.getInventory().setItem(hand, itemStack);
@@ -310,11 +249,9 @@ public class ZDrawer extends ZUtils implements Drawer {
             this.itemStack = null;
             this.amount = 0;
             this.itemDisplay.setItemStack(new ItemStack(Material.AIR));
-            this.textDisplay.text(Component.text("", NamedTextColor.WHITE));
-
-        } else {
-            this.textDisplay.text(Component.text(String.valueOf(this.amount), NamedTextColor.WHITE));
         }
+
+        updateText();
     }
 
     @Override

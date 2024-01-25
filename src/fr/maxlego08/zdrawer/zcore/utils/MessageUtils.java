@@ -91,6 +91,11 @@ public abstract class MessageUtils extends LocationUtils {
 
         MetaUpdater updater = plugin.getInventoryManager().getMeta();
 
+        System.out.println(plugin + " - " + message + " - " + args.length);
+        for (Object arg : args) {
+            System.out.println(arg);
+        }
+
         if (sender instanceof ConsoleCommandSender) {
             if (message.getMessages().size() > 0) {
                 message.getMessages().forEach(msg -> sender.sendMessage(removeColorCodes(Message.PREFIX.msg() + getMessage(msg, args))));
