@@ -158,6 +158,19 @@ drawer:
         z: 0.97
         yaw: 0
         pitch: -90
+  sizes:
+    itemDisplay:
+      x: 0.6
+      y: 0.6
+      z: 0.01
+    upgradeDisplay:
+      x: 0.15
+      y: 0.15
+      z: 0.01
+    textDisplay:
+      x: 0.6
+      y: 0.6
+      z: 0.6
 
 customCrafts:
   upgradeDisplay:
@@ -180,6 +193,7 @@ customCrafts:
 
 upgrades:
   woodUpgrade:
+    displayName: "Wood Upgrade"
     displayItem:
       material: "IRON_BLOCK"
     limit: 4096

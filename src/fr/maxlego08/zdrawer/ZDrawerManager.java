@@ -11,6 +11,7 @@ import fr.maxlego08.zdrawer.api.DrawerUpgrade;
 import fr.maxlego08.zdrawer.api.craft.Craft;
 import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
+import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import fr.maxlego08.zdrawer.craft.ZCraft;
 import fr.maxlego08.zdrawer.craft.ZCraftUpgrade;
@@ -80,6 +81,9 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
     private List<String> shade;
     private long drawerLimit;
     private boolean enableFormatting = false;
+    private DisplaySize itemDisplaySize;
+    private DisplaySize upgradeDisplaySize;
+    private DisplaySize textDisplaySize;
 
     public ZDrawerManager(DrawerPlugin plugin) {
         this.plugin = plugin;
@@ -314,6 +318,10 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
 
         this.loadNumberFormat(configuration);
         this.loadPosition(configuration);
+
+        this.itemDisplaySize = new DisplaySize(configuration, "drawer.sizes.itemDisplay.");
+        this.upgradeDisplaySize = new DisplaySize(configuration, "drawer.sizes.upgradeDisplay.");
+        this.textDisplaySize = new DisplaySize(configuration, "drawer.sizes.textDisplay.");
     }
 
     private void loadNumberFormat(YamlConfiguration configuration) {
@@ -608,5 +616,20 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
     @Override
     public DrawerPosition getDrawerPosition(BlockFace blockFace) {
         return this.drawerPositions.get(blockFace);
+    }
+
+    @Override
+    public DisplaySize getItemDisplaySize() {
+        return this.itemDisplaySize;
+    }
+
+    @Override
+    public DisplaySize getUpgradeDisplaySize() {
+        return this.upgradeDisplaySize;
+    }
+
+    @Override
+    public DisplaySize getTextDisplaySize() {
+        return this.textDisplaySize;
     }
 }

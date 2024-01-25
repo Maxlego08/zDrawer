@@ -2,6 +2,7 @@ package fr.maxlego08.zdrawer.api;
 
 import fr.maxlego08.zdrawer.api.craft.Craft;
 import fr.maxlego08.zdrawer.api.storage.Savable;
+import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -122,5 +123,27 @@ public interface DrawerManager extends Savable {
      * @return The DrawerPosition representing the drawer's orientation or position relative to the specified block face.
      */
     DrawerPosition getDrawerPosition(BlockFace blockFace);
+
+    /**
+     * Retrieves the display size for the item within a drawer.
+     *
+     * @return The DisplaySize value representing the size of the item display.
+     */
+    DisplaySize getItemDisplaySize();
+
+    /**
+     * Retrieves the display size for the upgrade associated with a drawer.
+     *
+     * @return The DisplaySize value representing the size of the upgrade display.
+     */
+    DisplaySize getUpgradeDisplaySize();
+
+    /**
+     * Retrieves the display size for the text associated with a drawer.
+     *
+     * @return The DisplaySize value representing the size of the text display.
+     */
+    DisplaySize getTextDisplaySize();
+
 
 }
