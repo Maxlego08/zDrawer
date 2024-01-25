@@ -525,8 +525,9 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
     public void giveDrawer(CommandSender sender, Player player, DrawerUpgrade drawerUpgrade, Material material, Long amount) {
 
         Drawer drawer = new ZDrawer(material, amount, drawerUpgrade);
-        ItemStack itemStack = buildDrawer(player, drawer);
+        this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
 
+        ItemStack itemStack = buildDrawer(player, drawer);
         give(player, itemStack);
 
         message(this.plugin, sender, Message.DRAWER_GIVE_SENDER, "%player%", player.getName());
