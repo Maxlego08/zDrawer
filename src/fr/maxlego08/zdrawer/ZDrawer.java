@@ -153,6 +153,7 @@ public class ZDrawer extends ZUtils implements Drawer {
     @Override
     public void updateText() {
         this.textDisplay.setText(this.plugin.getManager().numberFormat(amount));
+        TextDisplayUtil.setDisplayedText(this.textDisplay, this.plugin.getManager().numberFormat(amount));
     }
 
     @Override
