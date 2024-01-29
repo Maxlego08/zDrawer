@@ -6,6 +6,7 @@ import fr.maxlego08.menu.exceptions.InventoryException;
 import fr.maxlego08.menu.loader.MenuItemStackLoader;
 import fr.maxlego08.menu.zcore.utils.loader.Loader;
 import fr.maxlego08.zdrawer.api.Drawer;
+import fr.maxlego08.zdrawer.api.DrawerBorder;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
 import fr.maxlego08.zdrawer.api.craft.Craft;
@@ -19,30 +20,18 @@ import fr.maxlego08.zdrawer.placeholder.LocalPlaceholder;
 import fr.maxlego08.zdrawer.save.Config;
 import fr.maxlego08.zdrawer.zcore.utils.FormatConfig;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
-import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Server;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.type.Barrel;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -79,6 +68,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     private DisplaySize itemDisplaySize;
     private DisplaySize upgradeDisplaySize;
     private DisplaySize textDisplaySize;
+    private DrawerBorder drawerBorder;
 
     public ZDrawerManager(DrawerPlugin plugin) {
         this.plugin = plugin;
@@ -145,6 +135,13 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
 
             // Load upgrades
             this.loadUpgrades(file, configuration, loader);
+
+            this.drawerBorder = new ZDrawerBorder(configuration.getBoolean("drawer.border.enable"), loader.load(configuration, "drawer.border.item.", file),
+                    new DisplaySize(configuration, "drawer.border.scale.up."),
+                    new DisplaySize(configuration, "drawer.border.scale.down."),
+                    new DisplaySize(configuration, "drawer.border.scale.left."),
+                    new DisplaySize(configuration, "drawer.border.scale.right.")
+            );
         } catch (InventoryException exception) {
             exception.printStackTrace();
         }
@@ -169,6 +166,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         this.itemDisplaySize = new DisplaySize(configuration, "drawer.sizes.itemDisplay.");
         this.upgradeDisplaySize = new DisplaySize(configuration, "drawer.sizes.upgradeDisplay.");
         this.textDisplaySize = new DisplaySize(configuration, "drawer.sizes.textDisplay.");
+
 
         Config.enableDebug = configuration.getBoolean("enableDebug");
         Config.enableDebugTime = configuration.getBoolean("enableDebugTime");
@@ -417,5 +415,10 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     @Override
     public NamespacedKey getDataKeyUpgrade() {
         return this.DATA_KEY_UPGRADE;
+    }
+
+    @Override
+    public DrawerBorder getBorder() {
+        return drawerBorder;
     }
 }

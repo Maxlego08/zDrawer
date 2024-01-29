@@ -51,6 +51,7 @@ public class DrawerPlugin extends ZPlugin {
 
         this.addListener(new DrawerListener(this));
 
+        this.addSave(this.manager);
         this.addSave(new MessageLoader(this));
         this.addSave(this.storage);
 

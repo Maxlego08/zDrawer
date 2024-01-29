@@ -161,4 +161,6 @@ public interface DrawerManager extends Savable {
     NamespacedKey getDataKeyAmount();
 
     NamespacedKey getDataKeyUpgrade();
+
+    DrawerBorder getBorder();
 }

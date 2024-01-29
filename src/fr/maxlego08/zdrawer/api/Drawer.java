@@ -8,6 +8,8 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+
 public interface Drawer {
 
     /**
@@ -41,7 +43,7 @@ public interface Drawer {
     /**
      * Gets a string representation of the ItemStack in this drawer.
      *
-     * @return String representation of the ItemStack.
+     * @return St7ring representation of the ItemStack.
      */
     String getItemStackAsString();
 
@@ -168,4 +170,6 @@ public interface Drawer {
      * Updates the text displayed with the TextDisplay entity
      */
     void updateText();
+
+    List<ItemDisplay> getBorderDisplays();
 }

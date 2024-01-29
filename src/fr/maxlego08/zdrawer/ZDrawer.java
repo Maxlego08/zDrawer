@@ -1,6 +1,7 @@
 package fr.maxlego08.zdrawer;
 
 import fr.maxlego08.zdrawer.api.Drawer;
+import fr.maxlego08.zdrawer.api.DrawerBorder;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
@@ -22,6 +23,9 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ZDrawer extends ZUtils implements Drawer {
 
     private final DrawerPlugin plugin;
@@ -33,12 +37,14 @@ public class ZDrawer extends ZUtils implements Drawer {
     private ItemDisplay upgradeDisplay;
     private TextDisplay textDisplay;
     private DrawerUpgrade drawerUpgrade;
+    private List<ItemDisplay> borderDisplays = new ArrayList<>();
 
     public ZDrawer(DrawerPlugin plugin, Location location, BlockFace blockFace) {
         this.plugin = plugin;
         this.location = location;
         this.blockFace = blockFace;
         this.spawnDisplay();
+        this.spawnBorder(plugin.getManager().getBorder());
 
         Block block = location.getBlock();
         block.setType(Material.BARREL);
@@ -58,6 +64,12 @@ public class ZDrawer extends ZUtils implements Drawer {
         this.itemStack = material == null ? null : new ItemStack(material);
         this.amount = amount;
         this.drawerUpgrade = drawerUpgrade;
+    }
+
+    public void spawnBorder(DrawerBorder drawerBorder) {
+        if (!drawerBorder.isEnable()) return;
+        DrawerPosition drawerPosition = this.plugin.getManager().getDrawerPosition(blockFace);
+        drawerPosition.getBorderPositions().spawn(this.plugin, this, drawerBorder);
     }
 
     private void spawnDisplay() {
@@ -264,6 +276,7 @@ public class ZDrawer extends ZUtils implements Drawer {
         this.textDisplay.remove();
         this.itemDisplay.remove();
         this.upgradeDisplay.remove();
+        this.borderDisplays.forEach(Display::remove);
     }
 
     @Override
@@ -305,5 +318,10 @@ public class ZDrawer extends ZUtils implements Drawer {
     @Override
     public boolean isFull() {
         return this.hasLimit() && this.amount >= this.getLimit();
+    }
+
+    @Override
+    public List<ItemDisplay> getBorderDisplays() {
+        return this.borderDisplays;
     }
 }
