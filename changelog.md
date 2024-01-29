@@ -1,5 +1,8 @@
 # ToDo
 
+- [ ] Gérer le chargement des mondes, début du code déjà prévu, faut juste récupérer l'event de changement de monde et appliquer la méthode pour créer un Drawer
+- [ ] Gérer la gestion des chuncks, si le chunk et pas load alors on ne fait pas spam les entités, et on va juste faire spawn l'entité au changement, c'est une piste pour débug le plugin
+
 - Manage HOPPER
 - Create admin commands
 - SQL and SQLite storage

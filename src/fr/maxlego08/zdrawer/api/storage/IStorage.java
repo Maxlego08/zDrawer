@@ -4,6 +4,7 @@ import fr.maxlego08.zdrawer.api.Drawer;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -56,4 +57,24 @@ public interface IStorage {
      * @param world The world for which drawer data should be purged.
      */
     void purge(World world);
+
+    /**
+     * Retrieves a list of DrawerContainer objects that are waiting for the world to load.
+     * This method may be used to manage drawers that are not yet placed in the world
+     * or are in a queue for some processing.
+     *
+     * @return List<DrawerContainer> A list of DrawerContainer objects that are currently waiting in the world.
+     */
+    List<DrawerContainer> getWaitingWorldDrawers();
+
+    /**
+     * Creates or initializes a Drawer in the system. This method is responsible for setting up
+     * a new Drawer instance, making it ready for use within the game or application context.
+     * It may involve registering the Drawer, allocating resources, or preparing it for interaction
+     * with other components of the system.
+     *
+     * @param drawerContainer The Drawer object to be created or initialized.
+     */
+    void createDrawer(DrawerContainer drawerContainer);
+
 }

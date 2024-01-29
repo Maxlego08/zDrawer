@@ -1,5 +1,6 @@
-package fr.maxlego08.zdrawer.storage;
+package fr.maxlego08.zdrawer.api.storage;
 
+import org.bukkit.Bukkit;
 import org.bukkit.block.BlockFace;
 
 public class DrawerContainer {
@@ -55,5 +56,12 @@ public class DrawerContainer {
 
     public boolean hasUpgrade() {
         return this.upgrade != null;
+    }
+
+    public boolean isWorldLoaded() {
+        String[] locationArray = this.location.split(",");
+        String worldName = locationArray[0];
+        System.out.println("World loaded: " + Bukkit.getWorld(worldName));
+        return Bukkit.getWorld(worldName) != null;
     }
 }
