@@ -3,7 +3,7 @@ author: Maxlego08
 main: fr.maxlego08.zdrawer.DrawerPlugin
 website: https://groupez.dev
 description: Drawer Storage
-version: 1.0.0
+version: ${project.version}
 api-version: 1.20
 depend:
   - zMenu

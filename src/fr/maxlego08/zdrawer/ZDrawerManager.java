@@ -115,7 +115,7 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
                 Drawer drawer = this.currentPlayerDrawer.get(player.getUniqueId());
                 DrawerUpgrade drawerUpgrade = drawer.getUpgrade();
                 if (drawerUpgrade != null) {
-
+                    return drawerUpgrade.getDisplayName();
                 }
             }
             return Message.EMPTY_UPGRADE.getMessage();
@@ -177,6 +177,8 @@ public class ZDrawerManager extends ListenerAdapter implements DrawerManager {
 
     @Override
     protected void onInteract(PlayerInteractEvent event, Player player) {
+
+        if (event.isCancelled()) return;
 
         Block block = event.getClickedBlock();
         if (block == null) return;
