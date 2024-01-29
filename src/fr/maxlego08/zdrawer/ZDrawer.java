@@ -37,7 +37,7 @@ public class ZDrawer extends ZUtils implements Drawer {
     private ItemDisplay upgradeDisplay;
     private TextDisplay textDisplay;
     private DrawerUpgrade drawerUpgrade;
-    private List<ItemDisplay> borderDisplays = new ArrayList<>();
+    private final List<ItemDisplay> borderDisplays = new ArrayList<>();
 
     public ZDrawer(DrawerPlugin plugin, Location location, BlockFace blockFace) {
         this.plugin = plugin;

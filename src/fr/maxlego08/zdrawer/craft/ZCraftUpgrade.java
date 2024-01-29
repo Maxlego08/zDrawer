@@ -23,7 +23,7 @@ public class ZCraftUpgrade extends ZCraft {
 
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
-        persistentDataContainer.set(this.plugin.getNamespacedKeyUpgrade(), PersistentDataType.STRING, this.getName());
+        persistentDataContainer.set(this.plugin.getManager().getNamespaceContainer().getDataKeyUpgrade(), PersistentDataType.STRING, this.getName());
         itemStack.setItemMeta(itemMeta);
 
         return itemStack;

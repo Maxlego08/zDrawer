@@ -76,8 +76,8 @@ public class DrawerListener extends ListenerAdapter {
         if (itemStack != null && itemStack.hasItemMeta()) {
             ItemMeta itemMeta = itemStack.getItemMeta();
             PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
-            if (persistentDataContainer.has(this.plugin.getNamespacedKeyUpgrade())) {
-                String drawerUpgradeName = persistentDataContainer.get(this.plugin.getNamespacedKeyUpgrade(), PersistentDataType.STRING);
+            if (persistentDataContainer.has(this.manager.getNamespaceContainer().getDataKeyUpgrade())) {
+                String drawerUpgradeName = persistentDataContainer.get(this.manager.getNamespaceContainer().getDataKeyUpgrade(), PersistentDataType.STRING);
                 this.manager.getUpgrade(drawerUpgradeName).ifPresent(drawerUpgrade -> {
 
                     if (drawer.getLimit() >= drawerUpgrade.getLimit()) {
@@ -152,7 +152,7 @@ public class DrawerListener extends ListenerAdapter {
         if (block.getType() != Material.BARREL) return;
 
         ItemStack itemStack = event.getItemInHand();
-        if (!itemStack.hasItemMeta() || !itemStack.getItemMeta().getPersistentDataContainer().has(manager.getDataKeyDrawer()))
+        if (!itemStack.hasItemMeta() || !itemStack.getItemMeta().getPersistentDataContainer().has(this.manager.getNamespaceContainer().getDataKeyDrawer()))
             return;
 
         Barrel barrel = (Barrel) block.getBlockData();
@@ -163,17 +163,17 @@ public class DrawerListener extends ListenerAdapter {
         ItemMeta itemMeta = itemStack.getItemMeta();
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
 
-        if (persistentDataContainer.has(manager.getDataKeyAmount()) && persistentDataContainer.has(manager.getDataKeyItemStack())) {
-            String itemStackAsString = persistentDataContainer.getOrDefault(manager.getDataKeyItemStack(), PersistentDataType.STRING, "null");
-            long amount = persistentDataContainer.getOrDefault(manager.getDataKeyAmount(), PersistentDataType.LONG, 0L);
+        if (persistentDataContainer.has(this.manager.getNamespaceContainer().getDataKeyAmount()) && persistentDataContainer.has(this.manager.getNamespaceContainer().getDataKeyItemstack())) {
+            String itemStackAsString = persistentDataContainer.getOrDefault(this.manager.getNamespaceContainer().getDataKeyItemstack(), PersistentDataType.STRING, "null");
+            long amount = persistentDataContainer.getOrDefault(this.manager.getNamespaceContainer().getDataKeyAmount(), PersistentDataType.LONG, 0L);
             ItemStack drawerItemStack = ItemStackUtils.deserializeItemStack(itemStackAsString);
             if (drawerItemStack != null) {
                 drawer.setItemStack(drawerItemStack);
                 drawer.setAmount(amount);
             }
 
-            if (persistentDataContainer.has(manager.getDataKeyUpgrade())) {
-                manager.getUpgrade(persistentDataContainer.get(manager.getDataKeyUpgrade(), PersistentDataType.STRING)).ifPresent(drawer::setUpgrade);
+            if (persistentDataContainer.has(this.manager.getNamespaceContainer().getDataKeyUpgrade())) {
+                manager.getUpgrade(persistentDataContainer.get(this.manager.getNamespaceContainer().getDataKeyUpgrade(), PersistentDataType.STRING)).ifPresent(drawer::setUpgrade);
             }
         }
 
@@ -268,7 +268,7 @@ public class DrawerListener extends ListenerAdapter {
                 if (recipe == null) return;
 
                 ItemStack itemStack = recipe.getResult();
-                if (itemStack.hasItemMeta() && itemStack.getItemMeta().getPersistentDataContainer().has(this.manager.getDataKeyDrawer())) {
+                if (itemStack.hasItemMeta() && itemStack.getItemMeta().getPersistentDataContainer().has(this.manager.getNamespaceContainer().getDataKeyDrawer())) {
                     this.manager.getCurrentPlayerDrawer().remove(viewer.getUniqueId());
                     event.getInventory().setItem(0, this.manager.buildDrawer((Player) viewer, null));
                 }

@@ -5,6 +5,7 @@ import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.api.storage.Savable;
 import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
+import fr.maxlego08.zdrawer.api.utils.NamespaceContainer;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -149,18 +150,35 @@ public interface DrawerManager extends Savable {
      */
     DisplaySize getTextDisplaySize();
 
-
+    /**
+     * Retrieves the storage mechanism being used.
+     *
+     * @return IStorage The storage interface being used for data management.
+     */
     IStorage getStorage();
 
+    /**
+     * Retrieves a map of the current player drawers.
+     * The map keys are player UUIDs, and the values are the corresponding Drawer objects.
+     *
+     * @return Map<UUID, Drawer> A map linking player UUIDs to their respective Drawer objects.
+     */
     Map<UUID, Drawer> getCurrentPlayerDrawer();
 
-    NamespacedKey getDataKeyItemStack();
+    /**
+     * Retrieves the namespace container.
+     * This container may hold various namespaces used in the system.
+     *
+     * @return NamespaceContainer The container holding various namespaces.
+     */
+    NamespaceContainer getNamespaceContainer();
 
-    NamespacedKey getDataKeyDrawer();
-
-    NamespacedKey getDataKeyAmount();
-
-    NamespacedKey getDataKeyUpgrade();
-
+    /**
+     * Retrieves the default or current border settings for drawers.
+     * This may include visual and functional properties of the drawer borders.
+     *
+     * @return DrawerBorder The current or default settings for drawer borders.
+     */
     DrawerBorder getBorder();
+
 }

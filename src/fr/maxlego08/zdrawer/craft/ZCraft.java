@@ -107,7 +107,7 @@ public class ZCraft implements Craft {
 
         ItemMeta itemMeta = resultItemStack.getItemMeta();
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
-        persistentDataContainer.set(this.plugin.getNamespacedKeyCraft(), PersistentDataType.BOOLEAN, true);
+        persistentDataContainer.set(this.plugin.getManager().getNamespaceContainer().getDataKeyCraft(), PersistentDataType.BOOLEAN, true);
         resultItemStack.setItemMeta(itemMeta);
         return resultItemStack;
     }

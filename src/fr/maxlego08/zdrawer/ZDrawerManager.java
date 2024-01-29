@@ -14,6 +14,7 @@ import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
+import fr.maxlego08.zdrawer.api.utils.NamespaceContainer;
 import fr.maxlego08.zdrawer.craft.ZCraft;
 import fr.maxlego08.zdrawer.craft.ZCraftUpgrade;
 import fr.maxlego08.zdrawer.placeholder.LocalPlaceholder;
@@ -50,11 +51,7 @@ import java.util.stream.Collectors;
 public class ZDrawerManager extends ZUtils implements DrawerManager {
 
     private final DrawerPlugin plugin;
-    private final NamespacedKey DATA_KEY_DRAWER;
-    private final NamespacedKey DATA_KEY_CRAFT;
-    private final NamespacedKey DATA_KEY_ITEMSTACK;
-    private final NamespacedKey DATA_KEY_UPGRADE;
-    private final NamespacedKey DATA_KEY_AMOUNT;
+    private final NamespaceContainer namespaceContainer;
     private final Map<UUID, Drawer> currentPlayerDrawer = new HashMap<>();
     private final List<Craft> crafts = new ArrayList<>();
     private final List<DrawerUpgrade> drawerUpgrades = new ArrayList<>();
@@ -72,11 +69,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
 
     public ZDrawerManager(DrawerPlugin plugin) {
         this.plugin = plugin;
-        this.DATA_KEY_DRAWER = new NamespacedKey(plugin, "zdrawerContent");
-        this.DATA_KEY_ITEMSTACK = new NamespacedKey(plugin, "zdrawerItemstack");
-        this.DATA_KEY_AMOUNT = new NamespacedKey(plugin, "zdrawerAmount");
-        this.DATA_KEY_CRAFT = new NamespacedKey(this.plugin, "zdrawerCraft");
-        this.DATA_KEY_UPGRADE = new NamespacedKey(this.plugin, "zdrawerUpgradeName");
+        this.namespaceContainer = new NamespaceContainer(plugin);
 
         LocalPlaceholder placeholder = LocalPlaceholder.getInstance();
         placeholder.register("content", (player, string) -> {
@@ -148,7 +141,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
 
         ItemStack resultItemStack = this.buildDrawer(null, null);
 
-        ShapedRecipe recipe = new ShapedRecipe(this.DATA_KEY_CRAFT, resultItemStack);
+        ShapedRecipe recipe = new ShapedRecipe(this.namespaceContainer.getDataKeyCraft(), resultItemStack);
         recipe.shape(this.shade.toArray(new String[0]));
 
         ingredients.forEach((identifier, ingredient) -> {
@@ -156,7 +149,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         });
 
         Server server = this.plugin.getServer();
-        server.removeRecipe(this.DATA_KEY_CRAFT, false);
+        server.removeRecipe(this.namespaceContainer.getDataKeyCraft(), false);
         server.addRecipe(recipe);
         server.updateRecipes();
 
@@ -215,15 +208,15 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         ItemStack itemStackDrawer = this.drawerItemStack.build(player, false);
         ItemMeta itemMeta = itemStackDrawer.getItemMeta();
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
-        persistentDataContainer.set(DATA_KEY_DRAWER, PersistentDataType.BOOLEAN, true);
+        persistentDataContainer.set(this.namespaceContainer.getDataKeyDrawer(), PersistentDataType.BOOLEAN, true);
 
         if (drawer != null) {
             if (player != null) this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
 
-            persistentDataContainer.set(DATA_KEY_ITEMSTACK, PersistentDataType.STRING, drawer.hasItemStack() ? drawer.getItemStackAsString() : "null");
-            persistentDataContainer.set(DATA_KEY_AMOUNT, PersistentDataType.LONG, drawer.getAmount());
+            persistentDataContainer.set(this.namespaceContainer.getDataKeyItemstack(), PersistentDataType.STRING, drawer.hasItemStack() ? drawer.getItemStackAsString() : "null");
+            persistentDataContainer.set(this.namespaceContainer.getDataKeyAmount(), PersistentDataType.LONG, drawer.getAmount());
             if (drawer.getUpgrade() != null) {
-                persistentDataContainer.set(DATA_KEY_UPGRADE, PersistentDataType.STRING, drawer.getUpgradeName());
+                persistentDataContainer.set(this.namespaceContainer.getDataKeyUpgrade(), PersistentDataType.STRING, drawer.getUpgradeName());
             }
         }
 
@@ -398,23 +391,8 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     }
 
     @Override
-    public NamespacedKey getDataKeyItemStack() {
-        return this.DATA_KEY_ITEMSTACK;
-    }
-
-    @Override
-    public NamespacedKey getDataKeyDrawer() {
-        return this.DATA_KEY_DRAWER;
-    }
-
-    @Override
-    public NamespacedKey getDataKeyAmount() {
-        return this.DATA_KEY_AMOUNT;
-    }
-
-    @Override
-    public NamespacedKey getDataKeyUpgrade() {
-        return this.DATA_KEY_UPGRADE;
+    public NamespaceContainer getNamespaceContainer() {
+        return this.namespaceContainer;
     }
 
     @Override
