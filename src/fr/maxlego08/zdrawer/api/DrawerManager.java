@@ -1,10 +1,12 @@
 package fr.maxlego08.zdrawer.api;
 
 import fr.maxlego08.zdrawer.api.craft.Craft;
+import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.api.storage.Savable;
 import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
@@ -12,7 +14,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface DrawerManager extends Savable {
 
@@ -119,7 +123,7 @@ public interface DrawerManager extends Savable {
      * which is particularly useful when interacting with or placing drawers programmatically.
      *
      * @param blockFace The face of the block relative to which the drawer's position is to be determined.
-     *                This could be one of the six basic directions (NORTH, EAST, SOUTH, WEST, UP, DOWN) in Minecraft.
+     *                  This could be one of the six basic directions (NORTH, EAST, SOUTH, WEST, UP, DOWN) in Minecraft.
      * @return The DrawerPosition representing the drawer's orientation or position relative to the specified block face.
      */
     DrawerPosition getDrawerPosition(BlockFace blockFace);
@@ -146,4 +150,15 @@ public interface DrawerManager extends Savable {
     DisplaySize getTextDisplaySize();
 
 
+    IStorage getStorage();
+
+    Map<UUID, Drawer> getCurrentPlayerDrawer();
+
+    NamespacedKey getDataKeyItemStack();
+
+    NamespacedKey getDataKeyDrawer();
+
+    NamespacedKey getDataKeyAmount();
+
+    NamespacedKey getDataKeyUpgrade();
 }

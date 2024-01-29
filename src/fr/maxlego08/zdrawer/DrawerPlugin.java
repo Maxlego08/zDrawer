@@ -49,7 +49,7 @@ public class DrawerPlugin extends ZPlugin {
 
         this.registerCommand("zdrawer", new CommandDrawer(this), "drawer");
 
-        this.addListener(this.manager);
+        this.addListener(new DrawerListener(this));
 
         this.addSave(new MessageLoader(this));
         this.addSave(this.storage);
