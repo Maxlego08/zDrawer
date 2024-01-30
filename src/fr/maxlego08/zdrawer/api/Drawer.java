@@ -126,4 +126,10 @@ public interface Drawer {
     List<ItemDisplay> getBorderDisplays();
 
     String getData();
+
+    boolean hasItemStack(int index);
+
+    ItemStack getItemStack(int index);
+
+    long getAmount(int index);
 }

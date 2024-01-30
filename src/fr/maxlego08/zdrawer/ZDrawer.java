@@ -259,4 +259,22 @@ public class ZDrawer extends ZUtils implements Drawer {
                 .map(drawerCase -> drawerCase.getItemStackAsString() + ";" + drawerCase.getAmount())
                 .collect(Collectors.joining(",", this.drawerCases.size() + ",", ""));
     }
+
+    @Override
+    public boolean hasItemStack(int index) {
+        DrawerCase drawerCase = this.drawerCases.get(index);
+        return drawerCase.hasItemStack();
+    }
+
+    @Override
+    public ItemStack getItemStack(int index) {
+        DrawerCase drawerCase = this.drawerCases.get(index);
+        return drawerCase.getItemStack();
+    }
+
+    @Override
+    public long getAmount(int index) {
+        DrawerCase drawerCase = this.drawerCases.get(index);
+        return drawerCase.getAmount();
+    }
 }

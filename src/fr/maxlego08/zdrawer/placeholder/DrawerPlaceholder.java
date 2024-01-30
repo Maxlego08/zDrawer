@@ -12,34 +12,43 @@ public class DrawerPlaceholder extends ZUtils {
 
         LocalPlaceholder placeholder = LocalPlaceholder.getInstance();
 
-        // %zdrawer_content%
-        placeholder.register("content", (player, string) -> {
+        // %zdrawer_content_<index>%
+        placeholder.register("content_", (player, string) -> {
             if (manager.getCurrentPlayerDrawer().containsKey(player.getUniqueId())) {
                 Drawer drawer = manager.getCurrentPlayerDrawer().get(player.getUniqueId());
-                /*if (drawer.hasItemStack()) {
-                    return getItemName(drawer.getItemStack());
-                }*/
-                return "TODO - A mettre à jour";
+                try {
+                    int index = Integer.parseInt(string);
+                    if (drawer.hasItemStack(index)) {
+                        return getItemName(drawer.getItemStack(index));
+                    }
+                } catch (Exception ignored) {
+                }
             }
             return Message.EMPTY_DRAWER.getMessage();
         });
 
-        // %zdrawer_amount_formatted%
-        placeholder.register("amount_formatted", (player, string) -> {
+        // %zdrawer_amount_formatted_<index>%
+        placeholder.register("amount_formatted_", (player, string) -> {
             if (manager.getCurrentPlayerDrawer().containsKey(player.getUniqueId())) {
                 Drawer drawer = manager.getCurrentPlayerDrawer().get(player.getUniqueId());
-                // return manager.numberFormat(drawer.getAmount(), true);
-                return "TODO - A mettre à jour";
+                try {
+                    int index = Integer.parseInt(string);
+                    return manager.numberFormat(drawer.getAmount(index), true);
+                } catch (Exception ignored) {
+                }
             }
             return "0";
         });
 
-        // %zdrawer_amount%
-        placeholder.register("amount", (player, string) -> {
+        // %zdrawer_amount_<index>%
+        placeholder.register("amount_", (player, string) -> {
             if (manager.getCurrentPlayerDrawer().containsKey(player.getUniqueId())) {
                 Drawer drawer = manager.getCurrentPlayerDrawer().get(player.getUniqueId());
-                // return String.valueOf(drawer.getAmount());
-                return "TODO - A mettre à jour";
+                try {
+                    int index = Integer.parseInt(string);
+                    return String.valueOf(drawer.getAmount(index));
+                } catch (Exception ignored) {
+                }
             }
             return "0";
         });
