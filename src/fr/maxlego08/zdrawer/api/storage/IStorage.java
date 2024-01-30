@@ -1,6 +1,7 @@
 package fr.maxlego08.zdrawer.api.storage;
 
 import fr.maxlego08.zdrawer.api.Drawer;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -77,4 +78,5 @@ public interface IStorage {
      */
     void createDrawer(DrawerContainer drawerContainer);
 
+    List<Drawer> getDrawers(Chunk chunk);
 }

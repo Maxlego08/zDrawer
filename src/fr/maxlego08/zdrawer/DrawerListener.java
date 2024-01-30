@@ -3,12 +3,15 @@ package fr.maxlego08.zdrawer;
 import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.enums.Message;
+import fr.maxlego08.zdrawer.api.storage.DrawerContainer;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.listener.ListenerAdapter;
 import fr.maxlego08.zdrawer.save.Config;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Barrel;
@@ -24,6 +27,9 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -32,6 +38,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -283,6 +290,31 @@ public class DrawerListener extends ListenerAdapter {
             this.manager.getStorage().getDrawer(barrel.getLocation()).ifPresent(drawer -> {
                 event.setCancelled(true);
             });
+        }
+    }
+
+    @Override
+    public void onUnLoad(ChunkUnloadEvent event, Chunk chunk) {
+        this.manager.getStorage().getDrawers(chunk).forEach(Drawer::onDisable);
+    }
+
+    @Override
+    public void onLoad(ChunkLoadEvent event, Chunk chunk) {
+        this.manager.getStorage().getDrawers(chunk).forEach(Drawer::onLoad);
+    }
+
+    @Override
+    protected void onWorldLoad(WorldLoadEvent event, World world) {
+        IStorage storage = this.manager.getStorage();
+        List<DrawerContainer> drawerContainers = storage.getWaitingWorldDrawers();
+        String worldName = world.getName();
+        Iterator<DrawerContainer> iterator = drawerContainers.iterator();
+        while (iterator.hasNext()) {
+            DrawerContainer drawerContainer = iterator.next();
+            if (drawerContainer.getWorldName().equals(worldName)) {
+                iterator.remove();
+                storage.createDrawer(drawerContainer);
+            }
         }
     }
 }

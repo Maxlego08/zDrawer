@@ -26,6 +26,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 
 @SuppressWarnings("deprecation")
 public class AdapterListener extends ZUtils implements Listener {
@@ -59,8 +62,7 @@ public class AdapterListener extends ZUtils implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        this.plugin.getListenerAdapters()
-                .forEach(adapter -> adapter.onInventoryClick(event, (Player) event.getWhoClicked()));
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onInventoryClick(event, (Player) event.getWhoClicked()));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -100,32 +102,27 @@ public class AdapterListener extends ZUtils implements Listener {
 
     @EventHandler
     public void onDrag(InventoryDragEvent event) {
-        this.plugin.getListenerAdapters()
-                .forEach(adapter -> adapter.onInventoryDrag(event, (Player) event.getWhoClicked()));
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onInventoryDrag(event, (Player) event.getWhoClicked()));
     }
 
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
-        this.plugin.getListenerAdapters()
-                .forEach(adapter -> adapter.onInventoryClose(event, (Player) event.getPlayer()));
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onInventoryClose(event, (Player) event.getPlayer()));
     }
 
     @EventHandler
     public void onClose(InventoryOpenEvent event) {
-        this.plugin.getListenerAdapters()
-                .forEach(adapter -> adapter.onInventoryOpen(event, (Player) event.getPlayer(), event.getInventory()));
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onInventoryOpen(event, (Player) event.getPlayer(), event.getInventory()));
     }
 
     @EventHandler
     public void onClose(InventoryMoveItemEvent event) {
-        this.plugin.getListenerAdapters()
-                .forEach(adapter -> adapter.onInventoryMove(event, event.getDestination(), event.getItem(), event.getSource(), event.getInitiator()));
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onInventoryMove(event, event.getDestination(), event.getItem(), event.getSource(), event.getInitiator()));
     }
 
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
-        this.plugin.getListenerAdapters()
-                .forEach(adapter -> adapter.onCommand(event, event.getPlayer(), event.getMessage()));
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onCommand(event, event.getPlayer(), event.getMessage()));
     }
 
     @EventHandler
@@ -166,6 +163,21 @@ public class AdapterListener extends ZUtils implements Listener {
     @EventHandler
     public void onExplode(EntityExplodeEvent event) {
         this.plugin.getListenerAdapters().forEach(adapter -> adapter.onExplode(event, event.blockList(), event.getEntity()));
+    }
+
+    @EventHandler
+    public void onLoad(ChunkLoadEvent event) {
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onLoad(event, event.getChunk()));
+    }
+
+    @EventHandler
+    public void onUnLoad(ChunkUnloadEvent event) {
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onUnLoad(event, event.getChunk()));
+    }
+
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent event) {
+        this.plugin.getListenerAdapters().forEach(adapter -> adapter.onWorldLoad(event, event.getWorld()));
     }
 
 }

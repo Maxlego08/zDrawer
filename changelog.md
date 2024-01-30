@@ -1,17 +1,13 @@
 # ToDo
 
-- [ ] Gérer le chargement des mondes, début du code déjà prévu, faut juste récupérer l'event de changement de monde et appliquer la méthode pour créer un Drawer
-- [ ] Gérer la gestion des chuncks, si le chunk et pas load alors on ne fait pas spam les entités, et on va juste faire spawn l'entité au changement, c'est une piste pour débug le plugin
-
-- Manage HOPPER
-- Create admin commands
-- SQL and SQLite storage
-
-- Donner le drawer par command, et pouvoir appliquer une upgrade directement
-- Pouvoir ajouter un contenu et un nombre d'item dedans
-
-- Ajouter l'API SlimeFun pour les connecteurs entre coffre
-- Vérifier la compatibilité sur des plugins de skyblock / autre
+- [x] Manage HOPPER
+- [ ] Create admin commands
+- [ ] SQL and SQLite storage
+- [x] Give the drawer by command, and be able to apply an upgrade directly
+- [x] Be able to add content and number of items in it
+- [ ] Add SlimeFun API for Trunk Connectors
+- [x] Check compatibility on skyblock/ other plugins (not even need to be bored to add each plugin, it’s beautiful)
+- [x] Manage chunks and worlds
 
 Idée de gestion d'inventaire:
 - Pouvoir ajouter les items dedans
@@ -19,6 +15,6 @@ Idée de gestion d'inventaire:
 - Pouvoir vendre le contenu
 - Pouvoir récupérer le drawer
 
-Ajouter un système de log complèt pour savoir qui fait quoi
+Ajouter un système de log complète pour savoir qui fait quoi
 
 Any idea ?

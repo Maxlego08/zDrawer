@@ -4,6 +4,7 @@ import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.DrawerBorder;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
+import fr.maxlego08.zdrawer.zcore.utils.TextDisplayUtil;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import org.bukkit.Location;
@@ -31,20 +32,19 @@ public class ZDrawer extends ZUtils implements Drawer {
     private final DrawerPlugin plugin;
     private final Location location;
     private final BlockFace blockFace;
+    private final List<ItemDisplay> borderDisplays = new ArrayList<>();
     private ItemStack itemStack; // Use Material for the DEMO, but the real will use ItemStack
     private long amount;
     private ItemDisplay itemDisplay;
     private ItemDisplay upgradeDisplay;
     private TextDisplay textDisplay;
     private DrawerUpgrade drawerUpgrade;
-    private final List<ItemDisplay> borderDisplays = new ArrayList<>();
 
     public ZDrawer(DrawerPlugin plugin, Location location, BlockFace blockFace) {
         this.plugin = plugin;
         this.location = location;
         this.blockFace = blockFace;
-        this.spawnDisplay();
-        this.spawnBorder(plugin.getManager().getBorder());
+
 
         Block block = location.getBlock();
         block.setType(Material.BARREL);
@@ -53,6 +53,11 @@ public class ZDrawer extends ZUtils implements Drawer {
         block.setBlockData(barrel, false);
         org.bukkit.block.Barrel blockBarrel = (org.bukkit.block.Barrel) block.getState();
         blockBarrel.getInventory().setItem(0, new ItemStack(Material.STONE, 2));
+
+        if (!location.getChunk().isLoaded()) return;
+
+        this.spawnDisplay();
+        this.spawnBorder(plugin.getManager().getBorder());
     }
 
     public ZDrawer(Material material, long amount, DrawerUpgrade drawerUpgrade) {
@@ -152,7 +157,6 @@ public class ZDrawer extends ZUtils implements Drawer {
 
     @Override
     public void updateText() {
-        this.textDisplay.setText(this.plugin.getManager().numberFormat(amount));
         TextDisplayUtil.setDisplayedText(this.textDisplay, this.plugin.getManager().numberFormat(amount));
     }
 
@@ -274,10 +278,19 @@ public class ZDrawer extends ZUtils implements Drawer {
 
     @Override
     public void onDisable() {
-        this.textDisplay.remove();
-        this.itemDisplay.remove();
-        this.upgradeDisplay.remove();
+        if (this.textDisplay != null) this.textDisplay.remove();
+        if (this.itemDisplay != null) this.itemDisplay.remove();
+        if (this.upgradeDisplay != null) this.upgradeDisplay.remove();
         this.borderDisplays.forEach(Display::remove);
+    }
+
+    @Override
+    public void onLoad() {
+        this.spawnDisplay();
+        this.spawnBorder(plugin.getManager().getBorder());
+        if (this.itemStack != null) this.itemDisplay.setItemStack(itemStack);
+        if (this.drawerUpgrade != null) this.upgradeDisplay.setItemStack(this.drawerUpgrade.getDisplayItemStack());
+        updateText();
     }
 
     @Override

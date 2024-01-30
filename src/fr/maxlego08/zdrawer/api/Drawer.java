@@ -96,6 +96,8 @@ public interface Drawer {
      */
     void onDisable();
 
+    void onLoad();
+
     /**
      * Checks if there is an ItemStack stored in this drawer.
      *

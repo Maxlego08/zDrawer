@@ -7,6 +7,7 @@ import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.api.storage.DrawerContainer;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
@@ -20,6 +21,7 @@ import java.util.Optional;
 public class JsonStorage implements IStorage {
 
     private final List<DrawerContainer> waitingDrawers = new ArrayList<>();
+    private transient Map<String, List<Drawer>> drawerMapChunk = new HashMap<>();
     private transient DrawerPlugin plugin;
     private transient Map<String, Drawer> drawerMap = new HashMap<>();
     private List<DrawerContainer> drawers = new ArrayList<>();
@@ -55,6 +57,7 @@ public class JsonStorage implements IStorage {
     @Override
     public void createDrawer(DrawerContainer drawerContainer) {
         Location location = stringToLocation(drawerContainer.getLocation());
+
         Drawer drawer = new ZDrawer(this.plugin, location, drawerContainer.getBlockFace());
         if (drawerContainer.hasItemStack()) {
             ItemStack itemStack = ItemStackUtils.deserializeItemStack(drawerContainer.getItemStack());
@@ -65,6 +68,10 @@ public class JsonStorage implements IStorage {
             this.plugin.getManager().getUpgrade(drawerContainer.getUpgrade()).ifPresent(drawer::setUpgrade);
         }
         drawerMap.put(drawerContainer.getLocation(), drawer);
+
+        if (this.drawerMapChunk == null) this.drawerMapChunk = new HashMap<>();
+        List<Drawer> drawerList = this.drawerMapChunk.computeIfAbsent(location.getChunk().getX() + "," + location.getChunk().getZ(), a -> new ArrayList<>());
+        drawerList.add(drawer);
     }
 
     @Override
@@ -117,5 +124,18 @@ public class JsonStorage implements IStorage {
 
     public void setPlugin(DrawerPlugin plugin) {
         this.plugin = plugin;
+        this.drawerMapChunk = new HashMap<>();
+    }
+
+    public Map<String, Drawer> getDrawerMap() {
+        return drawerMap;
+    }
+
+    public Map<String, List<Drawer>> getDrawerMapChunk() {
+        return drawerMapChunk;
+    }
+
+    public List<Drawer> getDrawers(Chunk chunk) {
+        return drawerMapChunk.getOrDefault(chunk.getX() + "," + chunk.getZ(), new ArrayList<>());
     }
 }

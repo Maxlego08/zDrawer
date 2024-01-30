@@ -59,9 +59,11 @@ public class DrawerContainer {
     }
 
     public boolean isWorldLoaded() {
+        return Bukkit.getWorld(getWorldName()) != null;
+    }
+
+    public String getWorldName() {
         String[] locationArray = this.location.split(",");
-        String worldName = locationArray[0];
-        System.out.println("World loaded: " + Bukkit.getWorld(worldName));
-        return Bukkit.getWorld(worldName) != null;
+        return locationArray[0];
     }
 }
