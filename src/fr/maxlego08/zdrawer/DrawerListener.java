@@ -2,11 +2,14 @@ package fr.maxlego08.zdrawer;
 
 import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.DrawerManager;
+import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.api.storage.DrawerContainer;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
+import fr.maxlego08.zdrawer.api.utils.NamespaceContainer;
 import fr.maxlego08.zdrawer.listener.ListenerAdapter;
 import fr.maxlego08.zdrawer.save.Config;
+import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -142,8 +145,10 @@ public class DrawerListener extends ListenerAdapter {
 
             this.manager.getCurrentPlayerDrawer().put(player.getUniqueId(), drawer);
 
-            ItemStack itemStack = this.manager.buildDrawer(player, drawer);
-            block.getWorld().dropItem(block.getLocation().add(0.5, 0.1, 0.5), itemStack);
+            this.manager.getDrawer(drawer.getConfigurationName()).ifPresent(drawerConfiguration -> {
+                ItemStack itemStack = this.manager.buildDrawer(drawerConfiguration, player, drawer);
+                block.getWorld().dropItem(block.getLocation().add(0.5, 0.1, 0.5), itemStack);
+            });
         } else {
 
             event.setCancelled(true);
@@ -166,21 +171,29 @@ public class DrawerListener extends ListenerAdapter {
         BlockFace blockFace = barrel.getFacing().getOppositeFace();
         Location location = block.getLocation().clone();
 
-        Drawer drawer = new ZDrawer(plugin, location, blockFace);
         ItemMeta itemMeta = itemStack.getItemMeta();
+        NamespaceContainer namespaceContainer = this.manager.getNamespaceContainer();
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
+        String drawerName = persistentDataContainer.get(namespaceContainer.getDataKeyDrawer(), PersistentDataType.STRING);
+        Optional<DrawerConfiguration> optional = this.manager.getDrawer(drawerName);
+        if (!optional.isPresent()) {
+            Logger.info("Impossible to place a drawer, configuration " + drawerName + " doesn't exit !", Logger.LogType.ERROR);
+            return;
+        }
 
-        if (persistentDataContainer.has(this.manager.getNamespaceContainer().getDataKeyAmount()) && persistentDataContainer.has(this.manager.getNamespaceContainer().getDataKeyItemstack())) {
-            String itemStackAsString = persistentDataContainer.getOrDefault(this.manager.getNamespaceContainer().getDataKeyItemstack(), PersistentDataType.STRING, "null");
-            long amount = persistentDataContainer.getOrDefault(this.manager.getNamespaceContainer().getDataKeyAmount(), PersistentDataType.LONG, 0L);
+        Drawer drawer = new ZDrawer(plugin, optional.get(), location, blockFace);
+
+        if (persistentDataContainer.has(namespaceContainer.getDataKeyAmount()) && persistentDataContainer.has(namespaceContainer.getDataKeyItemstack())) {
+            String itemStackAsString = persistentDataContainer.getOrDefault(namespaceContainer.getDataKeyItemstack(), PersistentDataType.STRING, "null");
+            long amount = persistentDataContainer.getOrDefault(namespaceContainer.getDataKeyAmount(), PersistentDataType.LONG, 0L);
             ItemStack drawerItemStack = ItemStackUtils.deserializeItemStack(itemStackAsString);
             if (drawerItemStack != null) {
                 drawer.setItemStack(drawerItemStack);
                 drawer.setAmount(amount);
             }
 
-            if (persistentDataContainer.has(this.manager.getNamespaceContainer().getDataKeyUpgrade())) {
-                manager.getUpgrade(persistentDataContainer.get(this.manager.getNamespaceContainer().getDataKeyUpgrade(), PersistentDataType.STRING)).ifPresent(drawer::setUpgrade);
+            if (persistentDataContainer.has(namespaceContainer.getDataKeyUpgrade())) {
+                manager.getUpgrade(persistentDataContainer.get(namespaceContainer.getDataKeyUpgrade(), PersistentDataType.STRING)).ifPresent(drawer::setUpgrade);
             }
         }
 
@@ -276,8 +289,14 @@ public class DrawerListener extends ListenerAdapter {
 
                 ItemStack itemStack = recipe.getResult();
                 if (itemStack.hasItemMeta() && itemStack.getItemMeta().getPersistentDataContainer().has(this.manager.getNamespaceContainer().getDataKeyDrawer())) {
-                    this.manager.getCurrentPlayerDrawer().remove(viewer.getUniqueId());
-                    event.getInventory().setItem(0, this.manager.buildDrawer((Player) viewer, null));
+
+                    String drawerName = itemStack.getItemMeta().getPersistentDataContainer().get(this.manager.getNamespaceContainer().getDataKeyDrawer(), PersistentDataType.STRING);
+                    this.manager.getDrawer(drawerName).ifPresent(drawerConfiguration -> {
+
+                        // Drawer of a new drawer, so we will remove the cache
+                        this.manager.getCurrentPlayerDrawer().remove(viewer.getUniqueId());
+                        event.getInventory().setItem(0, this.manager.buildDrawer(drawerConfiguration, (Player) viewer, null));
+                    });
                 }
             }
         });

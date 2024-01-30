@@ -6,9 +6,9 @@ import fr.maxlego08.menu.exceptions.InventoryException;
 import fr.maxlego08.menu.loader.MenuItemStackLoader;
 import fr.maxlego08.menu.zcore.utils.loader.Loader;
 import fr.maxlego08.zdrawer.api.Drawer;
-import fr.maxlego08.zdrawer.api.DrawerBorder;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
+import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import fr.maxlego08.zdrawer.api.craft.Craft;
 import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
@@ -24,7 +24,6 @@ import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
 import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
@@ -32,8 +31,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.RecipeChoice;
-import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -55,11 +52,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     private final List<Craft> crafts = new ArrayList<>();
     private final List<DrawerUpgrade> drawerUpgrades = new ArrayList<>();
     private final Map<BlockFace, DrawerPosition> drawerPositions = new HashMap<>();
-    private MenuItemStack drawerItemStack;
-    private Map<String, MenuItemStack> ingredients = new HashMap<>();
-    private List<String> shade;
-    private long drawerLimit;
-    private DrawerBorder drawerBorder;
+    private final List<DrawerConfiguration> drawerConfigurations = new ArrayList<>();
 
     public ZDrawerManager(DrawerPlugin plugin) {
         this.plugin = plugin;
@@ -81,41 +74,29 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     @Override
     public void load(Persist persist) {
 
+        this.drawerConfigurations.clear();
+
         InventoryManager inventoryManager = this.plugin.getInventoryManager();
         Loader<MenuItemStack> loader = new MenuItemStackLoader(inventoryManager);
         YamlConfiguration configuration = (YamlConfiguration) plugin.getConfig();
 
-        this.drawerLimit = configuration.getLong("drawer.limit", 0);
-
         File file = new File(this.plugin.getDataFolder(), "config.yml");
+
         try {
-            this.drawerItemStack = loader.load(configuration, "drawer.item.", file);
-            loadCraft(configuration, loader, file);
+            for (String drawerName : configuration.getConfigurationSection("drawer.drawers.").getKeys(false)) {
+                String path = "drawer.drawers." + drawerName + ".";
+                DrawerConfiguration drawerConfiguration = new DrawerConfiguration(this.plugin, configuration, path, loader, file, drawerName);
+                this.drawerConfigurations.add(drawerConfiguration);
+            }
 
             // Load custom crafts
             this.loadCustomCrafts(file, configuration);
 
             // Load upgrades
             this.loadUpgrades(file, configuration, loader);
-
-            this.drawerBorder = new ZDrawerBorder(configuration.getBoolean("drawer.border.enable"), loader.load(configuration, "drawer.border.item.", file), new DisplaySize(configuration, "drawer.border.scale.up."), new DisplaySize(configuration, "drawer.border.scale.down."), new DisplaySize(configuration, "drawer.border.scale.left."), new DisplaySize(configuration, "drawer.border.scale.right."));
         } catch (InventoryException exception) {
             exception.printStackTrace();
         }
-
-        ItemStack resultItemStack = this.buildDrawer(null, null);
-
-        ShapedRecipe recipe = new ShapedRecipe(this.namespaceContainer.getDataKeyCraft(), resultItemStack);
-        recipe.shape(this.shade.toArray(new String[0]));
-
-        ingredients.forEach((identifier, ingredient) -> {
-            recipe.setIngredient(identifier.charAt(0), new RecipeChoice.ExactChoice(ingredient.build(null)));
-        });
-
-        Server server = this.plugin.getServer();
-        server.removeRecipe(this.namespaceContainer.getDataKeyCraft(), false);
-        server.addRecipe(recipe);
-        server.updateRecipes();
 
         this.loadPosition(configuration);
 
@@ -136,21 +117,12 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         }
     }
 
-    private void loadCraft(YamlConfiguration configuration, Loader<MenuItemStack> loader, File file) throws InventoryException {
-
-        this.shade = configuration.getStringList("drawer.craft.shade");
-        this.ingredients = new HashMap<>();
-        for (String ingredientKey : configuration.getConfigurationSection("drawer.craft.ingredients.").getKeys(false)) {
-            this.ingredients.put(ingredientKey, loader.load(configuration, "drawer.craft.ingredients." + ingredientKey + ".", file));
-        }
-    }
-
     @Override
-    public ItemStack buildDrawer(Player player, Drawer drawer) {
-        ItemStack itemStackDrawer = this.drawerItemStack.build(player, false);
+    public ItemStack buildDrawer(DrawerConfiguration drawerConfiguration, Player player, Drawer drawer) {
+        ItemStack itemStackDrawer = drawerConfiguration.getMenuItemStack().build(player, false);
         ItemMeta itemMeta = itemStackDrawer.getItemMeta();
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
-        persistentDataContainer.set(this.namespaceContainer.getDataKeyDrawer(), PersistentDataType.BOOLEAN, true);
+        persistentDataContainer.set(this.namespaceContainer.getDataKeyDrawer(), PersistentDataType.STRING, drawerConfiguration.getName());
 
         if (drawer != null) {
             if (player != null) this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
@@ -200,11 +172,6 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     }
 
     @Override
-    public long getDrawerLimit() {
-        return drawerLimit;
-    }
-
-    @Override
     public Optional<Craft> getCraft(String craftName) {
         return this.crafts.stream().filter(craft -> craft.getName().equals(craftName)).findFirst();
     }
@@ -215,12 +182,29 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     }
 
     @Override
-    public void giveDrawer(CommandSender sender, Player player, DrawerUpgrade drawerUpgrade, Material material, Long amount) {
+    public Optional<DrawerConfiguration> getDrawer(String drawerName) {
+        return this.drawerConfigurations.stream().filter(drawerConfiguration -> drawerConfiguration.getName().equalsIgnoreCase(drawerName)).findFirst();
+    }
 
+    @Override
+    public List<String> getDrawerNames() {
+        return this.drawerConfigurations.stream().map(DrawerConfiguration::getName).collect(Collectors.toList());
+    }
+
+    @Override
+    public void giveDrawer(CommandSender sender, Player player, String drawerName, DrawerUpgrade drawerUpgrade, Material material, Long amount) {
+
+        Optional<DrawerConfiguration> optional = this.getDrawer(drawerName);
+        if (!optional.isPresent()) {
+            message(this.plugin, sender, Message.DRAWER_NOT_FOUND, "%name%", drawerName);
+            return;
+        }
+
+        DrawerConfiguration drawerConfiguration = optional.get();
         Drawer drawer = new ZDrawer(material, amount, drawerUpgrade);
         this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
 
-        ItemStack itemStack = buildDrawer(player, drawer);
+        ItemStack itemStack = buildDrawer(drawerConfiguration, player, drawer);
         give(player, itemStack);
 
         message(this.plugin, sender, Message.DRAWER_GIVE_SENDER, "%player%", player.getName());
@@ -258,7 +242,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     }
 
     @Override
-    public void placeDrawer(CommandSender sender, World world, double x, double y, double z, BlockFace blockFace, DrawerUpgrade drawerUpgrade, Material material, long amount) {
+    public void placeDrawer(CommandSender sender, String drawerName, World world, double x, double y, double z, BlockFace blockFace, DrawerUpgrade drawerUpgrade, Material material, long amount) {
 
         Location location = new Location(world, x, y, z);
         Optional<Drawer> optional = this.getStorage().getDrawer(location);
@@ -267,7 +251,15 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
             return;
         }
 
-        Drawer drawer = new ZDrawer(this.plugin, location, blockFace);
+        Optional<DrawerConfiguration> optionalDrawerConfiguration = this.getDrawer(drawerName);
+        if (!optionalDrawerConfiguration.isPresent()) {
+            message(this.plugin, sender, Message.DRAWER_NOT_FOUND, "%name%", drawerName);
+            return;
+        }
+
+        DrawerConfiguration drawerConfiguration = optionalDrawerConfiguration.get();
+
+        Drawer drawer = new ZDrawer(this.plugin, drawerConfiguration, location, blockFace);
 
         if (drawerUpgrade != null) {
             drawer.setUpgrade(drawerUpgrade);
@@ -339,10 +331,5 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     @Override
     public NamespaceContainer getNamespaceContainer() {
         return this.namespaceContainer;
-    }
-
-    @Override
-    public DrawerBorder getBorder() {
-        return drawerBorder;
     }
 }

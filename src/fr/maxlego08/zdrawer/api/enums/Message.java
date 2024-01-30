@@ -58,6 +58,8 @@ public enum Message {
     EMPTY_DRAWER("Empty"),
     EMPTY_UPGRADE("#e32f1b✘"),
 
+    DRAWER_NOT_FOUND("§cCan’t find the drawer %name%§c."),
+
     DRAWER_GIVE_RECEIVE("§aYou just got a drawer."),
     DRAWER_GIVE_SENDER("§aYou just gave a Drawer to §f%player%§a."),
 

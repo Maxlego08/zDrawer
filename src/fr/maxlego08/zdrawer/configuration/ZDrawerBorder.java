@@ -1,9 +1,13 @@
-package fr.maxlego08.zdrawer;
+package fr.maxlego08.zdrawer.configuration;
 
 import fr.maxlego08.menu.MenuItemStack;
-import fr.maxlego08.zdrawer.api.DrawerBorder;
+import fr.maxlego08.menu.exceptions.InventoryException;
+import fr.maxlego08.menu.zcore.utils.loader.Loader;
+import fr.maxlego08.zdrawer.api.configuration.DrawerBorder;
 import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import org.bukkit.configuration.file.YamlConfiguration;
+
+import java.io.File;
 
 public class ZDrawerBorder implements DrawerBorder {
 
@@ -14,13 +18,13 @@ public class ZDrawerBorder implements DrawerBorder {
     private final DisplaySize left;
     private final DisplaySize right;
 
-    public ZDrawerBorder(boolean enable, MenuItemStack itemStack, DisplaySize up, DisplaySize down, DisplaySize left, DisplaySize right) {
-        this.enable = enable;
-        this.itemStack = itemStack;
-        this.up = up;
-        this.down = down;
-        this.left = left;
-        this.right = right;
+    public ZDrawerBorder(YamlConfiguration configuration, String path, Loader<MenuItemStack> loader, File file) throws InventoryException {
+        this.enable = configuration.getBoolean(path + "enable");
+        this.itemStack = loader.load(configuration, path + "item.", file);
+        this.up = new DisplaySize(configuration, path + "scale.up.");
+        this.down = new DisplaySize(configuration, path + "scale.down.");
+        this.left = new DisplaySize(configuration, path + "scale.left.");
+        this.right = new DisplaySize(configuration, path + "scale.right.");
     }
 
     public MenuItemStack getItemStack() {

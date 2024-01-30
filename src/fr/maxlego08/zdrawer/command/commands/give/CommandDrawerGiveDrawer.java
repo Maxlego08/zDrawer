@@ -25,6 +25,7 @@ public class CommandDrawerGiveDrawer extends VCommand {
         this.setPermission(Permission.ZDRAWER_GIVE_DRAWER);
         this.setDescription(Message.DESCRIPTION_GIVE_DRAWER);
         this.addRequireArg("player");
+        this.addRequireArg("drawer", (a, b) -> plugin.getManager().getDrawerNames());
         this.addOptionalArg("upgradeName", (a, b) -> plugin.getManager().getUpgradeNames());
         this.addOptionalArg("material", (a, b) -> materials);
         this.addOptionalArg("amount", (a, b) -> Arrays.asList("1", "2", "4", "6", "8", "16", "32", "64"));
@@ -36,18 +37,19 @@ public class CommandDrawerGiveDrawer extends VCommand {
         DrawerManager manager = plugin.getManager();
 
         Player player = this.argAsPlayer(0);
-        String upgradeName = this.argAsString(1);
-        String materialName = this.argAsString(2);
+        String drawerName = this.argAsString(1);
+        String upgradeName = this.argAsString(2);
+        String materialName = this.argAsString(3);
         Material material = null;
         try {
             if (materialName != null) material = Material.valueOf(materialName.toUpperCase());
         } catch (Exception ignored) {
         }
 
-        long amount = this.argAsLong(3, 0);
+        long amount = this.argAsLong(4, 0);
         DrawerUpgrade drawerUpgrade = manager.getUpgrade(upgradeName).orElse(null);
 
-        manager.giveDrawer(this.sender, player, drawerUpgrade, material, amount);
+        manager.giveDrawer(this.sender, player, drawerName, drawerUpgrade, material, amount);
 
         return CommandType.SUCCESS;
     }

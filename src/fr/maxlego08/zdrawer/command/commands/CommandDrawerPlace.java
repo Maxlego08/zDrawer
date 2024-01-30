@@ -8,25 +8,23 @@ import fr.maxlego08.zdrawer.command.VCommand;
 import fr.maxlego08.zdrawer.zcore.enums.Permission;
 import fr.maxlego08.zdrawer.zcore.utils.commands.CommandType;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.generator.WorldInfo;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class CommandDrawerPlace extends VCommand {
 
-    private final List<BlockFace> blockFaceAllowed = Arrays.asList(
-            BlockFace.DOWN,
-            BlockFace.UP,
-            BlockFace.WEST,
-            BlockFace.EAST,
-            BlockFace.NORTH,
-            BlockFace.SOUTH
-    );
+    private final List<BlockFace> blockFaceAllowed = Arrays.asList(BlockFace.DOWN, BlockFace.UP, BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH);
 
     public CommandDrawerPlace(DrawerPlugin plugin) {
         super(plugin);
@@ -37,10 +35,11 @@ public class CommandDrawerPlace extends VCommand {
         this.addSubCommand("place");
         this.setPermission(Permission.ZDRAWER_PLACE);
         this.setDescription(Message.DESCRIPTION_PLACE);
+        this.addRequireArg("drawer", (a, b) -> plugin.getManager().getDrawerNames());
         this.addRequireArg("world name", (a, b) -> Bukkit.getWorlds().stream().map(WorldInfo::getName).collect(Collectors.toList()));
-        this.addRequireArg("x");
-        this.addRequireArg("y");
-        this.addRequireArg("z");
+        this.addRequireArg("x", (sender, b) -> Collections.singletonList(toLocation(sender)[0]));
+        this.addRequireArg("y", (sender, b) -> Collections.singletonList(toLocation(sender)[1]));
+        this.addRequireArg("z", (sender, b) -> Collections.singletonList(toLocation(sender)[2]));
         this.addRequireArg("face", (a, b) -> blockFaces);
         this.addOptionalArg("upgradeName", (a, b) -> plugin.getManager().getUpgradeNames());
         this.addOptionalArg("material", (a, b) -> materials);
@@ -52,28 +51,38 @@ public class CommandDrawerPlace extends VCommand {
 
         DrawerManager manager = plugin.getManager();
 
-        World world = this.argAsWorld(0);
-        double x = this.argAsDouble(1);
-        double y = this.argAsDouble(2);
-        double z = this.argAsDouble(3);
+        String drawerName = this.argAsString(0);
+        World world = this.argAsWorld(1);
+        double x = this.argAsDouble(2);
+        double y = this.argAsDouble(3);
+        double z = this.argAsDouble(4);
 
-        BlockFace blockFace = BlockFace.valueOf(this.argAsString(4).toUpperCase());
+        BlockFace blockFace = BlockFace.valueOf(this.argAsString(5).toUpperCase());
         if (!blockFaceAllowed.contains(blockFace)) return CommandType.SYNTAX_ERROR;
 
-        String upgradeName = this.argAsString(5);
-        String materialName = this.argAsString(6);
+        String upgradeName = this.argAsString(6);
+        String materialName = this.argAsString(7);
         Material material = null;
         try {
             if (materialName != null) material = Material.valueOf(materialName.toUpperCase());
         } catch (Exception ignored) {
         }
 
-        long amount = this.argAsLong(7, 0);
+        long amount = this.argAsLong(8, 0);
         DrawerUpgrade drawerUpgrade = manager.getUpgrade(upgradeName).orElse(null);
 
-        manager.placeDrawer(this.sender, world, x, y, z, blockFace, drawerUpgrade, material, amount);
+        manager.placeDrawer(this.sender, drawerName, world, x, y, z, blockFace, drawerUpgrade, material, amount);
 
         return CommandType.SUCCESS;
+    }
+
+    private String[] toLocation(CommandSender sender) {
+        if (sender instanceof ConsoleCommandSender) {
+            return new String[]{"", "", ""};
+        }
+        Player player = (Player) sender;
+        Location location = player.getLocation();
+        return new String[]{String.valueOf(location.getBlockX()), String.valueOf(location.getBlockY()), String.valueOf(location.getBlockZ())};
     }
 
 }

@@ -8,6 +8,9 @@
 - [ ] Add SlimeFun API for Trunk Connectors
 - [x] Check compatibility on skyblock/ other plugins (not even need to be bored to add each plugin, it’s beautiful)
 - [x] Manage chunks and worlds
+- [ ] Add the ability to choose whether items drop to the ground or not.
+- [ ] If the configuration wants to drop the items to the floor, add another configuration so that the drawer does not break if it has too many item dedans. 
+- [ ] Add the ability to choose the viewing distance of the display entity 
 
 Idée de gestion d'inventaire:
 - Pouvoir ajouter les items dedans

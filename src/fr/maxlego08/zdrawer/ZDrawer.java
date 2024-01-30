@@ -1,8 +1,9 @@
 package fr.maxlego08.zdrawer;
 
 import fr.maxlego08.zdrawer.api.Drawer;
-import fr.maxlego08.zdrawer.api.DrawerBorder;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
+import fr.maxlego08.zdrawer.api.configuration.DrawerBorder;
+import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
@@ -31,6 +32,7 @@ import java.util.List;
 public class ZDrawer extends ZUtils implements Drawer {
 
     private final DrawerPlugin plugin;
+    private final DrawerConfiguration drawerConfiguration;
     private final Location location;
     private final BlockFace blockFace;
     private final List<ItemDisplay> borderDisplays = new ArrayList<>();
@@ -41,8 +43,9 @@ public class ZDrawer extends ZUtils implements Drawer {
     private TextDisplay textDisplay;
     private DrawerUpgrade drawerUpgrade;
 
-    public ZDrawer(DrawerPlugin plugin, Location location, BlockFace blockFace) {
+    public ZDrawer(DrawerPlugin plugin, DrawerConfiguration drawerConfiguration, Location location, BlockFace blockFace) {
         this.plugin = plugin;
+        this.drawerConfiguration = drawerConfiguration;
         this.location = location;
         this.blockFace = blockFace;
 
@@ -58,11 +61,12 @@ public class ZDrawer extends ZUtils implements Drawer {
         if (!location.getChunk().isLoaded()) return;
 
         this.spawnDisplay();
-        this.spawnBorder(plugin.getManager().getBorder());
+        this.spawnBorder(drawerConfiguration.getBorder());
     }
 
     public ZDrawer(Material material, long amount, DrawerUpgrade drawerUpgrade) {
 
+        this.drawerConfiguration = null;
         this.plugin = null;
         this.location = null;
         this.blockFace = null;
@@ -117,6 +121,11 @@ public class ZDrawer extends ZUtils implements Drawer {
         display.setInvulnerable(true);
         display.setTransformation(transformation);
         display.setMetadata("zdrawer-entity", new FixedMetadataValue(this.plugin, true));
+    }
+
+    @Override
+    public String getConfigurationName() {
+        return this.drawerConfiguration.getName();
     }
 
     @Override
@@ -288,7 +297,7 @@ public class ZDrawer extends ZUtils implements Drawer {
     @Override
     public void onLoad() {
         this.spawnDisplay();
-        this.spawnBorder(plugin.getManager().getBorder());
+        this.spawnBorder(this.drawerConfiguration.getBorder());
         if (this.itemStack != null) this.itemDisplay.setItemStack(itemStack);
         if (this.drawerUpgrade != null) this.upgradeDisplay.setItemStack(this.drawerUpgrade.getDisplayItemStack());
         updateText();
@@ -301,7 +310,7 @@ public class ZDrawer extends ZUtils implements Drawer {
 
     @Override
     public long getLimit() {
-        return this.drawerUpgrade == null ? this.plugin.getManager().getDrawerLimit() : this.drawerUpgrade.getLimit();
+        return this.drawerUpgrade == null ? this.drawerConfiguration.getLimit() : this.drawerUpgrade.getLimit();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package fr.maxlego08.zdrawer.api.utils;
 
 import fr.maxlego08.zdrawer.api.Drawer;
-import fr.maxlego08.zdrawer.api.DrawerBorder;
+import fr.maxlego08.zdrawer.api.configuration.DrawerBorder;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;

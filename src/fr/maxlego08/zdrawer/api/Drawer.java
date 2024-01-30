@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface Drawer {
 
+    String getConfigurationName();
+
     /**
      * Gets the location of this drawer in the world.
      *

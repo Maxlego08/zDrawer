@@ -1,5 +1,7 @@
 package fr.maxlego08.zdrawer.api;
 
+import fr.maxlego08.zdrawer.api.configuration.DrawerBorder;
+import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import fr.maxlego08.zdrawer.api.craft.Craft;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.api.storage.Savable;
@@ -7,7 +9,6 @@ import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import fr.maxlego08.zdrawer.api.utils.NamespaceContainer;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
@@ -20,13 +21,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface DrawerManager extends Savable {
-
-    /**
-     * Gets the global limit for the number of items a single drawer can hold.
-     *
-     * @return The maximum number of items allowed in a drawer.
-     */
-    long getDrawerLimit();
 
     /**
      * Retrieves a craft recipe by its name.
@@ -44,6 +38,10 @@ public interface DrawerManager extends Savable {
      */
     Optional<DrawerUpgrade> getUpgrade(String upgradeName);
 
+    Optional<DrawerConfiguration> getDrawer(String drawerName);
+
+    List<String> getDrawerNames();
+
     /**
      * Gives a customized drawer item to a player.
      *
@@ -53,7 +51,7 @@ public interface DrawerManager extends Savable {
      * @param material      The material of the drawer.
      * @param amount        The amount of the item to be given.
      */
-    void giveDrawer(CommandSender sender, Player player, DrawerUpgrade drawerUpgrade, Material material, Long amount);
+    void giveDrawer(CommandSender sender, Player player, String drawerName, DrawerUpgrade drawerUpgrade, Material material, Long amount);
 
     /**
      * Constructs a drawer ItemStack based on the specified parameters.
@@ -62,7 +60,7 @@ public interface DrawerManager extends Savable {
      * @param drawer The drawer configuration.
      * @return The ItemStack representing the built drawer.
      */
-    ItemStack buildDrawer(Player player, Drawer drawer);
+    ItemStack buildDrawer(DrawerConfiguration drawerConfiguration, Player player, Drawer drawer);
 
     /**
      * Gets a list of all available upgrade names.
@@ -100,7 +98,7 @@ public interface DrawerManager extends Savable {
      * @param material      The material of the drawer.
      * @param amount        The amount of the item to be placed inside the drawer.
      */
-    void placeDrawer(CommandSender sender, World world, double x, double y, double z, BlockFace blockFace, DrawerUpgrade drawerUpgrade, Material material, long amount);
+    void placeDrawer(CommandSender sender, String drawerName, World world, double x, double y, double z, BlockFace blockFace, DrawerUpgrade drawerUpgrade, Material material, long amount);
 
     /**
      * Purges all drawers in a specified world, effectively removing them.
@@ -114,7 +112,7 @@ public interface DrawerManager extends Savable {
      * Formats a number according to the plugin's formatting rules.
      *
      * @param number The number to format.
-     * @param force Force the format
+     * @param force  Force the format
      * @return A string representation of the formatted number.
      */
     String numberFormat(long number, boolean force);
@@ -173,13 +171,5 @@ public interface DrawerManager extends Savable {
      * @return NamespaceContainer The container holding various namespaces.
      */
     NamespaceContainer getNamespaceContainer();
-
-    /**
-     * Retrieves the default or current border settings for drawers.
-     * This may include visual and functional properties of the drawer borders.
-     *
-     * @return DrawerBorder The current or default settings for drawer borders.
-     */
-    DrawerBorder getBorder();
 
 }

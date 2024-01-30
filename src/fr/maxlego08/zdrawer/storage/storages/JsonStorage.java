@@ -3,8 +3,10 @@ package fr.maxlego08.zdrawer.storage.storages;
 import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.ZDrawer;
 import fr.maxlego08.zdrawer.api.Drawer;
-import fr.maxlego08.zdrawer.api.storage.IStorage;
+import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import fr.maxlego08.zdrawer.api.storage.DrawerContainer;
+import fr.maxlego08.zdrawer.api.storage.IStorage;
+import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -41,7 +43,7 @@ public class JsonStorage implements IStorage {
         String stringLocation = locationToString(drawer.getLocation());
         this.drawerMap.put(stringLocation, drawer);
 
-        DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getItemStackAsString(), drawer.getUpgradeName(), drawer.getAmount());
+        DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getConfigurationName(), drawer.getItemStackAsString(), drawer.getUpgradeName(), drawer.getAmount());
         this.drawers.add(drawerContainer);
     }
 
@@ -58,7 +60,12 @@ public class JsonStorage implements IStorage {
     public void createDrawer(DrawerContainer drawerContainer) {
         Location location = stringToLocation(drawerContainer.getLocation());
 
-        Drawer drawer = new ZDrawer(this.plugin, location, drawerContainer.getBlockFace());
+        Optional<DrawerConfiguration> optional = plugin.getManager().getDrawer(drawerContainer.getDrawerName());
+        if (!optional.isPresent()) {
+            Logger.info("Impossible to load a drawer, configuration " + drawerContainer.getDrawerName() + " doesn't exit !", Logger.LogType.ERROR);
+            return;
+        }
+        Drawer drawer = new ZDrawer(this.plugin, optional.get(), location, drawerContainer.getBlockFace());
         if (drawerContainer.hasItemStack()) {
             ItemStack itemStack = ItemStackUtils.deserializeItemStack(drawerContainer.getItemStack());
             drawer.setItemStack(itemStack);
@@ -93,7 +100,7 @@ public class JsonStorage implements IStorage {
         this.drawers = new ArrayList<>();
         this.drawerMap.forEach((stringLocation, drawer) -> {
             drawer.onDisable();
-            DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getItemStackAsString(), drawer.getUpgradeName(), drawer.getAmount());
+            DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getConfigurationName(), drawer.getItemStackAsString(), drawer.getUpgradeName(), drawer.getAmount());
             this.drawers.add(drawerContainer);
         });
     }
