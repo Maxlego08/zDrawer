@@ -13,9 +13,8 @@ public class NamespaceContainer {
 
     private final NamespacedKey dataKeyDrawer;
     private final NamespacedKey dataKeyCraft;
-    private final NamespacedKey dataKeyItemstack;
+    private final NamespacedKey dataKeyContent;
     private final NamespacedKey dataKeyUpgrade;
-    private final NamespacedKey dataKeyAmount;
 
     /**
      * Constructs a new NamespaceContainer with specific namespaced keys for each data type.
@@ -24,8 +23,7 @@ public class NamespaceContainer {
      */
     public NamespaceContainer(Plugin plugin) {
         this.dataKeyDrawer = new NamespacedKey(plugin, "content");
-        this.dataKeyItemstack = new NamespacedKey(plugin, "itemstack");
-        this.dataKeyAmount = new NamespacedKey(plugin, "amount");
+        this.dataKeyContent = new NamespacedKey(plugin, "itemstack");
         this.dataKeyCraft = new NamespacedKey(plugin, "craft");
         this.dataKeyUpgrade = new NamespacedKey(plugin, "upgrade");
     }
@@ -53,8 +51,8 @@ public class NamespaceContainer {
      *
      * @return NamespacedKey The namespaced key for item stack data.
      */
-    public NamespacedKey getDataKeyItemstack() {
-        return dataKeyItemstack;
+    public NamespacedKey getDataKeyContent() {
+        return dataKeyContent;
     }
 
     /**
@@ -66,12 +64,4 @@ public class NamespaceContainer {
         return dataKeyUpgrade;
     }
 
-    /**
-     * Retrieves the namespaced key for amount data.
-     *
-     * @return NamespacedKey The namespaced key for amount data.
-     */
-    public NamespacedKey getDataKeyAmount() {
-        return dataKeyAmount;
-    }
 }

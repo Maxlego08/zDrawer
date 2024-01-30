@@ -133,16 +133,15 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
         persistentDataContainer.set(this.namespaceContainer.getDataKeyDrawer(), PersistentDataType.STRING, drawerConfiguration.getName());
 
-        System.out.println("TODO Mettre à jour le BuildDrawer pour le contenu d'un Drawer");
-        /*if (drawer != null) {
+        if (drawer != null) {
             if (player != null) this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
 
-            persistentDataContainer.set(this.namespaceContainer.getDataKeyItemstack(), PersistentDataType.STRING, drawer.hasItemStack() ? drawer.getItemStackAsString() : "null");
-            persistentDataContainer.set(this.namespaceContainer.getDataKeyAmount(), PersistentDataType.LONG, drawer.getAmount());
+            persistentDataContainer.set(this.namespaceContainer.getDataKeyContent(), PersistentDataType.STRING, drawer.getData());
+
             if (drawer.getUpgrade() != null) {
                 persistentDataContainer.set(this.namespaceContainer.getDataKeyUpgrade(), PersistentDataType.STRING, drawer.getUpgradeName());
             }
-        }*/
+        }
 
         itemStackDrawer.setItemMeta(itemMeta);
         return itemStackDrawer;

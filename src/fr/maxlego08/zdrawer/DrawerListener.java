@@ -10,7 +10,6 @@ import fr.maxlego08.zdrawer.api.utils.NamespaceContainer;
 import fr.maxlego08.zdrawer.listener.ListenerAdapter;
 import fr.maxlego08.zdrawer.save.Config;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
-import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -189,15 +188,10 @@ public class DrawerListener extends ListenerAdapter {
 
         Drawer drawer = new ZDrawer(plugin, optional.get(), location, blockFace);
 
-        if (persistentDataContainer.has(namespaceContainer.getDataKeyAmount()) && persistentDataContainer.has(namespaceContainer.getDataKeyItemstack())) {
-            String itemStackAsString = persistentDataContainer.getOrDefault(namespaceContainer.getDataKeyItemstack(), PersistentDataType.STRING, "null");
-            long amount = persistentDataContainer.getOrDefault(namespaceContainer.getDataKeyAmount(), PersistentDataType.LONG, 0L);
-            ItemStack drawerItemStack = ItemStackUtils.deserializeItemStack(itemStackAsString);
-            System.out.println("TODO - Modifier le onPlace de drawer");
-            /*if (drawerItemStack != null) {
-                drawer.setItemStack(drawerItemStack);
-                drawer.setAmount(amount);
-            }*/
+        if (persistentDataContainer.has(namespaceContainer.getDataKeyContent())) {
+
+            String drawerData = persistentDataContainer.getOrDefault(namespaceContainer.getDataKeyContent(), PersistentDataType.STRING, "null");
+            drawer.load(drawerData);
 
             if (persistentDataContainer.has(namespaceContainer.getDataKeyUpgrade())) {
                 manager.getUpgrade(persistentDataContainer.get(namespaceContainer.getDataKeyUpgrade(), PersistentDataType.STRING)).ifPresent(drawer::setUpgrade);

@@ -132,4 +132,6 @@ public interface Drawer {
     ItemStack getItemStack(int index);
 
     long getAmount(int index);
+
+    void load(String data);
 }

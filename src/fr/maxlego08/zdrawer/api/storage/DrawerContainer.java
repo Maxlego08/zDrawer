@@ -60,14 +60,6 @@ public class DrawerContainer {
     }
 
     public void loadData(Drawer drawer) {
-        String[] values = this.data.split(",");
-        int dataAmount = Integer.parseInt(values[0]);
-        for (int index = 1; index < dataAmount + 1; index++) {
-            String[] currentValues = values[index].split(";");
-            ItemStack itemStack = ItemStackUtils.deserializeItemStack(currentValues[0]);
-            int amount = Integer.parseInt(currentValues[1]);
-            drawer.setItemStack(index - 1, itemStack);
-            drawer.setAmount(index - 1, amount);
-        }
+        drawer.load(this.data);
     }
 }

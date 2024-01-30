@@ -10,6 +10,7 @@ import fr.maxlego08.zdrawer.api.configuration.DrawerSizeDirection;
 import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
+import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -276,5 +277,18 @@ public class ZDrawer extends ZUtils implements Drawer {
     public long getAmount(int index) {
         DrawerCase drawerCase = this.drawerCases.get(index);
         return drawerCase.getAmount();
+    }
+
+    @Override
+    public void load(String data) {
+        String[] values = data.split(",");
+        int dataAmount = Integer.parseInt(values[0]);
+        for (int index = 1; index < dataAmount + 1; index++) {
+            String[] currentValues = values[index].split(";");
+            ItemStack itemStack = ItemStackUtils.deserializeItemStack(currentValues[0]);
+            int amount = Integer.parseInt(currentValues[1]);
+            setItemStack(index - 1, itemStack);
+            setAmount(index - 1, amount);
+        }
     }
 }
