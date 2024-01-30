@@ -5,7 +5,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.zcore.enums.EnumInventory;
-import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.zcore.enums.Permission;
 import fr.maxlego08.zdrawer.zcore.utils.builder.CooldownBuilder;
 import fr.maxlego08.zdrawer.zcore.utils.builder.TimerBuilder;
@@ -28,6 +27,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -38,6 +38,7 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
@@ -53,13 +54,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -135,15 +131,22 @@ public abstract class ZUtils extends MessageUtils {
     }
 
     /**
-     * Gives an item to the player, if the player's inventory is full then the
-     * item will drop to the ground
+     * Gives an itemStack to the player, if the player's inventory is full then the
+     * itemStack will drop to the ground
      *
      * @param player
-     * @param item
+     * @param itemStack
+     * @param enableDirection
      */
-    protected void give(Player player, ItemStack item) {
-        if (hasInventoryFull(player)) player.getWorld().dropItem(player.getLocation(), item);
-        else player.getInventory().addItem(item);
+    protected void give(Player player, ItemStack itemStack, boolean enableDirection) {
+        if (player.getInventory().firstEmpty() == -1) {
+            Location dropLocation = player.getLocation();
+            Item droppedItem = dropLocation.getWorld().dropItem(dropLocation, itemStack);
+            Vector direction = dropLocation.getDirection();
+            direction.multiply(0.2);
+            direction.setY(0.15);
+            droppedItem.setVelocity(direction);
+        } else player.getInventory().addItem(itemStack);
     }
 
     /**

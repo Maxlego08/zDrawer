@@ -9,7 +9,9 @@ import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
 import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
+import fr.maxlego08.zdrawer.api.configuration.DrawerSize;
 import fr.maxlego08.zdrawer.api.craft.Craft;
+import fr.maxlego08.zdrawer.api.enums.DrawerType;
 import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.api.utils.DisplaySize;
@@ -53,6 +55,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     private final List<DrawerUpgrade> drawerUpgrades = new ArrayList<>();
     private final Map<BlockFace, DrawerPosition> drawerPositions = new HashMap<>();
     private final List<DrawerConfiguration> drawerConfigurations = new ArrayList<>();
+    private final Map<DrawerType, DrawerSize> drawerSizes = new HashMap<>();
 
     public ZDrawerManager(DrawerPlugin plugin) {
         this.plugin = plugin;
@@ -98,6 +101,12 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
             exception.printStackTrace();
         }
 
+        this.drawerSizes.clear();
+        for (String drawerTypeKey : configuration.getConfigurationSection("drawer.sizes.").getKeys(false)) {
+            DrawerType drawerType = DrawerType.valueOf(drawerTypeKey.toUpperCase());
+            DrawerSize size = new DrawerSize(drawerType, configuration, "drawer.sizes." + drawerTypeKey + ".");
+            this.drawerSizes.put(drawerType, size);
+        }
         this.loadPosition(configuration);
 
         Config.getInstance().load(configuration);
@@ -124,7 +133,8 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
         persistentDataContainer.set(this.namespaceContainer.getDataKeyDrawer(), PersistentDataType.STRING, drawerConfiguration.getName());
 
-        if (drawer != null) {
+        System.out.println("TODO Mettre à jour le BuildDrawer pour le contenu d'un Drawer");
+        /*if (drawer != null) {
             if (player != null) this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
 
             persistentDataContainer.set(this.namespaceContainer.getDataKeyItemstack(), PersistentDataType.STRING, drawer.hasItemStack() ? drawer.getItemStackAsString() : "null");
@@ -132,7 +142,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
             if (drawer.getUpgrade() != null) {
                 persistentDataContainer.set(this.namespaceContainer.getDataKeyUpgrade(), PersistentDataType.STRING, drawer.getUpgradeName());
             }
-        }
+        }*/
 
         itemStackDrawer.setItemMeta(itemMeta);
         return itemStackDrawer;
@@ -205,7 +215,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
 
         ItemStack itemStack = buildDrawer(drawerConfiguration, player, drawer);
-        give(player, itemStack);
+        give(player, itemStack, false);
 
         message(this.plugin, sender, Message.DRAWER_GIVE_SENDER, "%player%", player.getName());
         message(this.plugin, player, Message.DRAWER_GIVE_RECEIVE);
@@ -235,7 +245,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
 
         Craft craft = optional.get();
         ItemStack itemStack = craft.getResultItemStack(player);
-        give(player, itemStack);
+        give(player, itemStack, false);
 
         message(this.plugin, sender, Message.CRAFT_GIVE_SENDER, "%player%", player.getName(), "%name%", craft.getName());
         message(this.plugin, player, Message.CRAFT_GIVE_RECEIVE, "%name%", craft.getName());
@@ -265,10 +275,11 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
             drawer.setUpgrade(drawerUpgrade);
         }
 
-        if (material != null) {
+        System.out.println("TODO - Mettre à jour le PlaceDrawer");
+        /*if (material != null) {
             drawer.setAmount(amount);
             drawer.setItemStack(new ItemStack(material));
-        }
+        }*/
 
         this.getStorage().storeDrawer(drawer);
 
@@ -331,5 +342,10 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     @Override
     public NamespaceContainer getNamespaceContainer() {
         return this.namespaceContainer;
+    }
+
+    @Override
+    public DrawerSize getSize(DrawerType drawerType) {
+        return this.drawerSizes.get(drawerType);
     }
 }

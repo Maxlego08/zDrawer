@@ -16,9 +16,10 @@ public class DrawerPlaceholder extends ZUtils {
         placeholder.register("content", (player, string) -> {
             if (manager.getCurrentPlayerDrawer().containsKey(player.getUniqueId())) {
                 Drawer drawer = manager.getCurrentPlayerDrawer().get(player.getUniqueId());
-                if (drawer.hasItemStack()) {
+                /*if (drawer.hasItemStack()) {
                     return getItemName(drawer.getItemStack());
-                }
+                }*/
+                return "TODO - A mettre à jour";
             }
             return Message.EMPTY_DRAWER.getMessage();
         });
@@ -27,7 +28,8 @@ public class DrawerPlaceholder extends ZUtils {
         placeholder.register("amount_formatted", (player, string) -> {
             if (manager.getCurrentPlayerDrawer().containsKey(player.getUniqueId())) {
                 Drawer drawer = manager.getCurrentPlayerDrawer().get(player.getUniqueId());
-                return manager.numberFormat(drawer.getAmount(), true);
+                // return manager.numberFormat(drawer.getAmount(), true);
+                return "TODO - A mettre à jour";
             }
             return "0";
         });
@@ -36,7 +38,8 @@ public class DrawerPlaceholder extends ZUtils {
         placeholder.register("amount", (player, string) -> {
             if (manager.getCurrentPlayerDrawer().containsKey(player.getUniqueId())) {
                 Drawer drawer = manager.getCurrentPlayerDrawer().get(player.getUniqueId());
-                return String.valueOf(drawer.getAmount());
+                // return String.valueOf(drawer.getAmount());
+                return "TODO - A mettre à jour";
             }
             return "0";
         });

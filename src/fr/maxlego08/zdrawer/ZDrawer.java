@@ -1,14 +1,16 @@
 package fr.maxlego08.zdrawer;
 
 import fr.maxlego08.zdrawer.api.Drawer;
+import fr.maxlego08.zdrawer.api.DrawerCase;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
 import fr.maxlego08.zdrawer.api.configuration.DrawerBorder;
 import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
+import fr.maxlego08.zdrawer.api.configuration.DrawerSize;
+import fr.maxlego08.zdrawer.api.configuration.DrawerSizeDirection;
 import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
-import fr.maxlego08.zdrawer.zcore.utils.meta.Meta;
-import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -21,13 +23,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ZDrawer extends ZUtils implements Drawer {
 
@@ -36,11 +40,8 @@ public class ZDrawer extends ZUtils implements Drawer {
     private final Location location;
     private final BlockFace blockFace;
     private final List<ItemDisplay> borderDisplays = new ArrayList<>();
-    private ItemStack itemStack; // Use Material for the DEMO, but the real will use ItemStack
-    private long amount;
-    private ItemDisplay itemDisplay;
+    private final List<DrawerCase> drawerCases = new ArrayList<>();
     private ItemDisplay upgradeDisplay;
-    private TextDisplay textDisplay;
     private DrawerUpgrade drawerUpgrade;
 
     public ZDrawer(DrawerPlugin plugin, DrawerConfiguration drawerConfiguration, Location location, BlockFace blockFace) {
@@ -48,7 +49,6 @@ public class ZDrawer extends ZUtils implements Drawer {
         this.drawerConfiguration = drawerConfiguration;
         this.location = location;
         this.blockFace = blockFace;
-
 
         Block block = location.getBlock();
         block.setType(Material.BARREL);
@@ -59,6 +59,10 @@ public class ZDrawer extends ZUtils implements Drawer {
         blockBarrel.getInventory().setItem(0, new ItemStack(Material.STONE, 2));
 
         if (!location.getChunk().isLoaded()) return;
+
+        DrawerSize size = this.plugin.getManager().getSize(drawerConfiguration.getDrawerType());
+        DrawerSizeDirection drawerSizeDirection = size.getDrawerSizeDirectionMap().get(blockFace);
+        drawerSizeDirection.getPositions().forEach(position -> this.drawerCases.add(new ZDrawerCase(plugin, this)));
 
         this.spawnDisplay();
         this.spawnBorder(drawerConfiguration.getBorder());
@@ -71,8 +75,7 @@ public class ZDrawer extends ZUtils implements Drawer {
         this.location = null;
         this.blockFace = null;
 
-        this.itemStack = material == null ? null : new ItemStack(material);
-        this.amount = amount;
+        System.out.println("TODO UPDATE ICI MATERIAL AMOUNT");
         this.drawerUpgrade = drawerUpgrade;
     }
 
@@ -89,34 +92,58 @@ public class ZDrawer extends ZUtils implements Drawer {
         Location locationTextDisplay = this.location.clone();
 
         DrawerPosition drawerPosition = this.plugin.getManager().getDrawerPosition(blockFace);
+        drawerPosition.getUpgradeDisplay().apply(locationUpgradeDisplay);
         drawerPosition.getItemDisplay().apply(location);
         drawerPosition.getTextDisplay().apply(locationTextDisplay);
-        drawerPosition.getUpgradeDisplay().apply(locationUpgradeDisplay);
 
         World world = location.getWorld();
-
-        this.itemDisplay = world.spawn(location, ItemDisplay.class, display -> {
-            display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
-            setSize(display, this.plugin.getManager().getItemDisplaySize());
-        });
 
         this.upgradeDisplay = world.spawn(locationUpgradeDisplay, ItemDisplay.class, display -> {
             display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
             setSize(display, this.plugin.getManager().getUpgradeDisplaySize());
         });
 
-        this.textDisplay = world.spawn(locationTextDisplay, TextDisplay.class, display -> {
-            display.setAlignment(TextDisplay.TextAlignment.CENTER);
-            setSize(display, this.plugin.getManager().getTextDisplaySize());
-        });
+        DrawerSize size = this.plugin.getManager().getSize(drawerConfiguration.getDrawerType());
+        DrawerSizeDirection drawerSizeDirection = size.getDrawerSizeDirectionMap().get(blockFace);
+        DisplaySize scale = drawerSizeDirection.getScale();
 
-        updateText();
+        this.drawerCases.forEach(DrawerCase::onDisable);
+
+        List<DrawerSizeDirection.DrawerSizePosition> drawerSizePositions = drawerSizeDirection.getPositions();
+        for (int index = 0; index < drawerSizePositions.size(); index++) {
+
+            DrawerSizeDirection.DrawerSizePosition position = drawerSizePositions.get(index);
+            DrawerCase drawerCase = this.drawerCases.get(index);
+
+            Location currentLocationItem = location.clone();
+            Location currentLocationText = locationTextDisplay.clone();
+
+            position.getItemSize().apply(currentLocationItem);
+            position.getTextSize().apply(currentLocationText);
+
+            drawerCase.setItemDisplay(world.spawn(currentLocationItem, ItemDisplay.class, display -> {
+                display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
+                setSize(display, this.plugin.getManager().getItemDisplaySize(), scale);
+            }));
+
+            drawerCase.setTextDisplay(world.spawn(currentLocationText, TextDisplay.class, display -> {
+                display.text(Component.text("0"));
+                display.setAlignment(TextDisplay.TextAlignment.CENTER);
+                setSize(display, this.plugin.getManager().getTextDisplaySize(), scale);
+            }));
+
+            drawerCase.updateText();
+        }
     }
 
     private void setSize(Display display, DisplaySize displaySize) {
+        setSize(display, displaySize, new DisplaySize(0, 0, 0));
+    }
+
+    private void setSize(Display display, DisplaySize displaySize, DisplaySize displayMultiplicator) {
         Transformation transformation = display.getTransformation();
         Vector3f scale = transformation.getScale();
-        scale.set(displaySize.getX(), displaySize.getY(), displaySize.getZ());
+        scale.set(displaySize.getX() * displayMultiplicator.getX(), displaySize.getY() * displayMultiplicator.getY(), displaySize.getZ() * displayMultiplicator.getZ());
         display.setBillboard(Display.Billboard.FIXED);
         display.setInvulnerable(true);
         display.setTransformation(transformation);
@@ -138,159 +165,47 @@ public class ZDrawer extends ZUtils implements Drawer {
         return this.blockFace;
     }
 
+
     @Override
-    public ItemStack getItemStack() {
-        return this.itemStack;
+    public void setItemStack(int index, ItemStack itemStack) {
+        DrawerCase drawerCase = this.drawerCases.get(index);
+        drawerCase.setItemStack(itemStack);
     }
 
     @Override
-    public void setItemStack(ItemStack itemStack) {
-        this.itemStack = itemStack;
-        this.itemDisplay.setItemStack(itemStack);
+    public void setAmount(int index, long amount) {
+        DrawerCase drawerCase = this.drawerCases.get(index);
+        drawerCase.setAmount(amount);
+    }
+
+    private Optional<DrawerCase> findNearestCase(Location location) {
+        return this.drawerCases.stream().min(Comparator.comparingDouble(drawerCase -> drawerCase.getItemDisplay().getLocation().distanceSquared(location)));
     }
 
     @Override
-    public String getItemStackAsString() {
-        return ItemStackUtils.serializeItemStack(this.itemStack);
+    public void addItem(Player player, ItemStack itemStack, EquipmentSlot hand, Location position) {
+        findNearestCase(position).ifPresent(drawerCase -> drawerCase.addItem(player, itemStack, hand));
     }
 
     @Override
-    public long getAmount() {
-        return this.amount;
-    }
-
-    @Override
-    public void setAmount(long amount) {
-        this.amount = amount;
-        updateText();
-    }
-
-    @Override
-    public void updateText() {
-        Meta.meta.updateText(this.textDisplay, this.plugin.getManager().numberFormat(amount, false));
-    }
-
-    @Override
-    public ItemDisplay getItemDisplay() {
-        return this.itemDisplay;
-    }
-
-    @Override
-    public TextDisplay getTextDisplay() {
-        return this.textDisplay;
-    }
-
-    @Override
-    public void addItem(Player player, ItemStack itemStack, EquipmentSlot hand) {
-
-        if (isFull()) return;
-
-        // If the item does not exist, then we will create it
-        if (this.itemStack == null) {
-
-            this.itemStack = itemStack;
-            this.itemDisplay.setItemStack(itemStack);
-
-            if (this.hasLimit()) {
-
-                this.amount = Math.min(itemStack.getAmount(), this.getLimit());
-                if (this.amount == itemStack.getAmount()) {
-                    player.getInventory().setItem(hand, new ItemStack(Material.AIR));
-                } else itemStack.setAmount((int) (itemStack.getAmount() - this.amount));
-            } else {
-
-                this.amount = itemStack.getAmount();
-                player.getInventory().setItem(hand, new ItemStack(Material.AIR));
-            }
-
-            updateText();
-
-        } else if (itemStack.isSimilar(this.itemStack)) {
-
-            /// We will retrieve all the items that are similar to add them
-            if (player.isSneaking()) {
-
-                PlayerInventory inventory = player.getInventory();
-                for (int slot = 0; slot != 36; slot++) {
-
-                    ItemStack currentItemStack = inventory.getItem(slot);
-                    if (currentItemStack != null && this.itemStack.isSimilar(currentItemStack)) {
-                        int addAmount = (int) Math.min(currentItemStack.getAmount(), this.getLimit() - this.amount);
-                        this.amount += addAmount;
-                        if (addAmount < currentItemStack.getAmount()) {
-                            currentItemStack.setAmount(currentItemStack.getAmount() - addAmount);
-                            inventory.setItem(slot, currentItemStack);
-                            break; // Stop the loop if maxAmount is reached
-                        } else {
-                            inventory.setItem(slot, new ItemStack(Material.AIR));
-                        }
-                    }
-
-                }
-                updateText();
-
-            } else {
-
-                int addAmount = (int) Math.min(itemStack.getAmount(), this.getLimit() - this.amount);
-                this.amount += addAmount;
-                updateText();
-                if (addAmount < itemStack.getAmount()) {
-                    itemStack.setAmount(itemStack.getAmount() - addAmount);
-                    player.getInventory().setItem(hand, itemStack);
-                } else {
-                    player.getInventory().setItem(hand, new ItemStack(Material.AIR));
-                }
-            }
-        }
-    }
-
-    @Override
-    public void removeItem(Player player) {
-
-        if (this.itemStack == null) return;
-
-        if (player.isSneaking()) {
-
-            int itemStackAmount = (int) Math.min(this.amount, itemStack.getMaxStackSize());
-            ItemStack itemStack = this.itemStack.clone();
-            itemStack.setAmount(itemStackAmount);
-            remove(itemStack.getMaxStackSize());
-            give(player, itemStack);
-
-        } else {
-
-            ItemStack itemStack = this.itemStack.clone();
-            itemStack.setAmount(1);
-            remove(1);
-
-            give(player, itemStack);
-        }
+    public void removeItem(Player player, Location position) {
+        findNearestCase(position).ifPresent(drawerCase -> drawerCase.removeItem(player));
     }
 
     @Override
     public void remove(long amount) {
-        setAmount(this.amount - amount);
-
-        if (this.amount <= 0) {
-
-            this.itemStack = null;
-            this.amount = 0;
-            this.itemDisplay.setItemStack(new ItemStack(Material.AIR));
-        }
-
-        updateText();
+        System.out.println("TO UPDATE REMOVE AMOUNT");
     }
 
     @Override
     public void add(long amount) {
-        setAmount(this.amount + amount);
+        System.out.println("TO UPDATE ADD AMOUNT");
     }
 
     @Override
     public void onDisable() {
-        if (this.textDisplay != null) this.textDisplay.remove();
-        if (this.itemDisplay != null) this.itemDisplay.remove();
-        if (this.upgradeDisplay != null) this.upgradeDisplay.remove();
+        this.drawerCases.forEach(DrawerCase::onDisable);
+        Optional.ofNullable(this.upgradeDisplay).ifPresent(Display::remove);
         this.borderDisplays.forEach(Display::remove);
     }
 
@@ -298,14 +213,8 @@ public class ZDrawer extends ZUtils implements Drawer {
     public void onLoad() {
         this.spawnDisplay();
         this.spawnBorder(this.drawerConfiguration.getBorder());
-        if (this.itemStack != null) this.itemDisplay.setItemStack(itemStack);
-        if (this.drawerUpgrade != null) this.upgradeDisplay.setItemStack(this.drawerUpgrade.getDisplayItemStack());
-        updateText();
-    }
-
-    @Override
-    public boolean hasItemStack() {
-        return this.itemStack != null;
+        Optional.ofNullable(this.drawerUpgrade).ifPresent(upgrade -> this.upgradeDisplay.setItemStack(upgrade.getDisplayItemStack()));
+        this.drawerCases.forEach(DrawerCase::onLoad);
     }
 
     @Override
@@ -340,12 +249,14 @@ public class ZDrawer extends ZUtils implements Drawer {
     }
 
     @Override
-    public boolean isFull() {
-        return this.hasLimit() && this.amount >= this.getLimit();
+    public List<ItemDisplay> getBorderDisplays() {
+        return this.borderDisplays;
     }
 
     @Override
-    public List<ItemDisplay> getBorderDisplays() {
-        return this.borderDisplays;
+    public String getData() {
+        return this.drawerCases.stream()
+                .map(drawerCase -> drawerCase.getItemStackAsString() + ";" + drawerCase.getAmount())
+                .collect(Collectors.joining(",", this.drawerCases.size() + ",", ""));
     }
 }

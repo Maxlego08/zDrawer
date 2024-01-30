@@ -4,7 +4,6 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
@@ -28,54 +27,20 @@ public interface Drawer {
      */
     BlockFace getBlockFace();
 
-    /**
-     * Gets the ItemStack currently stored in this drawer.
-     *
-     * @return The ItemStack in the drawer.
-     */
-    ItemStack getItemStack();
 
     /**
      * Sets the ItemStack for this drawer.
      *
      * @param itemStack The new ItemStack to be placed in the drawer.
      */
-    void setItemStack(ItemStack itemStack);
-
-    /**
-     * Gets a string representation of the ItemStack in this drawer.
-     *
-     * @return St7ring representation of the ItemStack.
-     */
-    String getItemStackAsString();
-
-    /**
-     * Gets the total amount of items in this drawer.
-     *
-     * @return The total amount of items.
-     */
-    long getAmount();
+    void setItemStack(int index, ItemStack itemStack);
 
     /**
      * Sets the total amount of items in this drawer.
      *
      * @param amount The new amount of items to be set.
      */
-    void setAmount(long amount);
-
-    /**
-     * Gets the ItemDisplay associated with this drawer.
-     *
-     * @return The ItemDisplay for the drawer.
-     */
-    ItemDisplay getItemDisplay();
-
-    /**
-     * Gets the TextDisplay associated with this drawer.
-     *
-     * @return The TextDisplay for the drawer.
-     */
-    TextDisplay getTextDisplay();
+    void setAmount(int index, long amount);
 
     /**
      * Adds an item to the drawer from a player's inventory.
@@ -83,15 +48,17 @@ public interface Drawer {
      * @param player    The player adding the item.
      * @param itemStack The item to add to the drawer.
      * @param hand      The hand (slot) from which the item is being added.
+     * @param position
      */
-    void addItem(Player player, ItemStack itemStack, EquipmentSlot hand);
+    void addItem(Player player, ItemStack itemStack, EquipmentSlot hand, Location position);
 
     /**
      * Removes the stored item from the drawer for a player.
      *
-     * @param player The player removing the item.
+     * @param player   The player removing the item.
+     * @param position
      */
-    void removeItem(Player player);
+    void removeItem(Player player, Location position);
 
     /**
      * Performs necessary actions when the plugin is disabled.
@@ -99,13 +66,6 @@ public interface Drawer {
     void onDisable();
 
     void onLoad();
-
-    /**
-     * Checks if there is an ItemStack stored in this drawer.
-     *
-     * @return true if there is an ItemStack, false otherwise.
-     */
-    boolean hasItemStack();
 
     /**
      * Gets the maximum limit of items this drawer can hold.
@@ -163,17 +123,7 @@ public interface Drawer {
      */
     void add(long amount);
 
-    /**
-     * Checks if the drawer is full and cannot accept more items.
-     *
-     * @return true if the drawer is full, false otherwise.
-     */
-    boolean isFull();
-
-    /**
-     * Updates the text displayed with the TextDisplay entity
-     */
-    void updateText();
-
     List<ItemDisplay> getBorderDisplays();
+
+    String getData();
 }

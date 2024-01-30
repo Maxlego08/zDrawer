@@ -1,6 +1,6 @@
 # ToDo
 
-- [x] Manage HOPPER
+- [ ] Manage HOPPER
 - [ ] Create admin commands
 - [ ] SQL and SQLite storage
 - [x] Give the drawer by command, and be able to apply an upgrade directly
@@ -11,6 +11,9 @@
 - [ ] Add the ability to choose whether items drop to the ground or not.
 - [ ] If the configuration wants to drop the items to the floor, add another configuration so that the drawer does not break if it has too many item dedans. 
 - [ ] Add the ability to choose the viewing distance of the display entity 
+- [ ] Add option for destroy block with purge command 
+- [ ] Think about the possibility of creating giant storage blocks
+- [ ] Use PeristentDataContainer for entities
 
 Idée de gestion d'inventaire:
 - Pouvoir ajouter les items dedans

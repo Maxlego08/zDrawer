@@ -40,6 +40,7 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.RayTraceResult;
 
 import java.util.Iterator;
 import java.util.List;
@@ -109,14 +110,19 @@ public class DrawerListener extends ListenerAdapter {
 
         Action action = event.getAction();
 
+        RayTraceResult result = player.rayTraceBlocks(Config.maxDistance);
+        if (result == null) return;
+
+        Location position = result.getHitPosition().toLocation(player.getWorld());
+
         if (action == Action.RIGHT_CLICK_BLOCK) {
 
             if (itemStack == null) return;
 
-            drawer.addItem(player, itemStack, event.getHand());
+            drawer.addItem(player, itemStack, event.getHand(), position);
         } else if (action == Action.LEFT_CLICK_BLOCK) {
 
-            drawer.removeItem(player);
+            drawer.removeItem(player, position);
         }
     }
 
@@ -187,10 +193,11 @@ public class DrawerListener extends ListenerAdapter {
             String itemStackAsString = persistentDataContainer.getOrDefault(namespaceContainer.getDataKeyItemstack(), PersistentDataType.STRING, "null");
             long amount = persistentDataContainer.getOrDefault(namespaceContainer.getDataKeyAmount(), PersistentDataType.LONG, 0L);
             ItemStack drawerItemStack = ItemStackUtils.deserializeItemStack(itemStackAsString);
-            if (drawerItemStack != null) {
+            System.out.println("TODO - Modifier le onPlace de drawer");
+            /*if (drawerItemStack != null) {
                 drawer.setItemStack(drawerItemStack);
                 drawer.setAmount(amount);
-            }
+            }*/
 
             if (persistentDataContainer.has(namespaceContainer.getDataKeyUpgrade())) {
                 manager.getUpgrade(persistentDataContainer.get(namespaceContainer.getDataKeyUpgrade(), PersistentDataType.STRING)).ifPresent(drawer::setUpgrade);
@@ -235,13 +242,14 @@ public class DrawerListener extends ListenerAdapter {
 
             event.setCancelled(true);
 
-            if (drawer.getAmount() <= 0) return;
+            System.out.println("TODO - Corriger les hoppers");
+            /* if (drawer.getAmount() <= 0) return;
 
             ItemStack newItemStack = drawer.getItemStack().clone();
             newItemStack.setAmount(1);
             destination.addItem(newItemStack);
 
-            drawer.remove(1);
+            drawer.remove(1);*/
 
             return;
         }
@@ -257,7 +265,7 @@ public class DrawerListener extends ListenerAdapter {
             ItemStack newItemStack = item.clone();
 
             // Si le drawer n'a aucun item, alors on va ajouter l'item du hopper
-            if (!drawer.hasItemStack()) {
+            /*if (!drawer.hasItemStack()) {
 
                 drawer.setAmount(newItemStack.getAmount());
                 drawer.setItemStack(newItemStack);
@@ -276,7 +284,9 @@ public class DrawerListener extends ListenerAdapter {
 
             } else {
                 event.setCancelled(true);
-            }
+            }*/
+            System.out.println("TODO - Corriger les hoppers");
+            event.setCancelled(true);
         }
     }
 

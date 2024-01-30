@@ -7,12 +7,10 @@ import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import fr.maxlego08.zdrawer.api.storage.DrawerContainer;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
-import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +20,7 @@ import java.util.Optional;
 
 public class JsonStorage implements IStorage {
 
-    private final List<DrawerContainer> waitingDrawers = new ArrayList<>();
+    private transient final List<DrawerContainer> waitingDrawers = new ArrayList<>();
     private transient Map<String, List<Drawer>> drawerMapChunk = new HashMap<>();
     private transient DrawerPlugin plugin;
     private transient Map<String, Drawer> drawerMap = new HashMap<>();
@@ -43,7 +41,7 @@ public class JsonStorage implements IStorage {
         String stringLocation = locationToString(drawer.getLocation());
         this.drawerMap.put(stringLocation, drawer);
 
-        DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getConfigurationName(), drawer.getItemStackAsString(), drawer.getUpgradeName(), drawer.getAmount());
+        DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getConfigurationName(), drawer.getData(), drawer.getUpgradeName());
         this.drawers.add(drawerContainer);
     }
 
@@ -66,11 +64,11 @@ public class JsonStorage implements IStorage {
             return;
         }
         Drawer drawer = new ZDrawer(this.plugin, optional.get(), location, drawerContainer.getBlockFace());
-        if (drawerContainer.hasItemStack()) {
-            ItemStack itemStack = ItemStackUtils.deserializeItemStack(drawerContainer.getItemStack());
-            drawer.setItemStack(itemStack);
-            drawer.setAmount(drawerContainer.getAmount());
+
+        if (drawerContainer.hasData()) {
+            drawerContainer.loadData(drawer);
         }
+
         if (drawerContainer.hasUpgrade()) {
             this.plugin.getManager().getUpgrade(drawerContainer.getUpgrade()).ifPresent(drawer::setUpgrade);
         }
@@ -100,7 +98,7 @@ public class JsonStorage implements IStorage {
         this.drawers = new ArrayList<>();
         this.drawerMap.forEach((stringLocation, drawer) -> {
             drawer.onDisable();
-            DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getConfigurationName(), drawer.getItemStackAsString(), drawer.getUpgradeName(), drawer.getAmount());
+            DrawerContainer drawerContainer = new DrawerContainer(stringLocation, drawer.getBlockFace(), drawer.getConfigurationName(), drawer.getData(), drawer.getUpgradeName());
             this.drawers.add(drawerContainer);
         });
     }

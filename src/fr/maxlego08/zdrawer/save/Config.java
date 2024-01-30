@@ -24,6 +24,7 @@ public class Config {
     public static DisplaySize itemDisplaySize;
     public static DisplaySize upgradeDisplaySize;
     public static DisplaySize textDisplaySize;
+    public static double maxDistance = 4.5;
 
     /**
      * static Singleton instance.
@@ -58,9 +59,9 @@ public class Config {
         blacklistMaterials = configuration.getStringList("drawer.blacklistMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
         breakMaterials = configuration.getStringList("drawer.breakMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
 
-        itemDisplaySize = new DisplaySize(configuration, "drawer.sizes.itemDisplay.");
-        upgradeDisplaySize = new DisplaySize(configuration, "drawer.sizes.upgradeDisplay.");
-        textDisplaySize = new DisplaySize(configuration, "drawer.sizes.textDisplay.");
+        itemDisplaySize = new DisplaySize(configuration, "drawer.scales.itemDisplay.");
+        upgradeDisplaySize = new DisplaySize(configuration, "drawer.scales.upgradeDisplay.");
+        textDisplaySize = new DisplaySize(configuration, "drawer.scales.textDisplay.");
 
         this.loadNumberFormat(configuration);
     }

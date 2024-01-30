@@ -1,5 +1,6 @@
 package fr.maxlego08.zdrawer.api.utils;
 
+import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 /**
@@ -29,7 +30,7 @@ public class DisplaySize {
      * Constructs a new DisplaySize by reading dimensions from a YamlConfiguration.
      *
      * @param configuration The YamlConfiguration from which to read the size.
-     * @param path The base path in the configuration where the size is defined.
+     * @param path          The base path in the configuration where the size is defined.
      */
     public DisplaySize(YamlConfiguration configuration, String path) {
         this(configuration.getDouble(path + ".x"), configuration.getDouble(path + ".y"), configuration.getDouble(path + ".z"));
@@ -60,5 +61,14 @@ public class DisplaySize {
      */
     public double getZ() {
         return z;
+    }
+
+    @Override
+    public String toString() {
+        return "DisplaySize{" + "x=" + x + ", y=" + y + ", z=" + z + '}';
+    }
+
+    public Location apply(Location location) {
+        return location.add(x, y, z);
     }
 }

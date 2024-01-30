@@ -1,8 +1,9 @@
 package fr.maxlego08.zdrawer.api;
 
-import fr.maxlego08.zdrawer.api.configuration.DrawerBorder;
 import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
+import fr.maxlego08.zdrawer.api.configuration.DrawerSize;
 import fr.maxlego08.zdrawer.api.craft.Craft;
+import fr.maxlego08.zdrawer.api.enums.DrawerType;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.api.storage.Savable;
 import fr.maxlego08.zdrawer.api.utils.DisplaySize;
@@ -171,5 +172,7 @@ public interface DrawerManager extends Savable {
      * @return NamespaceContainer The container holding various namespaces.
      */
     NamespaceContainer getNamespaceContainer();
+
+    DrawerSize getSize(DrawerType drawerType);
 
 }
