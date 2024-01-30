@@ -80,13 +80,19 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
     public void addItem(Player player, ItemStack itemStack, EquipmentSlot hand) {
         if (isFull() || itemStack == null) return;
 
+        boolean needUpdate = false;
         if (this.itemStack == null) {
+            needUpdate = true;
             createNewItemStack(itemStack);
         } else if (itemStack.isSimilar(this.itemStack)) {
+            needUpdate = true;
             addItemToExistingStack(player, itemStack);
         }
-        updateInventory(player, itemStack, hand);
-        updateText();
+
+        if (needUpdate) {
+            updateInventory(player, itemStack, hand);
+            updateText();
+        }
     }
 
     private void createNewItemStack(ItemStack itemStack) {
