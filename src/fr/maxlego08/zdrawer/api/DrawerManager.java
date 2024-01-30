@@ -114,9 +114,10 @@ public interface DrawerManager extends Savable {
      * Formats a number according to the plugin's formatting rules.
      *
      * @param number The number to format.
+     * @param force Force the format
      * @return A string representation of the formatted number.
      */
-    String numberFormat(long number);
+    String numberFormat(long number, boolean force);
 
     /**
      * Determines the position of a drawer relative to a given block face.

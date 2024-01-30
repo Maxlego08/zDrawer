@@ -1,25 +1,34 @@
 package fr.maxlego08.zdrawer.save;
 
-import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
-import fr.maxlego08.zdrawer.api.storage.Savable;
+import fr.maxlego08.zdrawer.api.utils.DisplaySize;
+import fr.maxlego08.zdrawer.zcore.utils.FormatConfig;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-public class Config implements Savable {
+public class Config {
 
+    public static final List<FormatConfig> formatConfigs = new ArrayList<>();
     public static boolean enableDebug = true;
     public static boolean enableDebugTime = false;
-
     public static List<Material> breakMaterials = Arrays.asList(Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE);
     public static List<Material> blacklistMaterials = Arrays.asList(Material.BARREL, Material.BEDROCK);
+    public static String defaultFormat = "%amount%";
+    public static boolean enableFormatting = false;
+
+    public static DisplaySize itemDisplaySize;
+    public static DisplaySize upgradeDisplaySize;
+    public static DisplaySize textDisplaySize;
 
     /**
      * static Singleton instance.
      */
     private static volatile Config instance;
-
 
     /**
      * Private constructor for singleton.
@@ -42,10 +51,32 @@ public class Config implements Savable {
         return instance;
     }
 
-    public void save(Persist persist) {
+    public void load(YamlConfiguration configuration) {
+
+        enableDebug = configuration.getBoolean("enableDebug");
+        enableDebugTime = configuration.getBoolean("enableDebugTime");
+        blacklistMaterials = configuration.getStringList("drawer.blacklistMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
+        breakMaterials = configuration.getStringList("drawer.breakMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
+
+        itemDisplaySize = new DisplaySize(configuration, "drawer.sizes.itemDisplay.");
+        upgradeDisplaySize = new DisplaySize(configuration, "drawer.sizes.upgradeDisplay.");
+        textDisplaySize = new DisplaySize(configuration, "drawer.sizes.textDisplay.");
+
+        this.loadNumberFormat(configuration);
     }
 
-    public void load(Persist persist) {
-    }
+    private void loadNumberFormat(YamlConfiguration configuration) {
 
+        enableFormatting = configuration.getBoolean("numberFormat.enable", false);
+        defaultFormat = configuration.getString("numberFormat.display", "%amount%");
+        formatConfigs.clear();
+
+        List<Map<?, ?>> maps = configuration.getMapList("numberFormat.formats");
+        maps.forEach(map -> {
+            String format = (String) map.get("format");
+            String display = (String) map.getOrDefault("display", null);
+            long maxAmount = ((Number) map.get("maxAmount")).longValue();
+            formatConfigs.add(new FormatConfig(format, display == null ? "%amount%" : display, maxAmount));
+        });
+    }
 }

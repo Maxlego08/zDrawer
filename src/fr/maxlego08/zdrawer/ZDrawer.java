@@ -3,6 +3,7 @@ package fr.maxlego08.zdrawer;
 import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.DrawerBorder;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
+import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
 import fr.maxlego08.zdrawer.zcore.utils.meta.Meta;
@@ -92,26 +93,26 @@ public class ZDrawer extends ZUtils implements Drawer {
 
         this.itemDisplay = world.spawn(location, ItemDisplay.class, display -> {
             display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
-            setSize(display, 0.6f, 0.6f, 0.01f);
+            setSize(display, this.plugin.getManager().getItemDisplaySize());
         });
 
         this.upgradeDisplay = world.spawn(locationUpgradeDisplay, ItemDisplay.class, display -> {
             display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
-            setSize(display, 0.15f, 0.15f, 0.01f);
+            setSize(display, this.plugin.getManager().getUpgradeDisplaySize());
         });
 
         this.textDisplay = world.spawn(locationTextDisplay, TextDisplay.class, display -> {
             display.setAlignment(TextDisplay.TextAlignment.CENTER);
-            setSize(display, 0.6, 0.6, 0.6);
+            setSize(display, this.plugin.getManager().getTextDisplaySize());
         });
 
         updateText();
     }
 
-    private void setSize(Display display, double x, double y, double z) {
+    private void setSize(Display display, DisplaySize displaySize) {
         Transformation transformation = display.getTransformation();
         Vector3f scale = transformation.getScale();
-        scale.set(x, y, z);
+        scale.set(displaySize.getX(), displaySize.getY(), displaySize.getZ());
         display.setBillboard(Display.Billboard.FIXED);
         display.setInvulnerable(true);
         display.setTransformation(transformation);
@@ -157,7 +158,7 @@ public class ZDrawer extends ZUtils implements Drawer {
 
     @Override
     public void updateText() {
-        Meta.meta.updateText(this.textDisplay, this.plugin.getManager().numberFormat(amount));
+        Meta.meta.updateText(this.textDisplay, this.plugin.getManager().numberFormat(amount, false));
     }
 
     @Override

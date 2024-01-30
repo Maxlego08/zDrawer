@@ -17,7 +17,7 @@ import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import fr.maxlego08.zdrawer.api.utils.NamespaceContainer;
 import fr.maxlego08.zdrawer.craft.ZCraft;
 import fr.maxlego08.zdrawer.craft.ZCraftUpgrade;
-import fr.maxlego08.zdrawer.placeholder.LocalPlaceholder;
+import fr.maxlego08.zdrawer.placeholder.DrawerPlaceholder;
 import fr.maxlego08.zdrawer.save.Config;
 import fr.maxlego08.zdrawer.zcore.utils.FormatConfig;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
@@ -54,50 +54,19 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     private final Map<UUID, Drawer> currentPlayerDrawer = new HashMap<>();
     private final List<Craft> crafts = new ArrayList<>();
     private final List<DrawerUpgrade> drawerUpgrades = new ArrayList<>();
-    private final List<FormatConfig> formatConfigs = new ArrayList<>();
     private final Map<BlockFace, DrawerPosition> drawerPositions = new HashMap<>();
     private MenuItemStack drawerItemStack;
     private Map<String, MenuItemStack> ingredients = new HashMap<>();
     private List<String> shade;
     private long drawerLimit;
-    private String defaultFormat = "%amount%";
-    private boolean enableFormatting = false;
-    private DisplaySize itemDisplaySize;
-    private DisplaySize upgradeDisplaySize;
-    private DisplaySize textDisplaySize;
     private DrawerBorder drawerBorder;
 
     public ZDrawerManager(DrawerPlugin plugin) {
         this.plugin = plugin;
         this.namespaceContainer = new NamespaceContainer(plugin);
 
-        LocalPlaceholder placeholder = LocalPlaceholder.getInstance();
-        placeholder.register("content", (player, string) -> {
-            if (this.currentPlayerDrawer.containsKey(player.getUniqueId())) {
-                Drawer drawer = this.currentPlayerDrawer.get(player.getUniqueId());
-                if (drawer.hasItemStack()) {
-                    return getItemName(drawer.getItemStack());
-                }
-            }
-            return Message.EMPTY_DRAWER.getMessage();
-        });
-        placeholder.register("amount", (player, string) -> {
-            if (this.currentPlayerDrawer.containsKey(player.getUniqueId())) {
-                Drawer drawer = this.currentPlayerDrawer.get(player.getUniqueId());
-                return String.valueOf(drawer.getAmount());
-            }
-            return "0";
-        });
-        placeholder.register("upgrade", (player, string) -> {
-            if (this.currentPlayerDrawer.containsKey(player.getUniqueId())) {
-                Drawer drawer = this.currentPlayerDrawer.get(player.getUniqueId());
-                DrawerUpgrade drawerUpgrade = drawer.getUpgrade();
-                if (drawerUpgrade != null) {
-                    return drawerUpgrade.getDisplayName();
-                }
-            }
-            return Message.EMPTY_UPGRADE.getMessage();
-        });
+        DrawerPlaceholder drawerPlaceholder = new DrawerPlaceholder();
+        drawerPlaceholder.register(this);
     }
 
     @Override
@@ -148,32 +117,9 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         server.addRecipe(recipe);
         server.updateRecipes();
 
-        this.loadNumberFormat(configuration);
         this.loadPosition(configuration);
 
-        this.itemDisplaySize = new DisplaySize(configuration, "drawer.sizes.itemDisplay.");
-        this.upgradeDisplaySize = new DisplaySize(configuration, "drawer.sizes.upgradeDisplay.");
-        this.textDisplaySize = new DisplaySize(configuration, "drawer.sizes.textDisplay.");
-        this.defaultFormat = configuration.getString("numberFormat.display", "%amount%");
-
-        Config.enableDebug = configuration.getBoolean("enableDebug");
-        Config.enableDebugTime = configuration.getBoolean("enableDebugTime");
-        Config.blacklistMaterials = configuration.getStringList("drawer.blacklistMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
-        Config.breakMaterials = configuration.getStringList("drawer.breakMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
-    }
-
-    private void loadNumberFormat(YamlConfiguration configuration) {
-
-        enableFormatting = configuration.getBoolean("numberFormat.enable", false);
-        this.formatConfigs.clear();
-
-        List<Map<?, ?>> maps = configuration.getMapList("numberFormat.formats");
-        maps.forEach(map -> {
-            String format = (String) map.get("format");
-            String display = (String) map.getOrDefault("display", null);
-            long maxAmount = ((Number) map.get("maxAmount")).longValue();
-            this.formatConfigs.add(new FormatConfig(format, display == null ? "%amount%" : display, maxAmount));
-        });
+        Config.getInstance().load(configuration);
     }
 
     private void loadPosition(YamlConfiguration configuration) {
@@ -346,11 +292,11 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     }
 
     @Override
-    public String numberFormat(long number) {
+    public String numberFormat(long number, boolean force) {
 
-        if (!this.enableFormatting) return defaultFormat.replace("%amount%", String.valueOf(number));
+        if (!Config.enableFormatting && !force) return Config.defaultFormat.replace("%amount%", String.valueOf(number));
 
-        for (FormatConfig config : this.formatConfigs) {
+        for (FormatConfig config : Config.formatConfigs) {
             if (number < config.getMaxAmount()) {
 
                 String displayText = config.getDisplay();
@@ -372,17 +318,17 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
 
     @Override
     public DisplaySize getItemDisplaySize() {
-        return this.itemDisplaySize;
+        return Config.itemDisplaySize;
     }
 
     @Override
     public DisplaySize getUpgradeDisplaySize() {
-        return this.upgradeDisplaySize;
+        return Config.upgradeDisplaySize;
     }
 
     @Override
     public DisplaySize getTextDisplaySize() {
-        return this.textDisplaySize;
+        return Config.textDisplaySize;
     }
 
     @Override

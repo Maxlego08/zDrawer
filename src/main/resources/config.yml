@@ -20,6 +20,7 @@
 # Placeholders
 # - %zdrawer_content% » Displays the contents of the drawer with which the player interacts
 # - %zdrawer_amount% » Displays the amount of the drawer with which the player interacts
+# - %zdrawer_amount_formatted% » Displays the amount with the format of the drawer with which the player interacts
 # - %zdrawer_upgrade% » Displays the upgrade of the drawer with which the player interacts
 #
 # For item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
@@ -40,7 +41,7 @@ drawer:
       - "&8&oStore a large number of the same item"
       - ""
       - "#e3e3e3Content&8: #baffff%zdrawer_content%"
-      - "#e3e3e3Amount&8: #baffff%zdrawer_amount%"
+      - "#e3e3e3Amount&8: #baffff%zdrawer_amount_formatted%"
       - "#e3e3e3Upgrade&8: #baffff%zdrawer_upgrade%"
 
   border:
@@ -196,7 +197,7 @@ upgrades:
 # Number formatting settings for displaying large numbers in a more readable format.
 numberFormat:
   # Allows you to use colors to display text, works with MiniMessage: https://docs.advntr.dev/minimessage/format.html
-  display: "<white>%amount%"
+  display: "&f%amount%"
   # Toggle to enable/disable custom number formatting.
   enable: false
   # Documentation for String format: https://www.geeksforgeeks.org/java-string-format-method-with-examples/
