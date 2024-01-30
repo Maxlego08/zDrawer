@@ -4,8 +4,8 @@ import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.DrawerBorder;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
-import fr.maxlego08.zdrawer.zcore.utils.TextDisplayUtil;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
+import fr.maxlego08.zdrawer.zcore.utils.meta.Meta;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -157,7 +157,7 @@ public class ZDrawer extends ZUtils implements Drawer {
 
     @Override
     public void updateText() {
-        TextDisplayUtil.setDisplayedText(this.textDisplay, this.plugin.getManager().numberFormat(amount));
+        Meta.meta.updateText(this.textDisplay, this.plugin.getManager().numberFormat(amount));
     }
 
     @Override

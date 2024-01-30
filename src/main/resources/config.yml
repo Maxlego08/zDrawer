@@ -195,18 +195,25 @@ upgrades:
 
 # Number formatting settings for displaying large numbers in a more readable format.
 numberFormat:
+  # Allows you to use colors to display text, works with MiniMessage: https://docs.advntr.dev/minimessage/format.html
+  display: "<white>%amount%"
   # Toggle to enable/disable custom number formatting.
   enable: false
   # Documentation for String format: https://www.geeksforgeeks.org/java-string-format-method-with-examples/
   formats:
     - format: "" # Blank format to display text directly
       maxAmount: 1000
+      # Add colors to text display, works with MiniMessage
+      # display: "<gradient:#1cfc03:#2bd66f>%amount%"
     - format: "%.1fK"
       maxAmount: 1000000
+      # display: "<gradient:#7bd62b:#a3d14d>%amount%"
     - format: "%.1fM"
       maxAmount: 1000000000
+      # display: "<gradient:#ebe123:#ebbc23>%amount%"
     - format: "%.1fB"
       maxAmount: 1000000000000
+      # display: "<gradient:#eb8023:#eb4b23>%amount%"
     - format: "%.2fT"
       maxAmount: 1000000000000000
     - format: "%.2fQ"

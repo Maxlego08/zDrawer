@@ -24,7 +24,6 @@ import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
 import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -61,6 +60,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     private Map<String, MenuItemStack> ingredients = new HashMap<>();
     private List<String> shade;
     private long drawerLimit;
+    private String defaultFormat = "%amount%";
     private boolean enableFormatting = false;
     private DisplaySize itemDisplaySize;
     private DisplaySize upgradeDisplaySize;
@@ -129,12 +129,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
             // Load upgrades
             this.loadUpgrades(file, configuration, loader);
 
-            this.drawerBorder = new ZDrawerBorder(configuration.getBoolean("drawer.border.enable"), loader.load(configuration, "drawer.border.item.", file),
-                    new DisplaySize(configuration, "drawer.border.scale.up."),
-                    new DisplaySize(configuration, "drawer.border.scale.down."),
-                    new DisplaySize(configuration, "drawer.border.scale.left."),
-                    new DisplaySize(configuration, "drawer.border.scale.right.")
-            );
+            this.drawerBorder = new ZDrawerBorder(configuration.getBoolean("drawer.border.enable"), loader.load(configuration, "drawer.border.item.", file), new DisplaySize(configuration, "drawer.border.scale.up."), new DisplaySize(configuration, "drawer.border.scale.down."), new DisplaySize(configuration, "drawer.border.scale.left."), new DisplaySize(configuration, "drawer.border.scale.right."));
         } catch (InventoryException exception) {
             exception.printStackTrace();
         }
@@ -159,7 +154,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         this.itemDisplaySize = new DisplaySize(configuration, "drawer.sizes.itemDisplay.");
         this.upgradeDisplaySize = new DisplaySize(configuration, "drawer.sizes.upgradeDisplay.");
         this.textDisplaySize = new DisplaySize(configuration, "drawer.sizes.textDisplay.");
-
+        this.defaultFormat = configuration.getString("numberFormat.display", "%amount%");
 
         Config.enableDebug = configuration.getBoolean("enableDebug");
         Config.enableDebugTime = configuration.getBoolean("enableDebugTime");
@@ -175,8 +170,9 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         List<Map<?, ?>> maps = configuration.getMapList("numberFormat.formats");
         maps.forEach(map -> {
             String format = (String) map.get("format");
+            String display = (String) map.getOrDefault("display", null);
             long maxAmount = ((Number) map.get("maxAmount")).longValue();
-            this.formatConfigs.add(new FormatConfig(format, maxAmount));
+            this.formatConfigs.add(new FormatConfig(format, display == null ? "%amount%" : display, maxAmount));
         });
     }
 
@@ -352,14 +348,18 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     @Override
     public String numberFormat(long number) {
 
-        if (!this.enableFormatting) return String.valueOf(number);
+        if (!this.enableFormatting) return defaultFormat.replace("%amount%", String.valueOf(number));
 
         for (FormatConfig config : this.formatConfigs) {
             if (number < config.getMaxAmount()) {
-                if (config.getFormat().isEmpty()) return String.valueOf(number);
+
+                String displayText = config.getDisplay();
+                if (config.getFormat().isEmpty()) {
+                    return displayText.replace("%amount%", String.valueOf(number));
+                }
 
                 double divisor = config.getMaxAmount() == 1000 ? 1000.0 : config.getMaxAmount() / 1000.0;
-                return String.format(config.getFormat(), number / divisor);
+                return displayText.replace("%amount%", String.format(config.getFormat(), number / divisor));
             }
         }
         return String.valueOf(number);
