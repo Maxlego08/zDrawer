@@ -69,15 +69,18 @@ public class ZDrawer extends ZUtils implements Drawer {
         this.spawnBorder(drawerConfiguration.getBorder());
     }
 
-    public ZDrawer(Material material, long amount, DrawerUpgrade drawerUpgrade) {
+    public ZDrawer(DrawerPlugin plugin, Material material, long amount, DrawerUpgrade drawerUpgrade, DrawerConfiguration drawerConfiguration) {
 
         this.drawerConfiguration = null;
         this.plugin = null;
         this.location = null;
         this.blockFace = null;
 
-        System.out.println("TODO UPDATE ICI MATERIAL AMOUNT");
         this.drawerUpgrade = drawerUpgrade;
+
+        for (int index = 0; index < drawerConfiguration.getDrawerType().getSize(); index++) {
+            this.drawerCases.add(new ZDrawerCase(plugin, this, amount, material));
+        }
     }
 
     public void spawnBorder(DrawerBorder drawerBorder) {

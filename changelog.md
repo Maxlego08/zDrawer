@@ -14,6 +14,7 @@
 - [ ] Add option for destroy block with purge command 
 - [ ] Think about the possibility of creating giant storage blocks
 - [ ] Use PeristentDataContainer for entities
+- [ ] Add option for enable of disable drawer for each drawer
 
 Idée de gestion d'inventaire:
 - Pouvoir ajouter les items dedans

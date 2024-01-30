@@ -29,6 +29,13 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
         this.drawer = drawer;
     }
 
+    public ZDrawerCase(DrawerPlugin plugin, ZDrawer drawer, long amount, Material material) {
+        this.plugin = plugin;
+        this.drawer = drawer;
+        this.amount = amount;
+        this.itemStack = new ItemStack(material);
+    }
+
     @Override
     public ItemStack getItemStack() {
         return this.itemStack;

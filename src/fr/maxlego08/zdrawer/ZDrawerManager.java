@@ -210,7 +210,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         }
 
         DrawerConfiguration drawerConfiguration = optional.get();
-        Drawer drawer = new ZDrawer(material, amount, drawerUpgrade);
+        Drawer drawer = new ZDrawer(this.plugin, material, amount, drawerUpgrade, drawerConfiguration);
         this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
 
         ItemStack itemStack = buildDrawer(drawerConfiguration, player, drawer);
@@ -267,18 +267,16 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         }
 
         DrawerConfiguration drawerConfiguration = optionalDrawerConfiguration.get();
-
         Drawer drawer = new ZDrawer(this.plugin, drawerConfiguration, location, blockFace);
 
         if (drawerUpgrade != null) {
             drawer.setUpgrade(drawerUpgrade);
         }
 
-        System.out.println("TODO - Mettre à jour le PlaceDrawer");
-        /*if (material != null) {
-            drawer.setAmount(amount);
-            drawer.setItemStack(new ItemStack(material));
-        }*/
+        for (int index = 0; index < drawerConfiguration.getDrawerType().getSize(); index++) {
+            drawer.setAmount(index, amount);
+            drawer.setItemStack(index, new ItemStack(material));
+        }
 
         this.getStorage().storeDrawer(drawer);
 
