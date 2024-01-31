@@ -10,7 +10,8 @@
 - [x] Manage chunks and worlds
 - [x] Add the ability to choose whether items drop to the ground or not.
 - [x] If the configuration wants to drop the items to the floor, add another configuration so that the drawer does not break if it has too many item in. 
-- [ ] Add the ability to choose the viewing distance of the display entity 
+- [x] Add the ability to choose the viewing distance of the display entity 
+- [x] Add the ability to choose to enable or not the default background 
 - [x] Add option for destroy block with purge command 
 - [ ] Think about the possibility of creating giant storage blocks
 - [x] Use PersistentDataContainer for entities

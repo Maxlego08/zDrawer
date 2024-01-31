@@ -106,6 +106,7 @@ public class ZDrawer extends ZUtils implements Drawer {
 
         this.upgradeDisplay = world.spawn(locationUpgradeDisplay, ItemDisplay.class, display -> {
             display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
+            display.setViewRange(drawerConfiguration.getViewRange());
             setSize(display, this.plugin.getManager().getUpgradeDisplaySize());
         });
 
@@ -129,12 +130,16 @@ public class ZDrawer extends ZUtils implements Drawer {
 
             drawerCase.setItemDisplay(world.spawn(currentLocationItem, ItemDisplay.class, display -> {
                 display.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GUI);
+                display.setViewRange(drawerConfiguration.getViewRange());
                 setSize(display, this.plugin.getManager().getItemDisplaySize(), scale);
             }));
 
             drawerCase.setTextDisplay(world.spawn(currentLocationText, TextDisplay.class, display -> {
                 display.text(Component.text("0"));
+                display.setDefaultBackground(drawerConfiguration.isDefaultBackground());
+                System.out.println("Display default background: " + display.isDefaultBackground());
                 display.setAlignment(TextDisplay.TextAlignment.CENTER);
+                display.setViewRange(drawerConfiguration.getViewRange());
                 setSize(display, this.plugin.getManager().getTextDisplaySize(), scale);
             }));
 
@@ -316,12 +321,12 @@ public class ZDrawer extends ZUtils implements Drawer {
         World world = location.getWorld();
         this.drawerCases.forEach(drawerCase -> {
             if (drawerCase.hasItemStack() && drawerCase.getAmount() > 0) {
-
                 ItemStack itemStack = drawerCase.getItemStack().clone();
                 long amount = drawerCase.getAmount();
+                int maxStackSize = itemStack.getMaxStackSize();
+
                 while (amount > 0) {
-                    int currentAmount = Math.min(64, itemStack.getMaxStackSize());
-                    if (currentAmount > amount) currentAmount = (int) amount;
+                    int currentAmount = (int) Math.min(amount, maxStackSize);
                     ItemStack currentItem = itemStack.clone();
                     currentItem.setAmount(currentAmount);
                     world.dropItemNaturally(location, currentItem);

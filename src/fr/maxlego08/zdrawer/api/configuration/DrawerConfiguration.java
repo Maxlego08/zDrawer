@@ -94,5 +94,19 @@ public interface DrawerConfiguration {
      * @return The maximum number of items the Drawer can drop.
      */
     long getDropLimit();
+
+    /**
+     * Gets the view distance/range of this display.
+     *
+     * @return view range
+     */
+    float getViewRange();
+
+    /**
+     * Gets if the text has its default background.
+     *
+     * @return default background
+     */
+    boolean isDefaultBackground();
 }
 
