@@ -27,20 +27,35 @@
 #
 #########################################################################################################################################################
 
+# Displays more information in the console, if you have a problem please enable this option and send errors to support.
 enableDebug: false
+
+# Enables time debugs, is used to measure plugin performance
 enableDebugTime: false
 
-# Change the storage type, to change the storage you need to shut down your server, change the value and restart your server.
-# Storage type:
-# - JSON
-# - SQLITE
-# - MYSQL
-storage: SQLITE
-# Update everything each 2 minutes
+# Change the storage type of the plugin.
+#
+# Here are the types of storage available:
+# - JSON, a JSON file that will contain all the plugin data, for small and medium servers
+# - SQLITE, use of a database, for large servers
+# - MYSQL, use of a database, for large servers
+#
+storage: JSON
+
+# Updates data every 120,000 milliseconds (2 minutes).
+# If the storage is in JSON, then the file will save
+# If the storage is SQLITE or MYSQL then the drawers will be updated if they need to be
 updateInterval: 120000
 
+# Configuration for SQLITE and MYSQL storage
 sql:
+  # Table name
   tableName: "zdrawers"
+  user: homestead
+  password: secret
+  port: 3306
+  host: 192.168.10.10
+  database: zauctionhouse
 
 drawer:
   drawers:
@@ -50,11 +65,11 @@ drawer:
       limit: 2048 # The global limit for the number of items a single drawer can hold.
 
       # Enable or disable interaction with hopper
-      enableHopper: false
+      enableHopper: true
 
       # Drop items to the floor when the drawer is broken.
       dropContent:
-        enable: true # Enable or disable this option
+        enable: false # Enable or disable this option
         limit: 1024 # If there are more than 1024, the drawer cannot be broken, it should be empty before it can be broken.
 
       # Change distance to display entities
@@ -87,22 +102,36 @@ drawer:
 
       # Add a craft to the drawer
       craft:
-        enable: true # Activer ou désactiver le craft
+        enable: true # Enable or disable the craft
         shade: # The craft shade
           - "ABA"
           - "BCB"
           - "ABA"
         ingredients: # Ingredients of craft
-          A:
+          A: # you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
             material: SPRUCE_WOOD
-          B:
+          B: # you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
             material: SPRUCE_PLANKS
-          C:
+          C: # you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
             material: CHEST
 
     duo:
       type: DUO
-      limit: 2048 # The global limit for the number of items a single drawer can hold.
+      limit: 1024 # The global limit for the number of items a single drawer can hold.
+
+      # Enable or disable interaction with hopper
+      enableHopper: true
+
+      # Drop items to the floor when the drawer is broken.
+      dropContent:
+        enable: false # Enable or disable this option
+        limit: 1024 # If there are more than 1024, the drawer cannot be broken, it should be empty before it can be broken.
+
+      # Change distance to display entities
+      viewRange: 0.5
+
+      # Enable or disable background behind text display
+      enableTextBackground: false
 
       # Drawer item, for item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
       item:
@@ -144,7 +173,21 @@ drawer:
 
     trio:
       type: TRIO
-      limit: 2048 # The global limit for the number of items a single drawer can hold.
+      limit: 682 # The global limit for the number of items a single drawer can hold.
+
+      # Enable or disable interaction with hopper
+      enableHopper: true
+
+      # Drop items to the floor when the drawer is broken.
+      dropContent:
+        enable: false # Enable or disable this option
+        limit: 1024 # If there are more than 1024, the drawer cannot be broken, it should be empty before it can be broken.
+
+      # Change distance to display entities
+      viewRange: 0.5
+
+      # Enable or disable background behind text display
+      enableTextBackground: false
 
       # Drawer item, for item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
       item:
@@ -188,7 +231,21 @@ drawer:
 
     quad:
       type: QUAD
-      limit: 2048 # The global limit for the number of items a single drawer can hold.
+      limit: 512 # The global limit for the number of items a single drawer can hold.
+
+      # Enable or disable interaction with hopper
+      enableHopper: true
+
+      # Drop items to the floor when the drawer is broken.
+      dropContent:
+        enable: false # Enable or disable this option
+        limit: 1024 # If there are more than 1024, the drawer cannot be broken, it should be empty before it can be broken.
+
+      # Change distance to display entities
+      viewRange: 0.5
+
+      # Enable or disable background behind text display
+      enableTextBackground: false
 
       # Drawer item, for item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
       item:
@@ -296,6 +353,7 @@ drawer:
     upgradeDisplay: { x: 0.15, y: 0.15, z: 0.01 } # Size for the upgrade display.
     textDisplay: { x: 0.6, y: 0.6, z: 0.6 } # Size for the text display
 
+  # Allows to define the size changes according to the type of drawer
   sizes:
     SINGLE:
       SOUTH: { scale: { x: 1, y: 1, z: 1.0 }, positions: { 1: { item: { x: 0, y: 0.0, z: 0.0 }, text: { x: 0, y: 0.0, z: 0.0 } } } }
@@ -428,9 +486,11 @@ drawer:
     - DIAMOND_AXE
     - NETHERITE_AXE
 
+  # Define the worlds where it is forbidden to place a drawer
   disableWorlds:
     - "world_nether"
 
+  # Define the list of blacklist materials in a barrel
   blacklistMaterials:
     - BARREL
     - BEDROCK

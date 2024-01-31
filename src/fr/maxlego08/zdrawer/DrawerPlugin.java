@@ -33,9 +33,6 @@ public class DrawerPlugin extends ZPlugin {
 
         this.preEnable();
 
-        LocalPlaceholder placeholder = LocalPlaceholder.getInstance();
-        placeholder.setPrefix("zdrawer");
-
         this.saveDefaultConfig();
 
         ServicesManager servicesManager = this.getServer().getServicesManager();
@@ -59,7 +56,6 @@ public class DrawerPlugin extends ZPlugin {
         new Metrics(this, 20791);
 
         this.postEnable();
-        Placeholder.getPlaceholder();
 
         this.isSuccessfullyLoaded = true;
     }
