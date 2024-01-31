@@ -11,6 +11,7 @@ import fr.maxlego08.zdrawer.save.MessageLoader;
 import fr.maxlego08.zdrawer.storage.StorageManager;
 import fr.maxlego08.zdrawer.zcore.ZPlugin;
 import fr.maxlego08.zdrawer.zcore.utils.plugins.Metrics;
+import fr.maxlego08.zdrawer.zcore.utils.plugins.VersionChecker;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.ServicesManager;
@@ -44,6 +45,7 @@ public class DrawerPlugin extends ZPlugin {
         this.registerCommand("zdrawer", new CommandDrawer(this), "drawer");
 
         this.addListener(new DrawerListener(this));
+        new VersionChecker(this, 313).useLastVersion();
 
         this.addSave(this.manager);
         this.addSave(new MessageLoader(this));

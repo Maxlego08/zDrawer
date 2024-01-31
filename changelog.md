@@ -22,8 +22,14 @@
 - [ ] Improved default configuration, add more comments
 - [ ] Create log system
 
-## Idée de gestion d'inventaire :
-- Pouvoir ajouter les items dedans
-- Pouvoir placer ton sous inventaire ou le remplir
-- Pouvoir vendre le contenu
-- Pouvoir récupérer le drawer
+## Inventory Management Idea:
+- Be able to add items in
+- Be able to place your sub-inventory or complete it
+- Be able to sell content
+- Be able to retrieve the drawer
+
+# Unreleased
+
+# 1.0.0
+
+- First version of the plugin

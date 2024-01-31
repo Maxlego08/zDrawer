@@ -50,6 +50,7 @@ public enum Message {
     DESCRIPTION_PLACE("Place a drawer"),
     DESCRIPTION_PURGE("Delete all the drawer in a specific world"),
     DESCRIPTION_GIVE_CRAFT("Give a custom craft item to a player"),
+    DESCRIPTION_VERSION("Show plugin version"),
 
     UPGRADE_ERROR_LIMIT("§cThe drawer already has a larger limit, you can not add this limit."),
 
