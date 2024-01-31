@@ -295,22 +295,15 @@ public class ZDrawer extends ZUtils implements Drawer {
         }
     }
 
-    @Override
+
+
     public Optional<DrawerCase> findDrawerCase(ItemStack itemStack) {
-        DrawerCase drawerCase = null;
-
-        for (DrawerCase dCase : this.drawerCases) {
-            if (dCase.hasItemStack()) {
-                if (dCase.getItemStack().isSimilar(itemStack) && !dCase.isFull()) {
-                    return Optional.of(dCase);
-                }
-            } else if (drawerCase == null) {
-                drawerCase = dCase;
-            }
-        }
-
-        return Optional.ofNullable(drawerCase);
+        return drawerCases.stream()
+                .filter(dCase -> dCase.hasItemStack() && dCase.getItemStack().isSimilar(itemStack) && !dCase.isFull())
+                .findFirst()
+                .or(() -> drawerCases.stream().filter(dCase -> !dCase.hasItemStack()).findFirst());
     }
+
 
     @Override
     public Optional<DrawerCase> findFirstCase() {
