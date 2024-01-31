@@ -18,6 +18,7 @@ public class Config {
     public static boolean enableDebugTime = false;
     public static List<Material> breakMaterials = Arrays.asList(Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE);
     public static List<Material> blacklistMaterials = Arrays.asList(Material.BARREL, Material.BEDROCK);
+    public static List<String> disableWorlds = new ArrayList<>();
     public static String defaultFormat = "%amount%";
     public static boolean enableFormatting = false;
 
@@ -58,6 +59,7 @@ public class Config {
         enableDebugTime = configuration.getBoolean("enableDebugTime");
         blacklistMaterials = configuration.getStringList("drawer.blacklistMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
         breakMaterials = configuration.getStringList("drawer.breakMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
+        disableWorlds = configuration.getStringList("drawer.disableWorlds");
 
         itemDisplaySize = new DisplaySize(configuration, "drawer.scales.itemDisplay.");
         upgradeDisplaySize = new DisplaySize(configuration, "drawer.scales.upgradeDisplay.");

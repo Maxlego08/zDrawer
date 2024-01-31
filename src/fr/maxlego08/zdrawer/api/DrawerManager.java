@@ -39,27 +39,60 @@ public interface DrawerManager extends Savable {
      */
     Optional<DrawerUpgrade> getUpgrade(String upgradeName);
 
+    /**
+     * Retrieves the configuration for a Drawer by its name.
+     * <p>
+     * This method looks up the configuration of a Drawer based on its name.
+     * It is useful when you need to access specific properties or settings of a Drawer
+     * that has been identified or categorized by a unique name.
+     * </p>
+     *
+     * @param drawerName The name of the Drawer for which the configuration is sought.
+     * @return An {@link Optional<DrawerConfiguration>} containing the configuration of the specified Drawer.
+     *         The Optional is empty if no Drawer with the specified name exists.
+     */
     Optional<DrawerConfiguration> getDrawer(String drawerName);
 
+    /**
+     * Gets a list of all the names of Drawers available.
+     * <p>
+     * This method provides a comprehensive list of all the Drawer names.
+     * This can be used for display purposes or for iterating through all available Drawers
+     * to perform some action or analysis.
+     * </p>
+     *
+     * @return A List of Strings, each representing the name of a Drawer.
+     */
     List<String> getDrawerNames();
 
     /**
-     * Gives a customized drawer item to a player.
+     * Gives a Drawer to a player with specified configurations.
+     * <p>
+     * This method is used to provide a player with a Drawer item that has specific characteristics
+     * such as name, upgrade, material, and amount. It's useful for commands or events where
+     * a player needs to receive a Drawer directly.
+     * </p>
      *
-     * @param sender        The command sender who initiates the action.
-     * @param player        The player who will receive the drawer.
-     * @param drawerUpgrade The upgrade applied to the drawer, if any.
-     * @param material      The material of the drawer.
-     * @param amount        The amount of the item to be given.
+     * @param sender          The CommandSender who is issuing the command.
+     * @param player          The Player who will receive the Drawer.
+     * @param drawerName      The name of the Drawer to be given.
+     * @param drawerUpgrade   The upgrade to be applied to the Drawer.
+     * @param material        The Material of the Drawer.
+     * @param amount          The amount of the Drawer items to be given.
      */
     void giveDrawer(CommandSender sender, Player player, String drawerName, DrawerUpgrade drawerUpgrade, Material material, Long amount);
 
     /**
-     * Constructs a drawer ItemStack based on the specified parameters.
+     * Builds an ItemStack representing a Drawer based on its configuration.
+     * <p>
+     * This method is responsible for creating an ItemStack that visually and functionally
+     * represents a Drawer, using the specified DrawerConfiguration.
+     * </p>
      *
-     * @param player The player for whom the drawer is being built.
-     * @param drawer The drawer configuration.
-     * @return The ItemStack representing the built drawer.
+     * @param drawerConfiguration The configuration of the Drawer to build.
+     * @param player              The Player for whom the Drawer is being built.
+     * @param drawer              The Drawer instance to build the ItemStack for.
+     * @return The built ItemStack representing the specified Drawer.
      */
     ItemStack buildDrawer(DrawerConfiguration drawerConfiguration, Player player, Drawer drawer);
 
@@ -71,11 +104,15 @@ public interface DrawerManager extends Savable {
     List<String> getUpgradeNames();
 
     /**
-     * Gives a craft item associated with a specified craft name to a player.
+     * Gives a craft item to a player.
+     * <p>
+     * This method is used to provide a player with a craft item specified by its name.
+     * It's typically used in scenarios where players need to receive predefined craft items.
+     * </p>
      *
-     * @param sender    The command sender who initiates the action.
-     * @param player    The player who will receive the craft item.
-     * @param craftName The name of the craft recipe.
+     * @param sender   The CommandSender who is issuing the command.
+     * @param player   The Player who will receive the craft item.
+     * @param craftName The name of the craft item to be given.
      */
     void giveCraft(CommandSender sender, Player player, String craftName);
 
@@ -87,26 +124,36 @@ public interface DrawerManager extends Savable {
     List<String> getCraftNames();
 
     /**
-     * Places a drawer in the world at the specified location with the given parameters.
+     * Places a Drawer in the world at a specified location.
+     * <p>
+     * This method is used to programmatically place a Drawer in the world.
+     * It sets up the Drawer at the specified coordinates with the given configuration.
+     * </p>
      *
-     * @param sender        The command sender who initiates the action.
-     * @param world         The world where the drawer will be placed.
-     * @param x             The x-coordinate where the drawer will be placed.
-     * @param y             The y-coordinate where the drawer will be placed.
-     * @param z             The z-coordinate where the drawer will be placed.
-     * @param blockFace     The face of the block against which the drawer is placed.
-     * @param drawerUpgrade The upgrade applied to the drawer, if any.
-     * @param material      The material of the drawer.
-     * @param amount        The amount of the item to be placed inside the drawer.
+     * @param sender         The CommandSender who is issuing the command.
+     * @param drawerName     The name of the Drawer to be placed.
+     * @param world          The World where the Drawer is to be placed.
+     * @param x              The x-coordinate for the Drawer's location.
+     * @param y              The y-coordinate for the Drawer's location.
+     * @param z              The z-coordinate for the Drawer's location.
+     * @param blockFace      The BlockFace indicating the direction the Drawer is facing.
+     * @param drawerUpgrade  The upgrade to apply to the Drawer.
+     * @param material       The Material of the Drawer.
+     * @param amount         The amount of the material for the Drawer.
      */
     void placeDrawer(CommandSender sender, String drawerName, World world, double x, double y, double z, BlockFace blockFace, DrawerUpgrade drawerUpgrade, Material material, long amount);
 
+
     /**
-     * Purges all drawers in a specified world, effectively removing them.
+     * Purges all Drawer entities from a world, with an option to destroy their blocks.
+     * <p>
+     * This method is used to remove all Drawer entities from a specified world.
+     * It can also destroy the blocks associated with the Drawers if specified.
+     * </p>
      *
-     * @param sender       The command sender who initiates the purge.
-     * @param world        The world where drawers will be purged.
-     * @param destroyBlock
+     * @param sender       The CommandSender who is issuing the command.
+     * @param world        The World from which to purge the Drawers.
+     * @param destroyBlock A boolean indicating whether to destroy the block along with the Drawer entity.
      */
     void purgeWorld(CommandSender sender, World world, boolean destroyBlock);
 
@@ -174,6 +221,19 @@ public interface DrawerManager extends Savable {
      */
     NamespaceContainer getNamespaceContainer();
 
+    /**
+     * Retrieves the size configuration for a given type of Drawer.
+     * <p>
+     * This method returns the size specifications for a Drawer of the specified type.
+     * The size can include dimensions or any other relevant size-related properties
+     * that are defined for the DrawerType. This is useful for determining the
+     * physical space or capacity characteristics of different types of Drawers.
+     * </p>
+     *
+     * @param drawerType The {@link DrawerType} for which the size configuration is requested.
+     * @return The {@link DrawerSize} representing the size of the specified DrawerType.
+     */
     DrawerSize getSize(DrawerType drawerType);
+
 
 }

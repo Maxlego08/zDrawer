@@ -17,6 +17,7 @@ import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
 import fr.maxlego08.zdrawer.api.utils.NamespaceContainer;
+import fr.maxlego08.zdrawer.configuration.ZDrawerConfiguration;
 import fr.maxlego08.zdrawer.craft.ZCraft;
 import fr.maxlego08.zdrawer.craft.ZCraftUpgrade;
 import fr.maxlego08.zdrawer.placeholder.DrawerPlaceholder;
@@ -88,7 +89,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         try {
             for (String drawerName : configuration.getConfigurationSection("drawer.drawers.").getKeys(false)) {
                 String path = "drawer.drawers." + drawerName + ".";
-                DrawerConfiguration drawerConfiguration = new DrawerConfiguration(this.plugin, configuration, path, loader, file, drawerName);
+                DrawerConfiguration drawerConfiguration = new ZDrawerConfiguration(this.plugin, configuration, path, loader, file, drawerName);
                 this.drawerConfigurations.add(drawerConfiguration);
             }
 

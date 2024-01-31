@@ -1,57 +1,84 @@
 package fr.maxlego08.zdrawer.api.configuration;
 
 import fr.maxlego08.menu.MenuItemStack;
-import fr.maxlego08.menu.exceptions.InventoryException;
-import fr.maxlego08.menu.zcore.utils.loader.Loader;
-import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.api.craft.Craft;
 import fr.maxlego08.zdrawer.api.enums.DrawerType;
-import fr.maxlego08.zdrawer.configuration.ZDrawerBorder;
-import fr.maxlego08.zdrawer.craft.ZCraftDrawer;
-import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
+/**
+ * Interface for configuring a Drawer.
+ * <p>
+ * This interface provides methods to access various configurations for a Drawer.
+ * Each method allows the retrieval of a specific property of the Drawer configuration,
+ * such as its type, limit, menu item, border, crafting details, name, and hopper interaction.
+ * </p>
+ */
+public interface DrawerConfiguration {
 
-public class DrawerConfiguration {
+    /**
+     * Returns the type of the Drawer.
+     *
+     * @return the {@link DrawerType} representing the type of the Drawer.
+     */
+    DrawerType getDrawerType();
 
-    private final String name;
-    private final DrawerType drawerType;
-    private final long limit;
-    private final MenuItemStack menuItemStack;
-    private final DrawerBorder border;
-    private final Craft craft;
+    /**
+     * Retrieves the item limit for the Drawer.
+     * <p>
+     * This limit defines the maximum number of items the Drawer can hold.
+     * </p>
+     *
+     * @return a long value representing the item limit.
+     */
+    long getLimit();
 
-    public DrawerConfiguration(DrawerPlugin plugin, YamlConfiguration configuration, String path, Loader<MenuItemStack> loader, File file, String name) throws InventoryException {
-        this.name = name;
-        this.drawerType = DrawerType.valueOf(configuration.getString(path + "type", "SIMPLE").toUpperCase());
-        this.limit = configuration.getLong(path + "limit", 0);
-        this.menuItemStack = loader.load(configuration, path + "item.", file);
-        this.craft = new ZCraftDrawer(plugin, path + "craft.", configuration, name, file);
-        this.craft.register();
-        this.border = new ZDrawerBorder(configuration, path + "border.", loader, file);
-    }
+    /**
+     * Gets the MenuItemStack associated with the Drawer.
+     * <p>
+     * This stack is used to represent the Drawer in various UI elements.
+     * </p>
+     *
+     * @return the {@link MenuItemStack} associated with this Drawer.
+     */
+    MenuItemStack getMenuItemStack();
 
-    public DrawerType getDrawerType() {
-        return drawerType;
-    }
+    /**
+     * Returns the border configuration of the Drawer.
+     * <p>
+     * The border configuration defines the visual and interactive boundary of the Drawer.
+     * </p>
+     *
+     * @return the {@link DrawerBorder} representing the border of the Drawer.
+     */
+    DrawerBorder getBorder();
 
-    public long getLimit() {
-        return limit;
-    }
+    /**
+     * Retrieves the crafting configuration for the Drawer.
+     * <p>
+     * This includes details about how the Drawer can be crafted within the game.
+     * </p>
+     *
+     * @return the {@link Craft} object representing the crafting details of the Drawer.
+     */
+    Craft getCraft();
 
-    public MenuItemStack getMenuItemStack() {
-        return menuItemStack;
-    }
+    /**
+     * Gets the name of the Drawer.
+     * <p>
+     * The name is typically used for identification and display purposes.
+     * </p>
+     *
+     * @return a String representing the name of the Drawer.
+     */
+    String getName();
 
-    public DrawerBorder getBorder() {
-        return border;
-    }
-
-    public Craft getCraft() {
-        return craft;
-    }
-
-    public String getName() {
-        return name;
-    }
+    /**
+     * Determines whether hopper interactions are disabled for the Drawer.
+     * <p>
+     * If true, hoppers will not be able to interact with this Drawer.
+     * </p>
+     *
+     * @return true if hopper interactions are disabled, false otherwise.
+     */
+    boolean isDisableHopper();
 }
+

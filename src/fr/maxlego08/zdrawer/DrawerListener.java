@@ -173,6 +173,12 @@ public class DrawerListener extends ListenerAdapter {
         if (!itemStack.hasItemMeta() || !itemStack.getItemMeta().getPersistentDataContainer().has(this.manager.getNamespaceContainer().getDataKeyDrawer()))
             return;
 
+        if (Config.disableWorlds.contains(block.getWorld().getName())) {
+            event.setCancelled(true);
+            message(this.plugin, player, Message.DISABLE_WORLD);
+            return;
+        }
+
         Barrel barrel = (Barrel) block.getBlockData();
         BlockFace blockFace = barrel.getFacing().getOppositeFace();
         Location location = block.getLocation().clone();
@@ -227,7 +233,6 @@ public class DrawerListener extends ListenerAdapter {
         if (event.isCancelled()) return;
 
         IStorage storage = this.manager.getStorage();
-        // If the source is a barrel, then the item that will start green another inventory
         if (source.getHolder() instanceof org.bukkit.block.Barrel) {
 
             org.bukkit.block.Barrel barrel = (org.bukkit.block.Barrel) source.getHolder();
@@ -235,6 +240,8 @@ public class DrawerListener extends ListenerAdapter {
             if (!optional.isPresent()) return;
             Drawer drawer = optional.get();
             event.setCancelled(true);
+
+            if (drawer.getConfiguration().isDisableHopper()) return;
 
             Optional<DrawerCase> optionalDrawerCase = drawer.findFirstCase();
             optionalDrawerCase.ifPresent(drawerCase -> {
@@ -246,17 +253,20 @@ public class DrawerListener extends ListenerAdapter {
 
                 drawerCase.remove(1);
             });
-
             return;
         }
 
-        // Si la destination est un baril, alors l’article va dans le tiroir
         if (destination.getHolder() instanceof org.bukkit.block.Barrel) {
 
             org.bukkit.block.Barrel barrel = (org.bukkit.block.Barrel) destination.getHolder();
             Optional<Drawer> optional = storage.getDrawer(barrel.getLocation());
             if (!optional.isPresent()) return;
             Drawer drawer = optional.get();
+
+            if (drawer.getConfiguration().isDisableHopper()) {
+                event.setCancelled(true);
+                return;
+            }
 
             ItemStack newItemStack = item.clone();
             Optional<DrawerCase> optionalDrawerCase = drawer.findDrawerCase(newItemStack);
@@ -268,7 +278,6 @@ public class DrawerListener extends ListenerAdapter {
 
             DrawerCase drawerCase = optionalDrawerCase.get();
 
-            // Si le drawer n'a aucun item, alors on va ajouter l'item du hopper
             if (!drawerCase.hasItemStack()) {
 
                 drawerCase.setAmount(newItemStack.getAmount());

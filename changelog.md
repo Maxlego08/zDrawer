@@ -1,7 +1,7 @@
 # ToDo
 
 - [x] Manage HOPPER
-- [ ] Create admin commands
+- [x] Create admin commands
 - [ ] SQL and SQLite storage
 - [x] Give the drawer by command, and be able to apply an upgrade directly
 - [x] Be able to add content and number of items in it
@@ -14,7 +14,8 @@
 - [x] Add option for destroy block with purge command 
 - [ ] Think about the possibility of creating giant storage blocks
 - [x] Use PersistentDataContainer for entities
-- [ ] Add option for enable of disable drawer for each drawer
+- [ ] Add option for enable of disable hopper for each drawer
+- [x] Add an option to blacklist worlds.
 
 Idée de gestion d'inventaire :
 - Pouvoir ajouter les items dedans

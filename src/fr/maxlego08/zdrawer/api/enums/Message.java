@@ -73,6 +73,8 @@ public enum Message {
 
     CLEAR_DISPLAY("§aYou just removed all the entities that come from the plugin. §7Entities deleted§8: §f%amount%"),
 
+    DISABLE_WORLD("§cThe world is disabled. You cannot place a drawer here."),
+
     ;
 
     private List<String> messages;

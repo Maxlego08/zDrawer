@@ -67,7 +67,7 @@ public class JsonStorage implements IStorage {
         Drawer drawer = new ZDrawer(this.plugin, optional.get(), location, drawerContainer.getBlockFace());
 
         if (drawerContainer.hasData()) {
-            drawerContainer.loadData(drawer);
+            drawer.load(drawerContainer.getData());
         }
 
         if (drawerContainer.hasUpgrade()) {

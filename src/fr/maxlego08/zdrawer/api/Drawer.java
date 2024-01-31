@@ -1,5 +1,6 @@
 package fr.maxlego08.zdrawer.api;
 
+import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemDisplay;
@@ -10,8 +11,20 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Represents a Drawer in the game, containing various configurations and actions related to its functionality.
+ * <p>
+ * This class provides methods for managing the drawer's properties, interactions with players,
+ * item storage, and upgrades. It also handles drawer configuration and state management.
+ * </p>
+ */
 public interface Drawer {
 
+    /**
+     * Gets the name of the configuration associated with this drawer.
+     *
+     * @return The name of the drawer's configuration.
+     */
     String getConfigurationName();
 
     /**
@@ -66,6 +79,9 @@ public interface Drawer {
      */
     void onDisable();
 
+    /**
+     * Performs necessary actions when the drawer is loaded.
+     */
     void onLoad();
 
     /**
@@ -111,32 +127,87 @@ public interface Drawer {
     boolean hasUpgrade();
 
     /**
-     * Removes a specified amount of items from this drawer.
+     * Gets a list of ItemDisplays representing the border of the drawer.
      *
-     * @param amount The amount of items to remove.
+     * @return A list of ItemDisplays for the drawer's border.
      */
-    void remove(long amount);
-
-    /**
-     * Adds a specified amount of items to this drawer.
-     *
-     * @param amount The amount of items to add.
-     */
-    void add(long amount);
-
     List<ItemDisplay> getBorderDisplays();
 
+    /**
+     * Retrieves the data representation of the drawer, often used for saving and loading.
+     *
+     * @return A string representing the drawer's data.
+     */
     String getData();
 
+    /**
+     * Checks if the drawer has an ItemStack at the specified index.
+     *
+     * @param index The index to check.
+     * @return true if there is an ItemStack at the specified index, false otherwise.
+     */
     boolean hasItemStack(int index);
 
+    /**
+     * Retrieves the ItemStack at a specified index in the drawer.
+     *
+     * @param index The index from which to retrieve the ItemStack.
+     * @return The ItemStack at the specified index, or null if none exists.
+     */
     ItemStack getItemStack(int index);
 
+    /**
+     * Gets the amount of a specific item stored at a given index in the drawer.
+     *
+     * @param index The index to query the amount from.
+     * @return The amount of items at the specified index.
+     */
     long getAmount(int index);
 
+    /**
+     * Loads the drawer's data from a string representation, typically used for restoring state.
+     *
+     * @param data The string data to load the drawer's state from.
+     */
     void load(String data);
 
+    /**
+     * Searches for a DrawerCase that best matches the provided ItemStack.
+     * <p>
+     * This method iterates through the DrawerCases associated with the Drawer.
+     * It first looks for a DrawerCase that contains an ItemStack similar to the provided one
+     * and is not full. If none is found, it defaults to the first DrawerCase that does not contain any ItemStack.
+     * </p>
+     *
+     * @param itemStack The ItemStack to match against the DrawerCases.
+     * @return An {@link Optional<DrawerCase>} that contains either:
+     * - A DrawerCase matching the provided ItemStack.
+     * - The first empty DrawerCase, if no matching DrawerCase is found.
+     * - An empty Optional if no suitable DrawerCase is found.
+     */
     Optional<DrawerCase> findDrawerCase(ItemStack itemStack);
 
+    /**
+     * Finds the first available DrawerCase that does not contain an ItemStack.
+     * <p>
+     * This method is useful for locating the first empty space in a Drawer.
+     * It iterates through the DrawerCases and returns the first one found that is empty.
+     * </p>
+     *
+     * @return An {@link Optional<DrawerCase>} containing the first empty DrawerCase,
+     * or an empty Optional if all DrawerCases are occupied.
+     */
     Optional<DrawerCase> findFirstCase();
+
+    /**
+     * Retrieves the configuration settings for this Drawer.
+     * <p>
+     * The configuration includes various properties and behaviors of the Drawer,
+     * such as type, limit, menu item, border, and other specific settings.
+     * </p>
+     *
+     * @return The {@link DrawerConfiguration} associated with this Drawer.
+     */
+    DrawerConfiguration getConfiguration();
+
 }

@@ -14,7 +14,7 @@
 # - /zdrawer give drawer <player> [<upgrade name>] [<material>] [<amount>] » Give a drawer - zdrawer.give.drawer
 # - /zdrawer give craft <player> [<craft name>] » Give a craft item - zdrawer.give.craft
 # - /zdrawer place <world name> <x> <y> <z> <block face> [<upgrade name>] [<material>] [<amount>] » Place a drawer - zdrawer.place
-# - /zdrawer purge <world name> » Delete all the drawer in a specific world - zdrawer.purge
+# - /zdrawer purge <world name> <break block> » Delete all the drawer in a specific world - zdrawer.purge
 # - /zdrawer clear » Allows to remove all entities that come from the plugin. In case of a crash of your server or other it is possible that entities are duplicated. This command deletes them. - zdrawer.clear
 #
 # Placeholders
@@ -35,6 +35,7 @@ drawer:
     single:
       type: SINGLE
       limit: 2048 # The global limit for the number of items a single drawer can hold.
+      enableHopper: true
 
       # Drawer item, for item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
       item:
@@ -397,6 +398,9 @@ drawer:
     - GOLDEN_AXE
     - DIAMOND_AXE
     - NETHERITE_AXE
+
+  disableWorlds:
+    - "world_nether"
 
   blacklistMaterials:
     - BARREL

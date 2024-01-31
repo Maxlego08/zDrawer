@@ -197,16 +197,6 @@ public class ZDrawer extends ZUtils implements Drawer {
     }
 
     @Override
-    public void remove(long amount) {
-        System.out.println("TO UPDATE REMOVE AMOUNT");
-    }
-
-    @Override
-    public void add(long amount) {
-        System.out.println("TO UPDATE ADD AMOUNT");
-    }
-
-    @Override
     public void onDisable() {
         this.drawerCases.forEach(DrawerCase::onDisable);
         Optional.ofNullable(this.upgradeDisplay).ifPresent(Display::remove);
@@ -307,5 +297,10 @@ public class ZDrawer extends ZUtils implements Drawer {
     @Override
     public Optional<DrawerCase> findFirstCase() {
         return this.drawerCases.stream().filter(drawerCase -> drawerCase.hasItemStack() && drawerCase.getAmount() > 0).findFirst();
+    }
+
+    @Override
+    public DrawerConfiguration getConfiguration() {
+        return this.drawerConfiguration;
     }
 }
