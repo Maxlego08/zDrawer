@@ -10,6 +10,7 @@ import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 
 import java.util.ArrayList;
@@ -104,11 +105,15 @@ public class JsonStorage implements IStorage {
     }
 
     @Override
-    public void purge(World world) {
+    public void purge(World world, boolean destroyBlock) {
         this.drawers.removeIf(drawerContainer -> stringToLocation(drawerContainer.getLocation()).getWorld().getName().equals(world.getName()));
         this.drawerMap.entrySet().removeIf(entry -> {
             boolean needToDelete = stringToLocation(entry.getKey()).getWorld().getName().equals(world.getName());
-            if (needToDelete) entry.getValue().onDisable();
+            if (needToDelete) {
+                Drawer drawer = entry.getValue();
+                drawer.onDisable();
+                if (destroyBlock) drawer.getLocation().getBlock().setType(Material.AIR);
+            }
             return needToDelete;
         });
     }

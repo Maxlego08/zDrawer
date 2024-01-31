@@ -26,6 +26,7 @@ public class CommandDrawerPurge extends VCommand {
         this.setPermission(Permission.ZDRAWER_PURGE);
         this.setDescription(Message.DESCRIPTION_PURGE);
         this.addRequireArg("world name", (a, b) -> Bukkit.getWorlds().stream().map(WorldInfo::getName).collect(Collectors.toList()));
+        this.addOptionalArg("destroy block", (a,b) -> Arrays.asList("true", "false"));
     }
 
     @Override
@@ -34,7 +35,8 @@ public class CommandDrawerPurge extends VCommand {
         DrawerManager manager = plugin.getManager();
 
         World world = this.argAsWorld(0);
-        manager.purgeWorld(this.sender, world);
+        boolean destroyBlock = this.argAsBoolean(1, false);
+        manager.purgeWorld(this.sender, world, destroyBlock);
 
         return CommandType.SUCCESS;
     }

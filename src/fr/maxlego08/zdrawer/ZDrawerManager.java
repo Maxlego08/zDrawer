@@ -284,9 +284,9 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     }
 
     @Override
-    public void purgeWorld(CommandSender sender, World world) {
+    public void purgeWorld(CommandSender sender, World world, boolean destroyBlock) {
 
-        getStorage().purge(world);
+        getStorage().purge(world, destroyBlock);
         message(this.plugin, sender, Message.DRAWER_PURGE, "%world%", world.getName());
 
     }

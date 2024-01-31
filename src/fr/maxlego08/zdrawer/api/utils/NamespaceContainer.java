@@ -15,6 +15,7 @@ public class NamespaceContainer {
     private final NamespacedKey dataKeyCraft;
     private final NamespacedKey dataKeyContent;
     private final NamespacedKey dataKeyUpgrade;
+    private final NamespacedKey dataKeyEntity;
 
     /**
      * Constructs a new NamespaceContainer with specific namespaced keys for each data type.
@@ -26,6 +27,7 @@ public class NamespaceContainer {
         this.dataKeyContent = new NamespacedKey(plugin, "itemstack");
         this.dataKeyCraft = new NamespacedKey(plugin, "craft");
         this.dataKeyUpgrade = new NamespacedKey(plugin, "upgrade");
+        this.dataKeyEntity = new NamespacedKey(plugin, "entity");
     }
 
     /**
@@ -64,4 +66,12 @@ public class NamespaceContainer {
         return dataKeyUpgrade;
     }
 
+    /**
+     * Retrieves the namespaced key for entities.
+     *
+     * @return NamespacedKey The namespaced key for entities
+     */
+    public NamespacedKey getDataKeyEntity() {
+        return dataKeyEntity;
+    }
 }

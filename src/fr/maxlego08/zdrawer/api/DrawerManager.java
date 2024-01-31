@@ -104,10 +104,11 @@ public interface DrawerManager extends Savable {
     /**
      * Purges all drawers in a specified world, effectively removing them.
      *
-     * @param sender The command sender who initiates the purge.
-     * @param world  The world where drawers will be purged.
+     * @param sender       The command sender who initiates the purge.
+     * @param world        The world where drawers will be purged.
+     * @param destroyBlock
      */
-    void purgeWorld(CommandSender sender, World world);
+    void purgeWorld(CommandSender sender, World world, boolean destroyBlock);
 
     /**
      * Formats a number according to the plugin's formatting rules.

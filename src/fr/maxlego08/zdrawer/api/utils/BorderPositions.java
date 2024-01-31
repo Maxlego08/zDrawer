@@ -1,5 +1,6 @@
 package fr.maxlego08.zdrawer.api.utils;
 
+import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.configuration.DrawerBorder;
 import org.bukkit.Location;
@@ -8,8 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Transformation;
 
 import java.util.List;
@@ -91,7 +91,7 @@ public class BorderPositions {
      * @param drawer       The Drawer instance for which the borders are being set.
      * @param drawerBorder The DrawerBorder containing the settings and item stack for border display.
      */
-    public void spawn(Plugin plugin, Drawer drawer, DrawerBorder drawerBorder) {
+    public void spawn(DrawerPlugin plugin, Drawer drawer, DrawerBorder drawerBorder) {
 
         ItemStack itemStack = drawerBorder.getMenuItemStack().build(null);
         Location location = drawer.getLocation().clone();
@@ -117,7 +117,7 @@ public class BorderPositions {
      * @param scale     The display size of the item.
      * @return The spawned ItemDisplay.
      */
-    private ItemDisplay spawn(Plugin plugin, Location location, ItemStack itemStack, DisplaySize scale) {
+    private ItemDisplay spawn(DrawerPlugin plugin, Location location, ItemStack itemStack, DisplaySize scale) {
         World world = location.getWorld();
 
         return world.spawn(location, ItemDisplay.class, display -> {
@@ -128,7 +128,7 @@ public class BorderPositions {
             display.setBillboard(Display.Billboard.FIXED);
             display.setInvulnerable(true);
             display.setTransformation(transformation);
-            display.setMetadata("zdrawer-entity", new FixedMetadataValue(plugin, true));
+            display.getPersistentDataContainer().set(plugin.getManager().getNamespaceContainer().getDataKeyEntity(), PersistentDataType.BOOLEAN, true);
         });
     }
 }

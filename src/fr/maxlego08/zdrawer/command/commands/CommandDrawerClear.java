@@ -27,7 +27,7 @@ public class CommandDrawerClear extends VCommand {
         World world = this.player.getWorld();
         AtomicLong amount = new AtomicLong();
         world.getEntitiesByClasses(TextDisplay.class, ItemDisplay.class).forEach(display -> {
-            if (display.hasMetadata("zdrawer-entity")) {
+            if (display.getPersistentDataContainer().has(plugin.getManager().getNamespaceContainer().getDataKeyEntity())) {
                 display.remove();
                 amount.addAndGet(1);
             }

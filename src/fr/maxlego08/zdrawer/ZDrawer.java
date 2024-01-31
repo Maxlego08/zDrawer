@@ -24,7 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Transformation;
 import org.joml.Vector3f;
 
@@ -151,7 +151,7 @@ public class ZDrawer extends ZUtils implements Drawer {
         display.setBillboard(Display.Billboard.FIXED);
         display.setInvulnerable(true);
         display.setTransformation(transformation);
-        display.setMetadata("zdrawer-entity", new FixedMetadataValue(this.plugin, true));
+        display.getPersistentDataContainer().set(this.plugin.getManager().getNamespaceContainer().getDataKeyEntity(), PersistentDataType.BOOLEAN, true);
     }
 
     @Override
@@ -294,7 +294,6 @@ public class ZDrawer extends ZUtils implements Drawer {
             setAmount(index - 1, amount);
         }
     }
-
 
 
     public Optional<DrawerCase> findDrawerCase(ItemStack itemStack) {

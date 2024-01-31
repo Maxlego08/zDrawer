@@ -55,9 +55,10 @@ public interface IStorage {
      * Purges all drawer data associated with a specific world from the storage system.
      * This can be used to clean up data for worlds that are no longer in use or when performing a bulk deletion operation.
      *
-     * @param world The world for which drawer data should be purged.
+     * @param world        The world for which drawer data should be purged.
+     * @param destroyBlock
      */
-    void purge(World world);
+    void purge(World world, boolean destroyBlock);
 
     /**
      * Retrieves a list of DrawerContainer objects that are waiting for the world to load.
