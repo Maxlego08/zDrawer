@@ -7,7 +7,7 @@ import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-import fr.maxlego08.zdrawer.zcore.enums.Message;
+import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

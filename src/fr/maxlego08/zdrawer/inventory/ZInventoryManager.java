@@ -11,7 +11,7 @@ import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.exceptions.InventoryAlreadyExistException;
 import fr.maxlego08.zdrawer.exceptions.InventoryOpenException;
 import fr.maxlego08.zdrawer.zcore.enums.EnumInventory;
-import fr.maxlego08.zdrawer.zcore.enums.Message;
+import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import fr.maxlego08.zdrawer.zcore.utils.inventory.ItemButton;
 import org.bukkit.Bukkit;
@@ -89,7 +89,7 @@ public class ZInventoryManager extends ListenerAdapter {
 		Optional<VInventory> optional = this.getInventory(id);
 
 		if (!optional.isPresent()) {
-			message(player, Message.INVENTORY_CLONE_NULL, "%id%", id);
+			message(this.plugin, player, Message.INVENTORY_CLONE_NULL, "%id%", id);
 			return;
 		}
 
@@ -102,7 +102,7 @@ public class ZInventoryManager extends ListenerAdapter {
 		VInventory clonedInventory = inventory.clone();
 
 		if (clonedInventory == null) {
-			message(player, Message.INVENTORY_CLONE_NULL, "%id%", id);
+			message(this.plugin, player, Message.INVENTORY_CLONE_NULL, "%id%", id);
 			return;
 		}
 
@@ -113,10 +113,10 @@ public class ZInventoryManager extends ListenerAdapter {
 				player.openInventory(clonedInventory.getInventory());
 				playerInventories.put(player.getUniqueId(), clonedInventory);
 			} else if (result.equals(InventoryResult.ERROR)) {
-				message(player, Message.INVENTORY_OPEN_ERROR, "%id%", id);
+				message(this.plugin, player, Message.INVENTORY_OPEN_ERROR, "%id%", id);
 			}
 		} catch (InventoryOpenException e) {
-			message(player, Message.INVENTORY_OPEN_ERROR, "%id%", id);
+			message(this.plugin, player, Message.INVENTORY_OPEN_ERROR, "%id%", id);
 			e.printStackTrace();
 		}
 	}

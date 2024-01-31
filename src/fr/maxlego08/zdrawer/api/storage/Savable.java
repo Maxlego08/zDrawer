@@ -1,4 +1,6 @@
-package fr.maxlego08.zdrawer.zcore.utils.storage;
+package fr.maxlego08.zdrawer.api.storage;
+
+import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
 
 /**
  * The Savable interface represents objects that can be saved and loaded using a provided Persist object.

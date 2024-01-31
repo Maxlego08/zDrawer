@@ -94,7 +94,7 @@ public abstract class Arguments extends ZUtils {
 	 * @return
 	 */
 	protected long argAsLong(int index) {
-		return Long.valueOf(argAsString(index));
+		return Long.parseLong(argAsString(index));
 	}
 
 	/**

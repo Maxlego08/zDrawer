@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 public class LocalPlaceholder {
 	
 	private DrawerPlugin plugin;
-	private String prefix = "template";
+	private String prefix = "zdrawer";
 	private final Pattern pattern = Pattern.compile("[%]([^%]+)[%]");
 	private final List<AutoPlaceholder> autoPlaceholders = new ArrayList<AutoPlaceholder>();
 

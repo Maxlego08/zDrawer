@@ -2,9 +2,14 @@ package fr.maxlego08.zdrawer.zcore.enums;
 
 public enum Permission {
 	
-	EXAMPLE_PERMISSION
-
-	;
+	ZDRAWER_USE,
+	ZDRAWER_GIVE,
+	ZDRAWER_GIVE_DRAWER,
+	ZDRAWER_GIVE_CRAFT,
+	ZDRAWER_RELOAD,
+	ZDRAWER_CLEAR,
+	ZDRAWER_PLACE,
+	ZDRAWER_PURGE;
 
 	private String permission;
 

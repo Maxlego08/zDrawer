@@ -1,0 +1,571 @@
+#########################################################################################################################################################
+#
+#  ███████╗██████╗░██████╗░░█████╗░░██╗░░░░░░░██╗███████╗██████╗░
+#  ╚════██║██╔══██╗██╔══██╗██╔══██╗░██║░░██╗░░██║██╔════╝██╔══██╗
+#  ░░███╔═╝██║░░██║██████╔╝███████║░╚██╗████╗██╔╝█████╗░░██████╔╝
+#  ██╔══╝░░██║░░██║██╔══██╗██╔══██║░░████╔═████║░██╔══╝░░██╔══██╗
+#  ███████╗██████╔╝██║░░██║██║░░██║░░╚██╔╝░╚██╔╝░███████╗██║░░██║
+#  ╚══════╝╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚══════╝╚═╝░░╚═╝
+#
+# Commands and permissions:
+# - /zdrawer » Main command (Alaises: /drawer) - zdrawer.use
+# - /zdrawer reload » Reload config files - zdrawer.reload
+# - /zdrawer give » Give commands - zdrawer.craft.use
+# - /zdrawer give drawer <player> [<upgrade name>] [<material>] [<amount>] » Give a drawer - zdrawer.give.drawer
+# - /zdrawer give craft <player> [<craft name>] » Give a craft item - zdrawer.give.craft
+# - /zdrawer place <world name> <x> <y> <z> <block face> [<upgrade name>] [<material>] [<amount>] » Place a drawer - zdrawer.place
+# - /zdrawer purge <world name> <break block> » Delete all the drawer in a specific world - zdrawer.purge
+# - /zdrawer clear » Allows to remove all entities that come from the plugin. In case of a crash of your server or other it is possible that entities are duplicated. This command deletes them. - zdrawer.clear
+#
+# Placeholders
+# - %zdrawer_content_<index>% » Displays the contents of the drawer with which the player interacts
+# - %zdrawer_amount_<index>% » Displays the amount of the drawer with which the player interacts
+# - %zdrawer_amount_formatted_<index>% » Displays the amount with the format of the drawer with which the player interacts
+# - %zdrawer_upgrade% » Displays the upgrade of the drawer with which the player interacts
+#
+# For item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
+#
+#########################################################################################################################################################
+
+# Displays more information in the console, if you have a problem please enable this option and send errors to support.
+enableDebug: false
+
+# Enables time debugs, is used to measure plugin performance
+enableDebugTime: false
+
+# Change the storage type of the plugin.
+#
+# Here are the types of storage available:
+# - JSON, a JSON file that will contain all the plugin data, for small and medium servers
+# - SQLITE, use of a database, for large servers
+# - MYSQL, use of a database, for large servers
+#
+storage: JSON
+
+# Updates data every 120,000 milliseconds (2 minutes).
+# If the storage is in JSON, then the file will save
+# If the storage is SQLITE or MYSQL then the drawers will be updated if they need to be
+updateInterval: 120000
+
+# Configuration for SQLITE and MYSQL storage
+sql:
+  # Table name
+  tableName: "zdrawers"
+  user: homestead
+  password: secret
+  port: 3306
+  host: 192.168.10.10
+  database: zauctionhouse
+
+drawer:
+  drawers:
+    single: # The name of the drawer that will be used to define the name of the configuration, when your server is active, do not change its name.
+
+      type: SINGLE # Drawer type, available types are: SINGLE, DUO, TRIO and QUAD
+      limit: 2048 # The global limit for the number of items a single drawer can hold.
+
+      # Enable or disable interaction with hopper
+      enableHopper: true
+
+      # Drop items to the floor when the drawer is broken.
+      dropContent:
+        enable: false # Enable or disable this option
+        limit: 1024 # If there are more than 1024, the drawer cannot be broken, it should be empty before it can be broken.
+
+      # Change distance to display entities
+      viewRange: 0.5
+
+      # Enable or disable background behind text display
+      enableTextBackground: false
+
+      # Drawer item, for item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
+      item:
+        material: BARREL
+        name: "#22f54cᴅʀᴀᴡᴇʀ"
+        lore:
+          - "&8&oStore a large number of the same item"
+          - ""
+          - "#e3e3e3Content&8: #baffffx%zdrawer_amount_formatted_0% %zdrawer_content_0%"
+          - "#e3e3e3Upgrade&8: #baffff%zdrawer_upgrade%"
+
+      # Displays borders to the drawer
+      border:
+        enable: true # Enable or disable the option
+        scale: # Allows you to change the scale of the itemDisplay entity, changing its values can break the display, done only if you know what you are doing.
+          up: { x: 1.0, y: 0.05, z: 0.05 }
+          down: { x: 1.0, y: 0.05, z: 0.05 }
+          left: { x: 0.05, y: 0.9, z: 0.05 }
+          right: { x: 0.05, y: 0.9, z: 0.05 }
+        # Item that will be displayed, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
+        item:
+          material: SPRUCE_WOOD
+
+      # Add a craft to the drawer
+      craft:
+        enable: true # Enable or disable the craft
+        shade: # The craft shade
+          - "ABA"
+          - "BCB"
+          - "ABA"
+        ingredients: # Ingredients of craft
+          A: # you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
+            material: SPRUCE_WOOD
+          B: # you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
+            material: SPRUCE_PLANKS
+          C: # you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
+            material: CHEST
+
+    duo:
+      type: DUO
+      limit: 1024 # The global limit for the number of items a single drawer can hold.
+
+      # Enable or disable interaction with hopper
+      enableHopper: true
+
+      # Drop items to the floor when the drawer is broken.
+      dropContent:
+        enable: false # Enable or disable this option
+        limit: 1024 # If there are more than 1024, the drawer cannot be broken, it should be empty before it can be broken.
+
+      # Change distance to display entities
+      viewRange: 0.5
+
+      # Enable or disable background behind text display
+      enableTextBackground: false
+
+      # Drawer item, for item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
+      item:
+        material: BARREL
+        name: "#22f54cᴅʀᴀᴡᴇʀ ᴅᴜᴏ"
+        lore:
+          - "&8&oStore a large number of the same item"
+          - ""
+          - "&8First slot:"
+          - "#e3e3e3Content&8: #baffffx%zdrawer_amount_formatted_0% %zdrawer_content_0%"
+          - "&8Second slot:"
+          - "#e3e3e3Content&8: #baffffx%zdrawer_amount_formatted_1% %zdrawer_content_1%"
+          - ""
+          - "#e3e3e3Upgrade&8: #baffff%zdrawer_upgrade%"
+
+      border:
+        enable: true
+        scale:
+          up: { x: 1.0, y: 0.05, z: 0.05 }
+          down: { x: 1.0, y: 0.05, z: 0.05 }
+          left: { x: 0.05, y: 0.9, z: 0.05 }
+          right: { x: 0.05, y: 0.9, z: 0.05 }
+        item:
+          material: JUNGLE_WOOD
+
+      # Drawer craft
+      craft:
+        shade:
+          - "ABA"
+          - "BCB"
+          - "ABA"
+        ingredients:
+          A:
+            material: SPRUCE_WOOD
+          B:
+            material: SPRUCE_PLANKS
+          C:
+            material: IRON_BLOCK
+
+    trio:
+      type: TRIO
+      limit: 682 # The global limit for the number of items a single drawer can hold.
+
+      # Enable or disable interaction with hopper
+      enableHopper: true
+
+      # Drop items to the floor when the drawer is broken.
+      dropContent:
+        enable: false # Enable or disable this option
+        limit: 1024 # If there are more than 1024, the drawer cannot be broken, it should be empty before it can be broken.
+
+      # Change distance to display entities
+      viewRange: 0.5
+
+      # Enable or disable background behind text display
+      enableTextBackground: false
+
+      # Drawer item, for item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
+      item:
+        material: BARREL
+        name: "#22f54cᴅʀᴀᴡᴇʀ ᴛʀɪᴏ"
+        lore:
+          - "&8&oStore a large number of the same item"
+          - ""
+          - "&8First slot:"
+          - "#e3e3e3Content&8: #baffffx%zdrawer_amount_formatted_0% %zdrawer_content_0%"
+          - "&8Second slot:"
+          - "#e3e3e3Content&8: #baffffx%zdrawer_amount_formatted_1% %zdrawer_content_1%"
+          - "&8Third slot:"
+          - "#e3e3e3Content&8: #baffffx%zdrawer_amount_formatted_2% %zdrawer_content_2%"
+          - ""
+          - "#e3e3e3Upgrade&8: #baffff%zdrawer_upgrade%"
+
+      border:
+        enable: true
+        scale:
+          up: { x: 1.0, y: 0.05, z: 0.05 }
+          down: { x: 1.0, y: 0.05, z: 0.05 }
+          left: { x: 0.05, y: 0.9, z: 0.05 }
+          right: { x: 0.05, y: 0.9, z: 0.05 }
+        item:
+          material: DARK_OAK_WOOD
+
+      # Drawer craft
+      craft:
+        shade:
+          - "ABA"
+          - "BCB"
+          - "ABA"
+        ingredients:
+          A:
+            material: SPRUCE_WOOD
+          B:
+            material: SPRUCE_PLANKS
+          C:
+            material: DIAMOND_BLOCK
+
+    quad:
+      type: QUAD
+      limit: 512 # The global limit for the number of items a single drawer can hold.
+
+      # Enable or disable interaction with hopper
+      enableHopper: true
+
+      # Drop items to the floor when the drawer is broken.
+      dropContent:
+        enable: false # Enable or disable this option
+        limit: 1024 # If there are more than 1024, the drawer cannot be broken, it should be empty before it can be broken.
+
+      # Change distance to display entities
+      viewRange: 0.5
+
+      # Enable or disable background behind text display
+      enableTextBackground: false
+
+      # Drawer item, for item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
+      item:
+        material: BARREL
+        name: "#22f54cᴅʀᴀᴡᴇʀ qᴜᴀᴅ"
+        lore:
+          - "&8&oStore a large number of the same item"
+          - ""
+          - "&8First slot:"
+          - "#e3e3e3Content&8: #baffffx%zdrawer_amount_formatted_0% %zdrawer_content_0%"
+          - "&8Second slot:"
+          - "#e3e3e3Content&8: #baffffx%zdrawer_amount_formatted_1% %zdrawer_content_1%"
+          - "&8Third slot:"
+          - "#e3e3e3Content&8: #baffffx%zdrawer_amount_formatted_2% %zdrawer_content_2%"
+          - "&8Fourth slot:"
+          - "#e3e3e3Content&8: #baffffx%zdrawer_amount_formatted_3% %zdrawer_content_3%"
+          - ""
+          - "#e3e3e3Upgrade&8: #baffff%zdrawer_upgrade%"
+
+      border:
+        enable: true
+        scale:
+          up: { x: 1.0, y: 0.05, z: 0.05 }
+          down: { x: 1.0, y: 0.05, z: 0.05 }
+          left: { x: 0.05, y: 0.9, z: 0.05 }
+          right: { x: 0.05, y: 0.9, z: 0.05 }
+        item:
+          material: BIRCH_WOOD
+
+      # Drawer craft
+      craft:
+        shade:
+          - "ABA"
+          - "BCB"
+          - "ABA"
+        ingredients:
+          A:
+            material: SPRUCE_WOOD
+          B:
+            material: SPRUCE_PLANKS
+          C:
+            material: ENDER_CHEST
+
+  # Allows you to change the placement details of the entities, do not touch it if you do not know how.
+  # Even a small change can break the plugin display. Please be very careful.
+  entitiesPosition:
+    NORTH:
+      itemDisplay: { x: 0.5, y: 0.5, z: 1.01, yaw: -180, pitch: 0 }
+      upgradeDisplay: { x: 0.5, y: 0.9, z: 1.02,yaw: -180, pitch: 0 }
+      textDisplay: { x: 0.5, y: 0.05, z: 1.02, yaw: 0, pitch: 0 }
+      border:
+        up: { x: 0.5, y: 0.975, z: 1.025, yaw: -180, pitch: 0 }
+        down: { x: 0.5, y: 0.025, z: 1.025, yaw: -180, pitch: 0 }
+        left: { x: 0.025, y: 0.5, z: 1.025, yaw: -180, pitch: 0 }
+        right: { x: 0.975, y: 0.5, z: 1.025, yaw: -180, pitch: 0 }
+    EAST:
+      itemDisplay: { x: -0.01, y: 0.5, z: 0.5, yaw: -90, pitch: 0 }
+      upgradeDisplay: { x: -0.02, y: 0.9, z: 0.5, yaw: -90, pitch: 0 }
+      textDisplay: { x: -0.02, y: 0.05, z: 0.5, yaw: 90, pitch: 0 }
+      border:
+        up: { x: -0.025, y: 0.975, z: 0.5, yaw: -90, pitch: 0 }
+        down: { x: -0.025, y: 0.025, z: 0.5, yaw: -90, pitch: 0 }
+        left: { x: -0.025, y: 0.5, z: 0.975, yaw: -90, pitch: 0 }
+        right: { x: -0.025, y: 0.5, z: 0.025, yaw: -90, pitch: 0 }
+    SOUTH:
+      itemDisplay: { x: 0.5, y: 0.5, z: -0.01, yaw: 0, pitch: 0 }
+      upgradeDisplay: { x: 0.5, y: 0.9, z: -0.03, yaw: 0, pitch: 0 }
+      textDisplay: { x: 0.5, y: 0.05, z: -0.02, yaw: 180, pitch: 0 }
+      border:
+        up: { x: 0.5, y: 0.975, z: -0.025, yaw: 0, pitch: 0 }
+        down: { x: 0.5, y: 0.025, z: -0.025, yaw: 0, pitch: 0 }
+        left: { x: 0.025, y: 0.5, z: -0.025, yaw: 0, pitch: 0 }
+        right: { x: 0.975, y: 0.5, z: -0.025, yaw: 0, pitch: 0 }
+    WEST:
+      itemDisplay: { x: 1.01, y: 0.5, z: 0.5, yaw: 90, pitch: 0 }
+      upgradeDisplay: { x: -1.03, y: 0.9, z: 0.5, yaw: 90, pitch: 0 }
+      textDisplay: { x: 1.02, y: 0.05, z: 0.5, yaw: -90, pitch: 0 }
+      border:
+        up: { x: 1.025, y: 0.975, z: 0.5, yaw: 90, pitch: 0 }
+        down: { x: 1.025, y: 0.025, z: 0.5, yaw: 90, pitch: 0 }
+        left: { x: 1.025, y: 0.5, z: 0.975, yaw: 90, pitch: 0 }
+        right: { x: 1.025, y: 0.5, z: 0.025, yaw: 90, pitch: 0 }
+    UP:
+      itemDisplay: { x: 0.5, y: -0.02, z: 0.5, yaw: 180, pitch: -90 }
+      upgradeDisplay: { x: 0.5, y: -0.03, z: 0.9, yaw: 180, pitch: -90 }
+      textDisplay: { x: 0.5, y: -0.03, z: 0.05, yaw: 0, pitch: 90 }
+      border:
+        up: { x: 0.5, y: -0.025, z: 0.025, yaw: -180, pitch: -90 }
+        down: { x: 0.5, y: -0.025, z: 0.975, yaw: -180, pitch: -90 }
+        left: { x: 0.025, y: -0.025, z: 0.5, yaw: -180, pitch: -90 }
+        right: { x: 0.975, y: -0.025, z: 0.5, yaw: -180, pitch: -90 }
+    DOWN:
+      itemDisplay: { x: 0.5, y: 1.01, z: 0.5, yaw: 180, pitch: 90 }
+      upgradeDisplay: { x: 0.5, y: 1.02, z: 0.11, yaw: 180, pitch: 90 }
+      textDisplay: { x: 0.5, y: 1.02, z: 0.97, yaw: 0, pitch: -90 }
+      border:
+        up: { x: 0.5, y: 1.025, z: 0.025, yaw: -180, pitch: 90 }
+        down: { x: 0.5, y: 1.025, z: 0.975, yaw: -180, pitch: 90 }
+        left: { x: 0.025, y: 1.025, z: 0.5, yaw: -180, pitch: 90 }
+        right: { x: 0.975, y: 1.025, z: 0.5, yaw: -180, pitch: 90 }
+
+  # Defines the display sizes for item, upgrade, and text displays associated with the drawer.
+  scales:
+    itemDisplay: { x: 0.6, y: 0.6, z: 0.01 } # Size for the item display.
+    upgradeDisplay: { x: 0.15, y: 0.15, z: 0.01 } # Size for the upgrade display.
+    textDisplay: { x: 0.6, y: 0.6, z: 0.6 } # Size for the text display
+
+  # Allows to define the size changes according to the type of drawer
+  sizes:
+    SINGLE:
+      SOUTH: { scale: { x: 1, y: 1, z: 1.0 }, positions: { 1: { item: { x: 0, y: 0.0, z: 0.0 }, text: { x: 0, y: 0.0, z: 0.0 } } } }
+      NORTH: { scale: { x: 1, y: 1, z: 1.0 }, positions: { 1: { item: { x: 0, y: 0.0, z: 0.0 }, text: { x: 0, y: 0.0, z: 0.0 } } } }
+      EAST: { scale: { x: 1, y: 1, z: 1.0 }, positions: { 1: { item: { x: 0, y: 0.0, z: 0.0 }, text: { x: 0, y: 0.0, z: 0.0 } } } }
+      WEST: { scale: { x: 1, y: 1, z: 1.0 }, positions: { 1: { item: { x: 0, y: 0.0, z: 0.0 }, text: { x: 0, y: 0.0, z: 0.0 } } } }
+      UP: { scale: { x: 1, y: 1, z: 1.0 }, positions: { 1: { item: { x: 0, y: 0.0, z: 0.0 }, text: { x: 0, y: 0.0, z: 0.0 } } } }
+      DOWN: { scale: { x: 1, y: 1, z: 1.0 }, positions: { 1: { item: { x: 0, y: 0.0, z: 0.0 }, text: { x: 0, y: 0.0, z: 0.0 } } } }
+    DUO:
+      UP:
+        scale: { x: 0.8, y: 0.8, z: 1.0 }
+        positions:
+          1: { item: { x: 0.25, y: 0.0, z: 0.0 }, text: { x: 0.25, y: 0.0, z: 0.0 } }
+          2: { item: { x: -0.25, y: 0.0, z: 0.0 }, text: { x: -0.25, y: 0.0, z: 0.0 } }
+      DOWN:
+        scale: { x: 0.8, y: 0.8, z: 1.0 }
+        positions:
+          1: { item: { x: 0.25, y: 0.0, z: 0.0 }, text: { x: 0.25, y: 0.0, z: 0.0 } }
+          2: { item: { x: -0.25, y: 0.0, z: 0.0 }, text: { x: -0.25, y: 0.0, z: 0.0 } }
+      SOUTH:
+        scale: { x: 0.8, y: 0.8, z: 1.0 }
+        positions:
+          1: { item: { x: 0.25, y: 0.0, z: 0.0 }, text: { x: 0.25, y: 0.1, z: 0.0 } }
+          2: { item: { x: -0.25, y: 0.0, z: 0.0 }, text: { x: -0.25, y: 0.1, z: 0.0 } }
+      NORTH:
+        scale: { x: 0.8, y: 0.8, z: 1.0 }
+        positions:
+          1: { item: { x: -0.25, y: 0.0, z: 0.0 }, text: { x: -0.25, y: 0.1, z: 0.0 } }
+          2: { item: { x: 0.25, y: 0.0, z: 0.0 }, text: { x: 0.25, y: 0.1, z: 0.0 } }
+      EAST:
+        scale: { x: 0.8, y: 0.8, z: 1.0 }
+        positions:
+          1: { item: { x: 0.0, y: 0.0, z: -0.25 }, text: { x: 0.0, y: 0.1, z: -0.25 } }
+          2: { item: { x: 0.0, y: 0.0, z: 0.25 }, text: { x: 0.0, y: 0.1, z: 0.25 } }
+      WEST:
+        scale: { x: 0.8, y: 0.8, z: 1.0 }
+        positions:
+          1: { item: { x: 0.0, y: 0.0, z: 0.25 }, text: { x: 0.0, y: 0.1, z: 0.25 } }
+          2: { item: { x: 0.0, y: 0.0, z: -0.25 }, text: { x: 0.0, y: 0.1, z: -0.25 } }
+    TRIO:
+      SOUTH:
+        scale: { x: 0.7, y: 0.7, z: 1.0 }
+        positions:
+          1: { item: { x: 0.25, y: -0.15, z: 0.0 }, text: { x: 0.25, y: 0.0, z: 0.0 } }
+          2: { item: { x: -0.25, y: -0.15, z: 0.0 }, text: { x: -0.25, y: 0.0, z: 0.0 } }
+          3: { item: { x: 0.0, y: 0.25, z: 0.0 }, text: { x: 0.0, y: 0.4, z: 0.0 } }
+      NORTH:
+        scale: { x: 0.7, y: 0.7, z: 1.0 }
+        positions:
+          1: { item: { x: -0.25, y: -0.15, z: 0.0 }, text: { x: -0.25, y: 0.0, z: 0.0 } }
+          2: { item: { x: 0.25, y: -0.15, z: 0.0 }, text: { x: 0.25, y: 0.0, z: 0.0 } }
+          3: { item: { x: 0.0, y: 0.25, z: 0.0 }, text: { x: 0.0, y: 0.4, z: 0.0 } }
+      EAST:
+        scale: { x: 0.7, y: 0.7, z: 1.0 }
+        positions:
+          1: { item: { x: 0.0, y: -0.15, z: 0.25 }, text: { x: 0.0, y: 0.0, z: 0.25 } }
+          2: { item: { x: 0.0, y: -0.15, z: -0.25 }, text: { x: 0.0, y: 0.0, z: -0.25 } }
+          3: { item: { x: 0.0, y: 0.25, z: 0.0 }, text: { x: 0.0, y: 0.4, z: 0.0 } }
+      WEST:
+        scale: { x: 0.7, y: 0.7, z: 1.0 }
+        positions:
+          1: { item: { x: 0.0, y: -0.15, z: -0.25 }, text: { x: 0.0, y: 0.0, z: -0.25 } }
+          2: { item: { x: 0.0, y: -0.15, z: 0.25 }, text: { x: 0.0, y: 0.0, z: 0.25 } }
+          3: { item: { x: 0.0, y: 0.25, z: 0.0 }, text: { x: 0.0, y: 0.4, z: 0.0 } }
+      UP:
+        scale: { x: 0.7, y: 0.7, z: 1.0 }
+        positions:
+          1: { item: { x: 0.25, y: 0.0, z: -0.15 }, text: { x: 0.25, y: 0.0, z: 0.0 } }
+          2: { item: { x: -0.25, y: 0.0, z: -0.15 }, text: { x: -0.25, y: 0.0, z: 0.0 } }
+          3: { item: { x: 0.0, y: 0.0, z: 0.25 }, text: { x: 0.0, y: 0.0, z: 0.4 } }
+      DOWN:
+        scale: { x: 0.7, y: 0.7, z: 1.0 }
+        positions:
+          1: { item: { x: 0.25, y: 0.0, z: 0.15 }, text: { x: 0.25, y: 0.0, z: 0.0 } }
+          2: { item: { x: -0.25, y: 0.0, z: 0.15 }, text: { x: -0.25, y: 0.0, z: 0.0 } }
+          3: { item: { x: 0.0, y: 0.0, z: -0.25 }, text: { x: 0.0, y: 0.0, z: -0.4 } }
+
+    QUAD:
+      SOUTH:
+        scale: { x: 0.6, y: 0.6, z: 1.0 }
+        positions:
+          1: { item: { x: 0.2, y: -0.15, z: 0.0 }, text: { x: 0.2, y: 0.05, z: 0.0 } }
+          2: { item: { x: -0.2, y: -0.15, z: 0.0 }, text: { x: -0.2, y: 0.05, z: 0.0 } }
+          3: { item: { x: 0.2, y: 0.3, z: 0.0 }, text: { x: 0.2, y: 0.5, z: 0.0 } }
+          4: { item: { x: -0.2, y: 0.3, z: 0.0 }, text: { x: -0.2, y: 0.5, z: 0.0 } }
+      NORTH:
+        scale: { x: 0.6, y: 0.6, z: 1.0 }
+        positions:
+          1: { item: { x: -0.2, y: -0.15, z: 0.0 }, text: { x: -0.2, y: 0.05, z: 0.0 } }
+          2: { item: { x: 0.2, y: -0.15, z: 0.0 }, text: { x: 0.2, y: 0.05, z: 0.0 } }
+          3: { item: { x: -0.2, y: 0.3, z: 0.0 }, text: { x: -0.2, y: 0.5, z: 0.0 } }
+          4: { item: { x: 0.2, y: 0.3, z: 0.0 }, text: { x: 0.2, y: 0.5, z: 0.0 } }
+      EAST:
+        scale: { x: 0.6, y: 0.6, z: 1.0 }
+        positions:
+          1: { item: { x: 0.0, y: -0.15, z: 0.2 }, text: { x: 0.0, y: 0.05, z: 0.2 } }
+          2: { item: { x: 0.0, y: -0.15, z: -0.2 }, text: { x: 0.0, y: 0.05, z: -0.2 } }
+          3: { item: { x: 0.0, y: 0.3, z: 0.2 }, text: { x: 0.0, y: 0.5, z: 0.2 } }
+          4: { item: { x: 0.0, y: 0.3, z: -0.2 }, text: { x: 0.0, y: 0.5, z: -0.2 } }
+      WEST:
+        scale: { x: 0.6, y: 0.6, z: 1.0 }
+        positions:
+          1: { item: { x: 0.0, y: -0.15, z: -0.2 }, text: { x: 0.0, y: 0.05, z: -0.2 } }
+          2: { item: { x: 0.0, y: -0.15, z: 0.2 }, text: { x: 0.0, y: 0.05, z: 0.2 } }
+          3: { item: { x: 0.0, y: 0.3, z: -0.2 }, text: { x: 0.0, y: 0.5, z: -0.2 } }
+          4: { item: { x: 0.0, y: 0.3, z: 0.2 }, text: { x: 0.0, y: 0.5, z: 0.2 } }
+      UP:
+        scale: { x: 0.6, y: 0.6, z: 1.0 }
+        positions:
+          1: { item: { x: 0.2, y: 0.0, z: -0.2 }, text: { x: 0.2, y: 0.0, z: 0.0 } }
+          2: { item: { x: -0.2, y: 0.0, z: 0.25 }, text: { x: -0.2, y: 0.0, z: 0.45 } }
+          3: { item: { x: 0.2, y: 0.0, z: 0.25 }, text: { x: 0.2, y: 0.0, z: 0.45 } }
+          4: { item: { x: -0.2, y: 0.0, z: -0.2 }, text: { x: -0.2, y: 0.0, z: 0.0 } }
+      DOWN:
+        scale: { x: 0.6, y: 0.6, z: 1.0 }
+        positions:
+          1: { item: { x: 0.2, y: 0.0, z: 0.25 }, text: { x: 0.2, y: 0.0, z: 0.0 } }
+          2: { item: { x: -0.2, y: 0.0, z: -0.2 }, text: { x: -0.2, y: 0.0, z: -0.45 } }
+          3: { item: { x: 0.2, y: 0.0, z: -0.2 }, text: { x: 0.2, y: 0.0, z: -0.45 } }
+          4: { item: { x: -0.2, y: 0.0, z: 0.25 }, text: { x: -0.2, y: 0.0, z: 0.0 } }
+
+
+
+  # Tools to break a drawer
+  breakMaterials:
+    - WOODEN_AXE
+    - STONE_AXE
+    - IRON_AXE
+    - GOLDEN_AXE
+    - DIAMOND_AXE
+    - NETHERITE_AXE
+
+  # Define the worlds where it is forbidden to place a drawer
+  disableWorlds:
+    - "world_nether"
+
+  # Define the list of blacklist materials in a barrel
+  blacklistMaterials:
+    - BARREL
+    - BEDROCK
+
+# Custom crafts provided by the plugin, possibly for upgrades or special drawer-related items.
+customCrafts:
+  upgradeDisplay:
+    # For item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
+    result:
+      url: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQxNDlkYzRkNzFmOWE0N2I3MTRhZDgxN2YxNmYzYjU1N2QzMzUzZTBhZTNiY2M0ODExMmFlMmFjZDgyNyJ9fX0="
+      name: "#54b2e8Upgrade Frame"
+      lore:
+        - "&8Upgrade frame for craft Drawer Upgrade"
+    shade:
+      - "AAA"
+      - "BCB"
+      - "AAA"
+    ingredients:
+      A:
+        material: STICK
+      B:
+        material: SPRUCE_PLANKS
+      C:
+        material: BARREL
+
+# Upgrade configurations for drawers, defining various tiers or types of upgrades available.
+upgrades:
+  woodUpgrade:
+    displayName: "Wood Upgrade" # Human-readable name for the upgrade.
+    # Item used for display on drawer
+    # For item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
+    displayItem:
+      material: "IRON_BLOCK"
+    limit: 4096 # New item limit when this upgrade is applied.
+    # Craft for the upgrade
+    craft:
+      enable: true # Enable the craft
+      # For item configuration, you can use the zMenu documentation: https://docs.zmenu.dev/configurations/items
+      result:
+        url: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmM3NjI4ZTg5N2NiNGM5MzEyZjgwMmYyOGMyZWM0NjZkN2U3MjFlYzM3MDEwMzc4Y2M0NWRkMmRjNjg4MTBjMyJ9fX0="
+        name: "#cc7727Upgrade Wood"
+      shade:
+        - "AAA"
+        - "BCB"
+        - "AAA"
+      ingredients:
+        A:
+          material: STICK
+        B:
+          material: BARREL
+        C:
+          customCraft: upgradeDisplay
+
+# Number formatting settings for displaying large numbers in a more readable format.
+numberFormat:
+  # Allows you to use colors to display text, works with MiniMessage: https://docs.advntr.dev/minimessage/format.html
+  display: "&f%amount%"
+  # Toggle to enable/disable custom number formatting.
+  enable: false
+  # Documentation for String format: https://www.geeksforgeeks.org/java-string-format-method-with-examples/
+  formats:
+    - format: "" # Blank format to display text directly
+      maxAmount: 1000
+      # Add colors to text display, works with MiniMessage
+      # display: "<gradient:#1cfc03:#2bd66f>%amount%"
+    - format: "%.1fK"
+      maxAmount: 1000000
+      # display: "<gradient:#7bd62b:#a3d14d>%amount%"
+    - format: "%.1fM"
+      maxAmount: 1000000000
+      # display: "<gradient:#ebe123:#ebbc23>%amount%"
+    - format: "%.1fB"
+      maxAmount: 1000000000000
+      # display: "<gradient:#eb8023:#eb4b23>%amount%"
+    - format: "%.2fT"
+      maxAmount: 1000000000000000
+    - format: "%.2fQ"
+      maxAmount: 1000000000000000000

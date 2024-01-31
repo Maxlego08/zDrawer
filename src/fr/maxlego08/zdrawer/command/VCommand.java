@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import fr.maxlego08.zdrawer.DrawerPlugin;
-import fr.maxlego08.zdrawer.zcore.enums.Message;
+import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.zcore.enums.Permission;
 import fr.maxlego08.zdrawer.zcore.utils.commands.CollectionBiConsumer;
 import fr.maxlego08.zdrawer.zcore.utils.commands.CommandType;
@@ -586,7 +586,7 @@ public abstract class VCommand extends Arguments {
 	public void syntaxMessage() {
 		this.subVCommands.forEach(command -> {
 			if (command.getPermission() == null || hasPermission(sender, command.getPermission())) {
-				message(this.sender, Message.COMMAND_SYNTAXE_HELP, "%syntax%", command.getSyntax(), "%description%",
+				message(this.plugin, this.sender, Message.COMMAND_SYNTAXE_HELP, "%syntax%", command.getSyntax(), "%description%",
 						command.getDescription());
 			}
 		});

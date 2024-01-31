@@ -1,5 +1,6 @@
-package fr.maxlego08.zdrawer.zcore.enums;
+package fr.maxlego08.zdrawer.api.enums;
 
+import fr.maxlego08.zdrawer.zcore.enums.MessageType;
 import fr.maxlego08.zdrawer.zcore.utils.nms.NMSUtils;
 import org.bukkit.inventory.ItemStack;
 
@@ -10,7 +11,7 @@ import java.util.Map;
 
 public enum Message {
 
-    PREFIX("§8(§6Template§8) "),
+    PREFIX("#4ae0b6zDrawer #575757• &f"),
 
     TELEPORT_MOVE("§cYou must not move!"),
     TELEPORT_MESSAGE("§7Teleportation in §3%second% §7seconds!"),
@@ -42,8 +43,39 @@ public enum Message {
     COMMAND_SYNTAXE_HELP("§f%syntax% §7» §7%description%"),
 
     RELOAD("§aYou have just reloaded the configuration files."),
-
     DESCRIPTION_RELOAD("Reload configuration files"),
+    DESCRIPTION_CLEAR("Allows to remove all entities that come from the plugin. In case of a crash of your server or other it is possible that entities are duplicated. This command deletes them."),
+    DESCRIPTION_GIVE_USE("Show give commands"),
+    DESCRIPTION_GIVE_DRAWER("Give a drawer to a player"),
+    DESCRIPTION_PLACE("Place a drawer"),
+    DESCRIPTION_PURGE("Delete all the drawer in a specific world"),
+    DESCRIPTION_GIVE_CRAFT("Give a custom craft item to a player"),
+    DESCRIPTION_VERSION("Show plugin version"),
+
+    UPGRADE_ERROR_LIMIT("§cThe drawer already has a larger limit, you can not add this limit."),
+
+    UPGRADE_SUCCESS("§aYou just put the upgrade §f%name%§a on the drawer."),
+
+    EMPTY_DRAWER("Empty"),
+    EMPTY_UPGRADE("#e32f1b✘"),
+
+    DRAWER_NOT_FOUND("§cCan’t find the drawer %name%§c."),
+
+    DRAWER_GIVE_RECEIVE("§aYou just got a drawer."),
+    DRAWER_GIVE_SENDER("§aYou just gave a Drawer to §f%player%§a."),
+
+    CRAFT_GIVE_ERROR("§cCraft §f%name%§c not found."),
+    CRAFT_GIVE_RECEIVE("§aYou just got a §f%name%§a."),
+    CRAFT_GIVE_SENDER("§aYou just gave a §b%name%§a to §f%player%§a."),
+
+    DRAWER_PLACE_ERROR("§cA drawer is already in this position."),
+    DRAWER_PLACE_SUCCESS("§aYou have just placed a drawer in the world §f§n%world%§r §aat §f%x%§7, §f%y%§7, §f%z%§a."),
+    DRAWER_PURGE("§aYou just purged the world §f%world%§a."),
+
+    CLEAR_DISPLAY("§aYou just removed all the entities that come from the plugin. §7Entities deleted§8: §f%amount%"),
+
+    DISABLE_WORLD("§cThe world is disabled. You cannot place a drawer here."),
+    BREAK_LIMIT("§cYour drawer contains too many items to be broken, you must empty it before."),
 
     ;
 
@@ -205,5 +237,18 @@ public enum Message {
         this.itemStack = itemStack;
     }
 
+    public boolean isValid() {
+
+        switch (type){
+            case ACTION:
+                return this.message != null;
+            case CENTER:
+            case TCHAT: return this.message != null || !this.messages.isEmpty();
+            case TITLE:
+            case NONE: return true;
+        }
+
+        return true;
+    }
 }
 

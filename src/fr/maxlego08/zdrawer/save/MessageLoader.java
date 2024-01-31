@@ -1,10 +1,10 @@
 package fr.maxlego08.zdrawer.save;
 
-import fr.maxlego08.zdrawer.zcore.enums.Message;
+import fr.maxlego08.zdrawer.api.enums.Message;
+import fr.maxlego08.zdrawer.api.storage.Savable;
 import fr.maxlego08.zdrawer.zcore.enums.MessageType;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
-import fr.maxlego08.zdrawer.zcore.utils.storage.Savable;
 import fr.maxlego08.zdrawer.zcore.utils.yaml.YamlUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,41 +16,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-/**
- * The MessageLoader class extends YamlUtils and implements Savable to manage message configurations.
- * This class is responsible for loading and saving custom messages to a YAML file for a Bukkit plugin.
- */
 public class MessageLoader extends YamlUtils implements Savable {
 
     private final List<Message> loadedMessages = new ArrayList<>();
 
-    /**
-     * Constructor for MessageLoader.
-     *
-     * @param plugin The JavaPlugin instance associated with this loader.
-     */
     public MessageLoader(JavaPlugin plugin) {
         super(plugin);
     }
 
-    /**
-     * Saves messages to the configuration file.
-     *
-     * @param persist The persist instance used for saving the data.
-     */
     @Override
     public void save(Persist persist) {
 
         if (persist != null) return;
 
         File file = new File(plugin.getDataFolder(), "messages.yml");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (!file.exists()) try {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         YamlConfiguration configuration = getConfig(file);
@@ -63,6 +46,7 @@ public class MessageLoader extends YamlUtils implements Savable {
             if (message.getType() != MessageType.TCHAT) {
                 configuration.set(path + ".type", message.getType().name());
             }
+
             if (message.getType().equals(MessageType.TCHAT) || message.getType().equals(MessageType.ACTION) || message.getType().equals(MessageType.CENTER)) {
 
                 if (message.isMessage()) {
@@ -70,6 +54,7 @@ public class MessageLoader extends YamlUtils implements Savable {
                 } else {
                     configuration.set(path + ".message", colorReverse(message.getMessage()));
                 }
+
             } else if (message.getType().equals(MessageType.TITLE)) {
 
                 configuration.set(path + ".title", colorReverse(message.getTitle()));
@@ -77,7 +62,9 @@ public class MessageLoader extends YamlUtils implements Savable {
                 configuration.set(path + ".fadeInTime", message.getStart());
                 configuration.set(path + ".showTime", message.getTime());
                 configuration.set(path + ".fadeOutTime", message.getEnd());
+
             }
+
         }
 
         try {
@@ -88,11 +75,6 @@ public class MessageLoader extends YamlUtils implements Savable {
 
     }
 
-    /**
-     * Loads messages from the configuration file.
-     *
-     * @param persist The persist instance used for loading the data.
-     */
     @Override
     public void load(Persist persist) {
 
@@ -118,7 +100,11 @@ public class MessageLoader extends YamlUtils implements Savable {
         boolean canSave = false;
         for (Message message : Message.values()) {
 
-            if (!this.loadedMessages.contains(message) && message.isUse()) {
+            if (!message.isValid()) {
+                Logger.info("Error with message " + message + ", it is invalid!");
+            }
+
+            if (!this.loadedMessages.contains(message)) {
                 canSave = true;
                 break;
             }
@@ -132,38 +118,34 @@ public class MessageLoader extends YamlUtils implements Savable {
     }
 
     /**
-     * Loads a single message from the given YAML configuration.
-     *
-     * @param configuration The YAML configuration to load the message from.
-     * @param key           The key under which the message is stored.
+     * @param configuration
+     * @param key
      */
     private void loadMessage(YamlConfiguration configuration, String key) {
-        try {
 
+        try {
             MessageType messageType = MessageType.valueOf(configuration.getString(key + ".type", "TCHAT").toUpperCase());
             String keys = key.substring("messages.".length());
             Message enumMessage = Message.valueOf(keys.toUpperCase().replace(".", "_"));
             enumMessage.setType(messageType);
-
-            System.out.println("Loaded: " + enumMessage);
-            this.loadedMessages.add(enumMessage);
+            loadedMessages.add(enumMessage);
 
             switch (messageType) {
                 case ACTION: {
                     String message = configuration.getString(key + ".message");
-                    enumMessage.setMessage(color(message));
+                    enumMessage.setMessage(message);
                     break;
                 }
                 case CENTER:
                 case TCHAT: {
                     if (configuration.contains(key + ".messages")) {
                         List<String> messages = configuration.getStringList(key + ".messages");
-                        enumMessage.setMessages(color(messages));
+                        enumMessage.setMessages(messages);
                         enumMessage.setMessage(null);
                     } else {
                         String message = configuration.getString(key + ".message");
-                        enumMessage.setMessage(color(message));
-                        enumMessage.setMessages(new ArrayList<String>());
+                        enumMessage.setMessage(message);
+                        enumMessage.setMessages(new ArrayList<>());
                     }
                     break;
                 }
@@ -173,9 +155,9 @@ public class MessageLoader extends YamlUtils implements Savable {
                     int fadeInTime = configuration.getInt(key + ".fadeInTime");
                     int showTime = configuration.getInt(key + ".showTime");
                     int fadeOutTime = configuration.getInt(key + ".fadeOutTime");
-                    Map<String, Object> titles = new HashMap<String, Object>();
-                    titles.put("title", color(title));
-                    titles.put("subtitle", color(subtitle));
+                    Map<String, Object> titles = new HashMap<>();
+                    titles.put("title", title);
+                    titles.put("subtitle", subtitle);
                     titles.put("start", fadeInTime);
                     titles.put("time", showTime);
                     titles.put("end", fadeOutTime);
@@ -190,10 +172,11 @@ public class MessageLoader extends YamlUtils implements Savable {
         } catch (Exception ignored) {
         }
 
-        if (configuration.isConfigurationSection(key + ".")) {
+        try {
             for (String newKey : configuration.getConfigurationSection(key + ".").getKeys(false)) {
                 loadMessage(configuration, key + "." + newKey);
             }
+        } catch (Exception ignored) {
         }
     }
 

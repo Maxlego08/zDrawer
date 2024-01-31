@@ -42,9 +42,8 @@ public abstract class LocationUtils extends PapiUtils{
 	 * @return location as string
 	 */
 	protected String changeLocationToString(Location location) {
-		String ret = location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + ","
+		return location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + ","
 				+ location.getBlockZ();
-		return ret;
 	}
 
 	/**

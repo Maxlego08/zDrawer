@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 
 import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
-import fr.maxlego08.zdrawer.zcore.utils.storage.Savable;
+import fr.maxlego08.zdrawer.api.storage.Savable;
 
 public class CooldownBuilder implements Savable {
 

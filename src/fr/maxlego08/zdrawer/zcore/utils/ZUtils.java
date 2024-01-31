@@ -5,7 +5,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.zcore.enums.EnumInventory;
-import fr.maxlego08.zdrawer.zcore.enums.Message;
 import fr.maxlego08.zdrawer.zcore.enums.Permission;
 import fr.maxlego08.zdrawer.zcore.utils.builder.CooldownBuilder;
 import fr.maxlego08.zdrawer.zcore.utils.builder.TimerBuilder;
@@ -28,6 +27,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -38,6 +38,7 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
@@ -53,13 +54,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -135,15 +131,22 @@ public abstract class ZUtils extends MessageUtils {
     }
 
     /**
-     * Gives an item to the player, if the player's inventory is full then the
-     * item will drop to the ground
+     * Gives an itemStack to the player, if the player's inventory is full then the
+     * itemStack will drop to the ground
      *
      * @param player
-     * @param item
+     * @param itemStack
+     * @param enableDirection
      */
-    protected void give(Player player, ItemStack item) {
-        if (hasInventoryFull(player)) player.getWorld().dropItem(player.getLocation(), item);
-        else player.getInventory().addItem(item);
+    protected void give(Player player, ItemStack itemStack, boolean enableDirection) {
+        if (player.getInventory().firstEmpty() == -1) {
+            Location dropLocation = player.getLocation();
+            Item droppedItem = dropLocation.getWorld().dropItem(dropLocation, itemStack);
+            Vector direction = dropLocation.getDirection();
+            direction.multiply(0.2);
+            direction.setY(0.15);
+            droppedItem.setVelocity(direction);
+        } else player.getInventory().addItem(itemStack);
     }
 
     /**
@@ -222,63 +225,6 @@ public abstract class ZUtils extends MessageUtils {
     protected boolean same(Location l, Location l2) {
         return (l.getBlockX() == l2.getBlockX()) && (l.getBlockY() == l2.getBlockY())
                 && (l.getBlockZ() == l2.getBlockZ()) && l.getWorld().getName().equals(l2.getWorld().getName());
-    }
-
-    /**
-     * Teleport a player to a given location with a given delay
-     *
-     * @param player   who will be teleported
-     * @param delay    before the teleportation of the player
-     * @param location where the player will be teleported
-     */
-    protected void teleport(Player player, int delay, Location location) {
-        teleport(player, delay, location, null);
-    }
-
-    /**
-     * Teleport a player to a given location with a given delay
-     *
-     * @param player   who will be teleported
-     * @param delay    before the teleportation of the player
-     * @param location where the player will be teleported
-     * @param code     executed when the player is teleported or not
-     */
-    protected void teleport(Player player, int delay, Location location, Consumer<Boolean> cmd) {
-        if (teleportPlayers.contains(player.getName())) {
-            message(player, Message.TELEPORT_ERROR);
-            return;
-        }
-        ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
-        Location playerLocation = player.getLocation();
-        AtomicInteger verif = new AtomicInteger(delay);
-        teleportPlayers.add(player.getName());
-        if (!location.getChunk().isLoaded())
-            location.getChunk().load();
-        ses.scheduleWithFixedDelay(() -> {
-            if (!same(playerLocation, player.getLocation())) {
-                message(player, Message.TELEPORT_MOVE);
-                ses.shutdown();
-                teleportPlayers.remove(player.getName());
-                if (cmd != null)
-                    cmd.accept(false);
-                return;
-            }
-            int currentSecond = verif.getAndDecrement();
-            if (!player.isOnline()) {
-                ses.shutdown();
-                teleportPlayers.remove(player.getName());
-                return;
-            }
-            if (currentSecond == 0) {
-                ses.shutdown();
-                teleportPlayers.remove(player.getName());
-                player.teleport(location);
-                message(player, Message.TELEPORT_SUCCESS);
-                if (cmd != null)
-                    cmd.accept(true);
-            } else
-                message(player, Message.TELEPORT_MESSAGE, currentSecond);
-        }, 0, 1, TimeUnit.SECONDS);
     }
 
     /**
@@ -464,7 +410,7 @@ public abstract class ZUtils extends MessageUtils {
      */
     protected void createInventory(DrawerPlugin plugin, Player player, EnumInventory inventory, int page,
                                    Object... objects) {
-        plugin.getInventoryManager().createInventory(inventory, player, page, objects);
+        plugin.getZInventoryManager().createInventory(inventory, player, page, objects);
     }
 
     /**
@@ -474,7 +420,7 @@ public abstract class ZUtils extends MessageUtils {
      * @param objects
      */
     protected void createInventory(DrawerPlugin plugin, Player player, int inventory, int page, Object... objects) {
-        plugin.getInventoryManager().createInventory(inventory, player, page, objects);
+        plugin.getZInventoryManager().createInventory(inventory, player, page, objects);
     }
 
     /**
