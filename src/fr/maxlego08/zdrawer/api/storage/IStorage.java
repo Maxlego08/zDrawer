@@ -79,5 +79,22 @@ public interface IStorage {
      */
     void createDrawer(DrawerContainer drawerContainer);
 
+    /**
+     * Retrieves a list of Drawers located in a specified chunk.
+     *
+     * @param chunk The {@link Chunk} in which to look for Drawers.
+     * @return A list of {@link Drawer} instances found within the specified chunk.
+     */
     List<Drawer> getDrawers(Chunk chunk);
+
+    /**
+     * Updates the storage system.
+     * <p>
+     * This method is used to perform a refresh or update of the storage system's state.
+     * It could involve synchronizing the state with external data, updating internal data structures,
+     * or other maintenance tasks required to keep the storage system accurate and efficient.
+     * </p>
+     */
+    void update();
+
 }

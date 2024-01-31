@@ -235,4 +235,20 @@ public interface Drawer {
      * @param location The {@link Location} in the game world where the items should be dropped.
      */
     void dropContent(Location location);
+
+
+    /**
+     * Checks if the current object needs to be updated.
+     *
+     * @return true if the object needs an update, false otherwise.
+     */
+    boolean needToUpdate();
+
+    /**
+     * Marks the current object as needing an update.
+     *
+     * @param needToUpdate Update value
+     */
+    void setNeedToUpdate(boolean needToUpdate);
+
 }

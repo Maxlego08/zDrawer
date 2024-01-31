@@ -21,11 +21,11 @@ import java.util.Optional;
 
 public class JsonStorage implements IStorage {
 
-    private transient final List<DrawerContainer> waitingDrawers = new ArrayList<>();
-    private transient Map<String, List<Drawer>> drawerMapChunk = new HashMap<>();
-    private transient DrawerPlugin plugin;
-    private transient Map<String, Drawer> drawerMap = new HashMap<>();
-    private List<DrawerContainer> drawers = new ArrayList<>();
+    protected transient final List<DrawerContainer> waitingDrawers = new ArrayList<>();
+    protected transient Map<String, List<Drawer>> drawerMapChunk = new HashMap<>();
+    protected transient DrawerPlugin plugin;
+    protected transient Map<String, Drawer> drawerMap = new HashMap<>();
+    protected List<DrawerContainer> drawers = new ArrayList<>();
 
     public JsonStorage(DrawerPlugin plugin) {
         this.plugin = plugin;
@@ -83,6 +83,7 @@ public class JsonStorage implements IStorage {
     @Override
     public void load() {
         this.drawerMap = new HashMap<>();
+        Logger.info("Loading " + this.drawers.size() + " drawers.", Logger.LogType.INFO);
         this.drawers.forEach(drawerContainer -> {
 
             if (!drawerContainer.isWorldLoaded()) {
@@ -123,7 +124,7 @@ public class JsonStorage implements IStorage {
         return this.waitingDrawers;
     }
 
-    private String locationToString(Location location) {
+    protected String locationToString(Location location) {
         return location.getWorld().getName() + "," + location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ();
     }
 
@@ -137,15 +138,12 @@ public class JsonStorage implements IStorage {
         this.drawerMapChunk = new HashMap<>();
     }
 
-    public Map<String, Drawer> getDrawerMap() {
-        return drawerMap;
-    }
-
-    public Map<String, List<Drawer>> getDrawerMapChunk() {
-        return drawerMapChunk;
-    }
-
     public List<Drawer> getDrawers(Chunk chunk) {
         return drawerMapChunk.getOrDefault(chunk.getX() + "," + chunk.getZ(), new ArrayList<>());
+    }
+
+    @Override
+    public void update() {
+
     }
 }

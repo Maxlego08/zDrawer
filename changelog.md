@@ -2,7 +2,8 @@
 
 - [x] Manage HOPPER
 - [x] Create admin commands
-- [ ] SQL and SQLite storage
+- [x] SQLite storage
+- [ ] MySql storage
 - [x] Give the drawer by command, and be able to apply an upgrade directly
 - [x] Be able to add content and number of items in it
 - [ ] Add SlimeFun API for Trunk Connectors
@@ -17,13 +18,12 @@
 - [x] Use PersistentDataContainer for entities
 - [x] Add option for enable of disable hopper for each drawer
 - [x] Add an option to blacklist worlds.
+- [ ] Fix upgrade display, doesnt appear
+- [ ] Improved default configuration, add more comments
+- [ ] Create log system
 
-Idée de gestion d'inventaire :
+## Idée de gestion d'inventaire :
 - Pouvoir ajouter les items dedans
 - Pouvoir placer ton sous inventaire ou le remplir
 - Pouvoir vendre le contenu
 - Pouvoir récupérer le drawer
-
-Ajouter un système de log complète pour savoir qui fait quoi
-
-Any idea ?

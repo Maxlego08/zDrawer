@@ -44,6 +44,7 @@ public class ZDrawer extends ZUtils implements Drawer {
     private final List<DrawerCase> drawerCases = new ArrayList<>();
     private ItemDisplay upgradeDisplay;
     private DrawerUpgrade drawerUpgrade;
+    private boolean needToUpdate;
 
     public ZDrawer(DrawerPlugin plugin, DrawerConfiguration drawerConfiguration, Location location, BlockFace blockFace) {
         this.plugin = plugin;
@@ -137,7 +138,6 @@ public class ZDrawer extends ZUtils implements Drawer {
             drawerCase.setTextDisplay(world.spawn(currentLocationText, TextDisplay.class, display -> {
                 display.text(Component.text("0"));
                 display.setDefaultBackground(drawerConfiguration.isDefaultBackground());
-                System.out.println("Display default background: " + display.isDefaultBackground());
                 display.setAlignment(TextDisplay.TextAlignment.CENTER);
                 display.setViewRange(drawerConfiguration.getViewRange());
                 setSize(display, this.plugin.getManager().getTextDisplaySize(), scale);
@@ -235,6 +235,7 @@ public class ZDrawer extends ZUtils implements Drawer {
 
     @Override
     public void setUpgrade(DrawerUpgrade drawerUpgrade) {
+        this.needToUpdate = true;
         this.drawerUpgrade = drawerUpgrade;
         this.upgradeDisplay.setItemStack(drawerUpgrade.getDisplayItemStack());
     }
@@ -334,5 +335,15 @@ public class ZDrawer extends ZUtils implements Drawer {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean needToUpdate() {
+        return this.needToUpdate;
+    }
+
+    @Override
+    public void setNeedToUpdate(boolean needToUpdate) {
+        this.needToUpdate = needToUpdate;
     }
 }

@@ -137,7 +137,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         if (drawer != null) {
             if (player != null) this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
 
-            if (!drawerConfiguration.isDropContent() && !force) {
+            if (!drawerConfiguration.isDropContent() || force) {
                 persistentDataContainer.set(this.namespaceContainer.getDataKeyContent(), PersistentDataType.STRING, drawer.getData());
             }
 

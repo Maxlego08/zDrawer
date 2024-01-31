@@ -97,6 +97,7 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
         }
 
         if (needUpdate) {
+            this.drawer.setNeedToUpdate(true);
             updateInventory(player, itemStack, hand);
             updateText();
         }
@@ -159,6 +160,7 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
             itemStack.setAmount(itemStackAmount);
             remove(itemStack.getMaxStackSize());
             give(player, itemStack, true);
+            this.drawer.setNeedToUpdate(true);
 
         } else {
 
@@ -167,6 +169,7 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
             remove(1);
 
             give(player, itemStack, true);
+            this.drawer.setNeedToUpdate(true);
         }
     }
 
@@ -198,12 +201,14 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
             this.itemDisplay.setItemStack(new ItemStack(Material.AIR));
         }
 
+        this.drawer.setNeedToUpdate(true);
         updateText();
     }
 
     @Override
     public void add(long amount) {
         setAmount(this.amount + amount);
+        this.drawer.setNeedToUpdate(true);
     }
 
     @Override

@@ -5,6 +5,7 @@ import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.storage.DrawerStorage;
 import fr.maxlego08.zdrawer.command.commands.CommandDrawer;
 import fr.maxlego08.zdrawer.placeholder.LocalPlaceholder;
+import fr.maxlego08.zdrawer.placeholder.Placeholder;
 import fr.maxlego08.zdrawer.save.Config;
 import fr.maxlego08.zdrawer.save.MessageLoader;
 import fr.maxlego08.zdrawer.storage.StorageManager;
@@ -23,17 +24,18 @@ import org.bukkit.plugin.ServicesManager;
 public class DrawerPlugin extends ZPlugin {
 
     private final ZDrawerManager manager = new ZDrawerManager(this);
-    private final DrawerStorage storage = new StorageManager(this);
+    private DrawerStorage storage;
     private InventoryManager inventoryManager;
     private boolean isSuccessfullyLoaded = false;
 
     @Override
     public void onEnable() {
 
+        this.preEnable();
+
         LocalPlaceholder placeholder = LocalPlaceholder.getInstance();
         placeholder.setPrefix("zdrawer");
 
-        this.preEnable();
         this.saveDefaultConfig();
 
         ServicesManager servicesManager = this.getServer().getServicesManager();
@@ -48,6 +50,8 @@ public class DrawerPlugin extends ZPlugin {
 
         this.addSave(this.manager);
         this.addSave(new MessageLoader(this));
+
+        this.storage = new StorageManager(this);
         this.addSave(this.storage);
 
         this.loadFiles();
@@ -55,6 +59,7 @@ public class DrawerPlugin extends ZPlugin {
         new Metrics(this, 20791);
 
         this.postEnable();
+        Placeholder.getPlaceholder();
 
         this.isSuccessfullyLoaded = true;
     }
