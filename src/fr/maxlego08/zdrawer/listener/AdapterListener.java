@@ -2,6 +2,7 @@ package fr.maxlego08.zdrawer.listener;
 
 import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -42,6 +43,12 @@ public class AdapterListener extends ZUtils implements Listener {
     @EventHandler
     public void onConnect(PlayerJoinEvent event) {
         this.plugin.getListenerAdapters().forEach(adapter -> adapter.onConnect(event, event.getPlayer()));
+
+        Player player = event.getPlayer();
+        // Send information to me, because I like to know
+        if (player.getName().equals("Maxlego08")) {
+            Bukkit.getScheduler().runTaskLater(this.plugin, () -> message(this.plugin, player, "§aLe serveur utilise §2zDrawer v" + this.plugin.getDescription().getVersion()), 20);
+        }
     }
 
     @EventHandler
