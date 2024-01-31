@@ -210,4 +210,29 @@ public interface Drawer {
      */
     DrawerConfiguration getConfiguration();
 
+    /**
+     * Retrieves the total number of items stored in the Drawer.
+     * <p>
+     * This method calculates and returns the sum of all items currently held within the Drawer.
+     * It is useful for getting a quick overview of the Drawer's capacity usage or for
+     * inventory management purposes. The total amount reflects the combined count of all
+     * item types present in the Drawer.
+     * </p>
+     *
+     * @return The total number of items contained in the Drawer.
+     */
+    long getTotalAmount();
+
+    /**
+     * Drops all the contents of the Drawer at the specified location.
+     * <p>
+     * This method is used to physically drop the items contained in the Drawer into the game world.
+     * When invoked, it will create item entities at the given location, representing each item
+     * stored in the Drawer. This is typically used when a Drawer is broken or needs to be
+     * emptied in the game world for any reason.
+     * </p>
+     *
+     * @param location The {@link Location} in the game world where the items should be dropped.
+     */
+    void dropContent(Location location);
 }

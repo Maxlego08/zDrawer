@@ -128,7 +128,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     }
 
     @Override
-    public ItemStack buildDrawer(DrawerConfiguration drawerConfiguration, Player player, Drawer drawer) {
+    public ItemStack buildDrawer(DrawerConfiguration drawerConfiguration, Player player, Drawer drawer, boolean force) {
         ItemStack itemStackDrawer = drawerConfiguration.getMenuItemStack().build(player, false);
         ItemMeta itemMeta = itemStackDrawer.getItemMeta();
         PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
@@ -137,7 +137,9 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         if (drawer != null) {
             if (player != null) this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
 
-            persistentDataContainer.set(this.namespaceContainer.getDataKeyContent(), PersistentDataType.STRING, drawer.getData());
+            if (!drawerConfiguration.isDropContent() && !force) {
+                persistentDataContainer.set(this.namespaceContainer.getDataKeyContent(), PersistentDataType.STRING, drawer.getData());
+            }
 
             if (drawer.getUpgrade() != null) {
                 persistentDataContainer.set(this.namespaceContainer.getDataKeyUpgrade(), PersistentDataType.STRING, drawer.getUpgradeName());
@@ -214,7 +216,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         Drawer drawer = new ZDrawer(this.plugin, material, amount, drawerUpgrade, drawerConfiguration);
         this.currentPlayerDrawer.put(player.getUniqueId(), drawer);
 
-        ItemStack itemStack = buildDrawer(drawerConfiguration, player, drawer);
+        ItemStack itemStack = buildDrawer(drawerConfiguration, player, drawer, true);
         give(player, itemStack, false);
 
         message(this.plugin, sender, Message.DRAWER_GIVE_SENDER, "%player%", player.getName());

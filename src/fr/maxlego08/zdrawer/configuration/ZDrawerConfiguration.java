@@ -22,12 +22,17 @@ public class ZDrawerConfiguration implements DrawerConfiguration {
     private final DrawerBorder border;
     private final Craft craft;
     private final boolean enableHopper;
+    private final boolean dropItems;
+    private final long dropItemLimit;
+
 
     public ZDrawerConfiguration(DrawerPlugin plugin, YamlConfiguration configuration, String path, Loader<MenuItemStack> loader, File file, String name) throws InventoryException {
         this.name = name;
         this.drawerType = DrawerType.valueOf(configuration.getString(path + "type", "SIMPLE").toUpperCase());
         this.limit = configuration.getLong(path + "limit", 0);
         this.enableHopper = configuration.getBoolean(path + "enableHopper", true);
+        this.dropItems = configuration.getBoolean(path + "dropContent.enable", false);
+        this.dropItemLimit = configuration.getLong(path + "dropContent.limit", limit / 2);
         this.menuItemStack = loader.load(configuration, path + "item.", file);
         this.craft = new ZCraftDrawer(plugin, path + "craft.", configuration, name, file);
         this.craft.register();
@@ -67,5 +72,15 @@ public class ZDrawerConfiguration implements DrawerConfiguration {
     @Override
     public boolean isDisableHopper() {
         return !this.enableHopper;
+    }
+
+    @Override
+    public boolean isDropContent() {
+        return this.dropItems;
+    }
+
+    @Override
+    public long getDropLimit() {
+        return this.dropItemLimit;
     }
 }

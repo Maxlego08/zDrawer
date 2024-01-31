@@ -305,4 +305,29 @@ public class ZDrawer extends ZUtils implements Drawer {
     public DrawerConfiguration getConfiguration() {
         return this.drawerConfiguration;
     }
+
+    @Override
+    public long getTotalAmount() {
+        return this.drawerCases.stream().mapToLong(DrawerCase::getAmount).sum();
+    }
+
+    @Override
+    public void dropContent(Location location) {
+        World world = location.getWorld();
+        this.drawerCases.forEach(drawerCase -> {
+            if (drawerCase.hasItemStack() && drawerCase.getAmount() > 0) {
+
+                ItemStack itemStack = drawerCase.getItemStack().clone();
+                long amount = drawerCase.getAmount();
+                while (amount > 0) {
+                    int currentAmount = Math.min(64, itemStack.getMaxStackSize());
+                    if (currentAmount > amount) currentAmount = (int) amount;
+                    ItemStack currentItem = itemStack.clone();
+                    currentItem.setAmount(currentAmount);
+                    world.dropItemNaturally(location, currentItem);
+                    amount -= currentAmount;
+                }
+            }
+        });
+    }
 }

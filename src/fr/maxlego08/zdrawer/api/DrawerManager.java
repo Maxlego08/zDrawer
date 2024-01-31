@@ -49,7 +49,7 @@ public interface DrawerManager extends Savable {
      *
      * @param drawerName The name of the Drawer for which the configuration is sought.
      * @return An {@link Optional<DrawerConfiguration>} containing the configuration of the specified Drawer.
-     *         The Optional is empty if no Drawer with the specified name exists.
+     * The Optional is empty if no Drawer with the specified name exists.
      */
     Optional<DrawerConfiguration> getDrawer(String drawerName);
 
@@ -73,12 +73,12 @@ public interface DrawerManager extends Savable {
      * a player needs to receive a Drawer directly.
      * </p>
      *
-     * @param sender          The CommandSender who is issuing the command.
-     * @param player          The Player who will receive the Drawer.
-     * @param drawerName      The name of the Drawer to be given.
-     * @param drawerUpgrade   The upgrade to be applied to the Drawer.
-     * @param material        The Material of the Drawer.
-     * @param amount          The amount of the Drawer items to be given.
+     * @param sender        The CommandSender who is issuing the command.
+     * @param player        The Player who will receive the Drawer.
+     * @param drawerName    The name of the Drawer to be given.
+     * @param drawerUpgrade The upgrade to be applied to the Drawer.
+     * @param material      The Material of the Drawer.
+     * @param amount        The amount of the Drawer items to be given.
      */
     void giveDrawer(CommandSender sender, Player player, String drawerName, DrawerUpgrade drawerUpgrade, Material material, Long amount);
 
@@ -92,9 +92,10 @@ public interface DrawerManager extends Savable {
      * @param drawerConfiguration The configuration of the Drawer to build.
      * @param player              The Player for whom the Drawer is being built.
      * @param drawer              The Drawer instance to build the ItemStack for.
+     * @param forceContent        Force adding the contents of the drawer in itemstack
      * @return The built ItemStack representing the specified Drawer.
      */
-    ItemStack buildDrawer(DrawerConfiguration drawerConfiguration, Player player, Drawer drawer);
+    ItemStack buildDrawer(DrawerConfiguration drawerConfiguration, Player player, Drawer drawer, boolean forceContent);
 
     /**
      * Gets a list of all available upgrade names.
@@ -110,8 +111,8 @@ public interface DrawerManager extends Savable {
      * It's typically used in scenarios where players need to receive predefined craft items.
      * </p>
      *
-     * @param sender   The CommandSender who is issuing the command.
-     * @param player   The Player who will receive the craft item.
+     * @param sender    The CommandSender who is issuing the command.
+     * @param player    The Player who will receive the craft item.
      * @param craftName The name of the craft item to be given.
      */
     void giveCraft(CommandSender sender, Player player, String craftName);
@@ -130,16 +131,16 @@ public interface DrawerManager extends Savable {
      * It sets up the Drawer at the specified coordinates with the given configuration.
      * </p>
      *
-     * @param sender         The CommandSender who is issuing the command.
-     * @param drawerName     The name of the Drawer to be placed.
-     * @param world          The World where the Drawer is to be placed.
-     * @param x              The x-coordinate for the Drawer's location.
-     * @param y              The y-coordinate for the Drawer's location.
-     * @param z              The z-coordinate for the Drawer's location.
-     * @param blockFace      The BlockFace indicating the direction the Drawer is facing.
-     * @param drawerUpgrade  The upgrade to apply to the Drawer.
-     * @param material       The Material of the Drawer.
-     * @param amount         The amount of the material for the Drawer.
+     * @param sender        The CommandSender who is issuing the command.
+     * @param drawerName    The name of the Drawer to be placed.
+     * @param world         The World where the Drawer is to be placed.
+     * @param x             The x-coordinate for the Drawer's location.
+     * @param y             The y-coordinate for the Drawer's location.
+     * @param z             The z-coordinate for the Drawer's location.
+     * @param blockFace     The BlockFace indicating the direction the Drawer is facing.
+     * @param drawerUpgrade The upgrade to apply to the Drawer.
+     * @param material      The Material of the Drawer.
+     * @param amount        The amount of the material for the Drawer.
      */
     void placeDrawer(CommandSender sender, String drawerName, World world, double x, double y, double z, BlockFace blockFace, DrawerUpgrade drawerUpgrade, Material material, long amount);
 

@@ -136,6 +136,15 @@ public class DrawerListener extends ListenerAdapter {
         if (!optional.isPresent()) return;
 
         Drawer drawer = optional.get();
+        DrawerConfiguration drawerConfiguration = drawer.getConfiguration();
+        if (drawerConfiguration.isDropContent()) {
+            if (drawer.getTotalAmount() > drawerConfiguration.getDropLimit()) {
+                event.setCancelled(true);
+                message(this.plugin, player, Message.BREAK_LIMIT);
+                return;
+            }
+        }
+
         PlayerInventory inventory = event.getPlayer().getInventory();
         ItemStack itemInMainHand = inventory.getItemInMainHand();
         ItemStack itemInOffHand = inventory.getItemInOffHand();
@@ -151,10 +160,12 @@ public class DrawerListener extends ListenerAdapter {
 
             this.manager.getCurrentPlayerDrawer().put(player.getUniqueId(), drawer);
 
-            this.manager.getDrawer(drawer.getConfigurationName()).ifPresent(drawerConfiguration -> {
-                ItemStack itemStack = this.manager.buildDrawer(drawerConfiguration, player, drawer);
-                block.getWorld().dropItem(block.getLocation().add(0.5, 0.1, 0.5), itemStack);
-            });
+            ItemStack itemStack = this.manager.buildDrawer(drawerConfiguration, player, drawer, false);
+            block.getWorld().dropItem(block.getLocation().add(0.5, 0.1, 0.5), itemStack);
+
+            if (drawerConfiguration.isDropContent()) {
+                drawer.dropContent(block.getLocation().add(0.5, 0.1, 0.5));
+            }
         } else {
 
             event.setCancelled(true);
@@ -316,7 +327,7 @@ public class DrawerListener extends ListenerAdapter {
 
                         // Drawer of a new drawer, so we will remove the cache
                         this.manager.getCurrentPlayerDrawer().remove(viewer.getUniqueId());
-                        event.getInventory().setItem(0, this.manager.buildDrawer(drawerConfiguration, (Player) viewer, null));
+                        event.getInventory().setItem(0, this.manager.buildDrawer(drawerConfiguration, (Player) viewer, null, false));
                     });
                 }
             }

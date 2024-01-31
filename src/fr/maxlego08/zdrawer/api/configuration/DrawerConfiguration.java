@@ -80,5 +80,19 @@ public interface DrawerConfiguration {
      * @return true if hopper interactions are disabled, false otherwise.
      */
     boolean isDisableHopper();
+
+    /**
+     * Checks if the Drawer is configured to drop its contents when certain conditions are met.
+     *
+     * @return true if the Drawer is configured to drop its contents, false otherwise.
+     */
+    boolean isDropContent();
+
+    /**
+     * Retrieves the limit for the number of items that can be dropped from the Drawer.
+     *
+     * @return The maximum number of items the Drawer can drop.
+     */
+    long getDropLimit();
 }
 
