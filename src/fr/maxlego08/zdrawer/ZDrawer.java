@@ -78,8 +78,10 @@ public class ZDrawer extends ZUtils implements Drawer {
 
         this.drawerUpgrade = drawerUpgrade;
 
-        for (int index = 0; index < drawerConfiguration.getDrawerType().getSize(); index++) {
-            this.drawerCases.add(new ZDrawerCase(plugin, this, amount, material));
+        if (material != null) {
+            for (int index = 0; index < drawerConfiguration.getDrawerType().getSize(); index++) {
+                this.drawerCases.add(new ZDrawerCase(plugin, this, amount, material));
+            }
         }
     }
 
