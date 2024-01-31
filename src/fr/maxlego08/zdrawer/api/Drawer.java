@@ -8,6 +8,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface Drawer {
 
@@ -134,4 +135,8 @@ public interface Drawer {
     long getAmount(int index);
 
     void load(String data);
+
+    Optional<DrawerCase> findDrawerCase(ItemStack itemStack);
+
+    Optional<DrawerCase> findFirstCase();
 }

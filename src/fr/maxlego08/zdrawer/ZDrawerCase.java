@@ -215,4 +215,16 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
     public void updateText() {
         Meta.meta.updateText(this.textDisplay, this.plugin.getManager().numberFormat(amount, false));
     }
+
+    @Override
+    public String toString() {
+        return "ZDrawerCase{" +
+                "plugin=" + plugin +
+                ", drawer=" + drawer +
+                ", itemDisplay=" + itemDisplay +
+                ", textDisplay=" + textDisplay +
+                ", itemStack=" + itemStack +
+                ", amount=" + amount +
+                '}';
+    }
 }

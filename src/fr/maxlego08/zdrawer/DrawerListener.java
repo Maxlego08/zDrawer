@@ -1,6 +1,7 @@
 package fr.maxlego08.zdrawer;
 
 import fr.maxlego08.zdrawer.api.Drawer;
+import fr.maxlego08.zdrawer.api.DrawerCase;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import fr.maxlego08.zdrawer.api.enums.Message;
@@ -233,17 +234,18 @@ public class DrawerListener extends ListenerAdapter {
             Optional<Drawer> optional = storage.getDrawer(barrel.getLocation());
             if (!optional.isPresent()) return;
             Drawer drawer = optional.get();
-
             event.setCancelled(true);
 
-            System.out.println("TODO - Corriger les hoppers");
-            /* if (drawer.getAmount() <= 0) return;
+            Optional<DrawerCase> optionalDrawerCase = drawer.findFirstCase();
+            optionalDrawerCase.ifPresent(drawerCase -> {
+                if (drawerCase.getAmount() <= 0) return;
 
-            ItemStack newItemStack = drawer.getItemStack().clone();
-            newItemStack.setAmount(1);
-            destination.addItem(newItemStack);
+                ItemStack newItemStack = drawerCase.getItemStack().clone();
+                newItemStack.setAmount(1);
+                destination.addItem(newItemStack);
 
-            drawer.remove(1);*/
+                drawerCase.remove(1);
+            });
 
             return;
         }
@@ -257,30 +259,36 @@ public class DrawerListener extends ListenerAdapter {
             Drawer drawer = optional.get();
 
             ItemStack newItemStack = item.clone();
+            Optional<DrawerCase> optionalDrawerCase = drawer.findDrawerCase(newItemStack);
+
+            if (!optionalDrawerCase.isPresent()) {
+                event.setCancelled(true);
+                return;
+            }
+
+            DrawerCase drawerCase = optionalDrawerCase.get();
 
             // Si le drawer n'a aucun item, alors on va ajouter l'item du hopper
-            /*if (!drawer.hasItemStack()) {
+            if (!drawerCase.hasItemStack()) {
 
-                drawer.setAmount(newItemStack.getAmount());
-                drawer.setItemStack(newItemStack);
+                drawerCase.setAmount(newItemStack.getAmount());
+                drawerCase.setItemStack(newItemStack);
                 event.setItem(new ItemStack(Material.AIR));
 
-            } else if (drawer.getItemStack().isSimilar(newItemStack)) {
+            } else if (drawerCase.getItemStack().isSimilar(newItemStack)) {
 
-                if (drawer.isFull()) {
+                if (drawerCase.isFull()) {
                     event.setCancelled(true);
                     return;
                 }
 
-                int addAmount = (int) Math.min(newItemStack.getAmount(), drawer.getLimit() - drawer.getAmount());
-                drawer.add(addAmount);
+                int addAmount = (int) Math.min(newItemStack.getAmount(), drawer.getLimit() - drawerCase.getAmount());
+                drawerCase.add(addAmount);
                 event.setItem(new ItemStack(Material.AIR));
 
             } else {
                 event.setCancelled(true);
-            }*/
-            System.out.println("TODO - Corriger les hoppers");
-            event.setCancelled(true);
+            }
         }
     }
 
