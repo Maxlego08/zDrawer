@@ -30,6 +30,8 @@
 
 # Unreleased
 
+# 1.0.1
+
 - Add option ``enableBreakMaterial``
 - Fixed duplicate entities
 
