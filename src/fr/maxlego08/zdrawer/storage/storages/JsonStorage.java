@@ -7,11 +7,14 @@ import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import fr.maxlego08.zdrawer.api.storage.DrawerContainer;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
+import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.TextDisplay;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class JsonStorage implements IStorage {
+public class JsonStorage extends ZUtils implements IStorage {
 
     protected transient final List<DrawerContainer> waitingDrawers = new ArrayList<>();
     protected transient Map<String, List<Drawer>> drawerMapChunk = new HashMap<>();
@@ -82,6 +85,9 @@ public class JsonStorage implements IStorage {
 
     @Override
     public void load() {
+
+        Bukkit.getWorlds().forEach(world -> clearWorld(this.plugin, world));
+
         this.drawerMap = new HashMap<>();
         Logger.info("Loading " + this.drawers.size() + " drawers.", Logger.LogType.INFO);
         this.drawers.forEach(drawerContainer -> {

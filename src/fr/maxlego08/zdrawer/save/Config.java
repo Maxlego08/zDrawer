@@ -21,7 +21,7 @@ public class Config {
     public static List<String> disableWorlds = new ArrayList<>();
     public static String defaultFormat = "%amount%";
     public static boolean enableFormatting = false;
-
+    public static boolean enableBreakMaterial = false;
     public static DisplaySize itemDisplaySize;
     public static DisplaySize upgradeDisplaySize;
     public static DisplaySize textDisplaySize;
@@ -55,8 +55,9 @@ public class Config {
 
     public void load(YamlConfiguration configuration) {
 
-        enableDebug = configuration.getBoolean("enableDebug");
-        enableDebugTime = configuration.getBoolean("enableDebugTime");
+        enableDebug = configuration.getBoolean("enableDebug", false);
+        enableDebugTime = configuration.getBoolean("enableDebugTime", false);
+        enableBreakMaterial = configuration.getBoolean("drawer.enableBreakMaterial", false);
         blacklistMaterials = configuration.getStringList("drawer.blacklistMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
         breakMaterials = configuration.getStringList("drawer.breakMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
         disableWorlds = configuration.getStringList("drawer.disableWorlds");

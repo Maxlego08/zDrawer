@@ -10,7 +10,7 @@
 # Commands and permissions:
 # - /zdrawer » Main command (Alaises: /drawer) - zdrawer.use
 # - /zdrawer reload » Reload config files - zdrawer.reload
-# - /zdrawer give » Give commands - zdrawer.craft.use
+# - /zdrawer give » Give commands - zdrawer.give.use
 # - /zdrawer give drawer <player> [<upgrade name>] [<material>] [<amount>] » Give a drawer - zdrawer.give.drawer
 # - /zdrawer give craft <player> [<craft name>] » Give a craft item - zdrawer.give.craft
 # - /zdrawer place <world name> <x> <y> <z> <block face> [<upgrade name>] [<material>] [<amount>] » Place a drawer - zdrawer.place
@@ -48,6 +48,7 @@ storage: JSON
 updateInterval: 120000
 
 # Configuration for SQLITE and MYSQL storage
+# Attention, storage in MYSQL is not yet available !
 sql:
   # Table name
   tableName: "zdrawers"
@@ -476,6 +477,8 @@ drawer:
           4: { item: { x: -0.2, y: 0.0, z: 0.25 }, text: { x: -0.2, y: 0.0, z: 0.0 } }
 
 
+  # Enable having to use an axe to break a drawer
+  enableBreakMaterial: true
 
   # Tools to break a drawer
   breakMaterials:

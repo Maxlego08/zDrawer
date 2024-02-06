@@ -30,6 +30,11 @@
 
 # Unreleased
 
+# 1.0.1
+
+- Add option ``enableBreakMaterial``
+- Fixed duplicate entities
+
 # 1.0.0
 
 - First version of the plugin
