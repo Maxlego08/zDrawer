@@ -77,7 +77,7 @@ public class DrawerListener extends ListenerAdapter {
 
         ItemStack itemStack = event.getItem();
 
-        if (itemStack != null && Config.breakMaterials.contains(itemStack.getType()) && event.getAction() == Action.LEFT_CLICK_BLOCK) {
+        if (itemStack != null && (Config.breakMaterials.contains(itemStack.getType()) || !Config.enableBreakMaterial) && event.getAction() == Action.LEFT_CLICK_BLOCK) {
             return;
         }
 
@@ -149,7 +149,7 @@ public class DrawerListener extends ListenerAdapter {
         ItemStack itemInMainHand = inventory.getItemInMainHand();
         ItemStack itemInOffHand = inventory.getItemInOffHand();
 
-        if (Config.breakMaterials.contains(itemInMainHand.getType()) || Config.breakMaterials.contains(itemInOffHand.getType())) {
+        if ((Config.breakMaterials.contains(itemInMainHand.getType()) || Config.breakMaterials.contains(itemInOffHand.getType())) || !Config.enableBreakMaterial) {
 
             event.setCancelled(false);
             event.setDropItems(false);
