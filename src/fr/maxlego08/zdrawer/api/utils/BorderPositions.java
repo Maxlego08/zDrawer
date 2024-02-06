@@ -9,6 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Transformation;
 
@@ -129,6 +130,7 @@ public class BorderPositions {
             display.setInvulnerable(true);
             display.setTransformation(transformation);
             display.getPersistentDataContainer().set(plugin.getManager().getNamespaceContainer().getDataKeyEntity(), PersistentDataType.BOOLEAN, true);
+            display.setMetadata("zdrawer", new FixedMetadataValue(plugin, true));
         });
     }
 }

@@ -48,6 +48,7 @@ storage: JSON
 updateInterval: 120000
 
 # Configuration for SQLITE and MYSQL storage
+# Attention, storage in MYSQL is not yet available !
 sql:
   # Table name
   tableName: "zdrawers"

@@ -9,6 +9,7 @@ import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import fr.maxlego08.zdrawer.api.craft.Craft;
 import fr.maxlego08.zdrawer.api.enums.DrawerType;
 import fr.maxlego08.zdrawer.craft.ZCraftDrawer;
+import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -38,6 +39,9 @@ public class ZDrawerConfiguration implements DrawerConfiguration {
         this.dropItemLimit = configuration.getLong(path + "dropContent.limit", limit / 2);
         this.viewRange = (float) configuration.getDouble(path + "viewRange", 0.5);
         this.menuItemStack = loader.load(configuration, path + "item.", file);
+        if (!this.menuItemStack.getMaterial().equalsIgnoreCase("barrel")){
+            Logger.info("Attention, it is not possible to use another material for the drawer, please leave the material BARREL", Logger.LogType.WARNING);
+        }
         this.craft = new ZCraftDrawer(plugin, path + "craft.", configuration, name, file);
         this.craft.register();
         this.border = new ZDrawerBorder(configuration, path + "border.", loader, file);

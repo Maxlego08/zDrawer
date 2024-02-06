@@ -4,15 +4,14 @@ import fr.maxlego08.menu.api.InventoryManager;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.storage.DrawerStorage;
 import fr.maxlego08.zdrawer.command.commands.CommandDrawer;
-import fr.maxlego08.zdrawer.placeholder.LocalPlaceholder;
-import fr.maxlego08.zdrawer.placeholder.Placeholder;
-import fr.maxlego08.zdrawer.save.Config;
 import fr.maxlego08.zdrawer.save.MessageLoader;
 import fr.maxlego08.zdrawer.storage.StorageManager;
 import fr.maxlego08.zdrawer.zcore.ZPlugin;
+import fr.maxlego08.zdrawer.zcore.logger.Logger;
+import fr.maxlego08.zdrawer.zcore.utils.nms.NmsVersion;
 import fr.maxlego08.zdrawer.zcore.utils.plugins.Metrics;
 import fr.maxlego08.zdrawer.zcore.utils.plugins.VersionChecker;
-import org.bukkit.NamespacedKey;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.ServicesManager;
 
@@ -31,6 +30,12 @@ public class DrawerPlugin extends ZPlugin {
 
     @Override
     public void onEnable() {
+
+        if (!NmsVersion.getCurrentVersion().isDisplayVersion()) {
+            Logger.info("The plugin only works from 1.19! We advise you to use the plugin from 1.20", Logger.LogType.ERROR);
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
 
         this.preEnable();
 

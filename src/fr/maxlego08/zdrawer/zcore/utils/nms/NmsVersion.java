@@ -159,4 +159,8 @@ public enum NmsVersion {
         return version;
     }
 
+    public boolean isDisplayVersion() {
+        return version >= 1190;
+    }
+
 }

@@ -59,6 +59,9 @@ public class DrawerListener extends ListenerAdapter {
     @Override
     protected void onInteract(PlayerInteractEvent event, Player player) {
 
+        System.out.println("A " + event.isCancelled());
+        System.out.println("B " + event.useInteractedBlock());
+        System.out.println("C " + event.useItemInHand());
         if (event.isCancelled()) return;
 
         Block block = event.getClickedBlock();
@@ -351,11 +354,15 @@ public class DrawerListener extends ListenerAdapter {
 
     @Override
     public void onLoad(ChunkLoadEvent event, Chunk chunk) {
+        clearChunk(this.plugin, chunk);
         this.manager.getStorage().getDrawers(chunk).forEach(Drawer::onLoad);
     }
 
     @Override
     protected void onWorldLoad(WorldLoadEvent event, World world) {
+
+        clearWorld(this.plugin, world);
+
         IStorage storage = this.manager.getStorage();
         List<DrawerContainer> drawerContainers = storage.getWaitingWorldDrawers();
         String worldName = world.getName();
