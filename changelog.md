@@ -30,6 +30,8 @@
 
 # Unreleased
 
+# 1.0.2
+
 - Add new command ``/zdrawer convert <type>`` Convert data to another storage type (zdrawer.convert)
 - Add WorldGuard Access Verification
 - Change default configuration to SQLITE
