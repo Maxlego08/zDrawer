@@ -82,10 +82,6 @@ public class DrawerListener extends ListenerAdapter {
 
         ItemStack itemStack = event.getItem();
 
-        if (itemStack != null && (Config.breakMaterials.contains(itemStack.getType()) || !Config.enableBreakMaterial) && event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            return;
-        }
-
         if (itemStack != null && Config.blacklistMaterials.contains(itemStack.getType())) return;
 
         // Check for upgrade

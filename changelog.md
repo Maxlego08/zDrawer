@@ -31,6 +31,9 @@
 # Unreleased
 
 - Add WorldGuard Access Verification
+- Change default configuration to SQLITE
+- Fixed item deletion error when drawer adds item and fills drawer
+- Fixed left click on drawer with item in hand
 
 # 1.0.1
 

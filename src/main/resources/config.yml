@@ -40,7 +40,7 @@ enableDebugTime: false
 # - SQLITE, use of a database, for large servers
 # - MYSQL, use of a database, for large servers
 #
-storage: JSON
+storage: SQLITE
 
 # Updates data every 120,000 milliseconds (2 minutes).
 # If the storage is in JSON, then the file will save
