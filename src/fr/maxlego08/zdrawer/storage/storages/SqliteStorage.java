@@ -2,6 +2,7 @@ package fr.maxlego08.zdrawer.storage.storages;
 
 import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.api.Drawer;
+import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import fr.maxlego08.zdrawer.api.storage.DrawerContainer;
 import fr.maxlego08.zdrawer.zcore.ZPlugin;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
@@ -144,6 +145,23 @@ public class SqliteStorage extends JsonStorage {
                 preparedStatement.setString(3, drawer.getConfigurationName());
                 preparedStatement.setString(4, drawer.getData());
                 preparedStatement.setString(5, drawer.getUpgradeName());
+                preparedStatement.executeUpdate();
+            } catch (SQLException exception) {
+                Logger.info("Error storing or updating drawer in SQLite: " + exception.getMessage(), Logger.LogType.ERROR);
+            }
+        });
+    }
+
+    public void updateDrawer(DrawerContainer drawerContainer) {
+        ZPlugin.service.execute(() -> {
+            String sql = "INSERT INTO " + this.tableName + " (location, blockFace, configurationName, content, upgradeName) " + "VALUES (?, ?, ?, ?, ?) " + "ON CONFLICT(location) DO UPDATE SET " + "blockFace = EXCLUDED.blockFace, " + "configurationName = EXCLUDED.configurationName, " + "content = EXCLUDED.content, " + "upgradeName = EXCLUDED.upgradeName";
+
+            try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql)) {
+                preparedStatement.setString(1, drawerContainer.getLocation());
+                preparedStatement.setString(2, drawerContainer.getBlockFace().name());
+                preparedStatement.setString(3, drawerContainer.getDrawerName());
+                preparedStatement.setString(4, drawerContainer.getData());
+                preparedStatement.setString(5, drawerContainer.getUpgrade());
                 preparedStatement.executeUpdate();
             } catch (SQLException exception) {
                 Logger.info("Error storing or updating drawer in SQLite: " + exception.getMessage(), Logger.LogType.ERROR);

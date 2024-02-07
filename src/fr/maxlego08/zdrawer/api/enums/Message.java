@@ -45,6 +45,7 @@ public enum Message {
     RELOAD("§aYou have just reloaded the configuration files."),
     DESCRIPTION_RELOAD("Reload configuration files"),
     DESCRIPTION_CLEAR("Allows to remove all entities that come from the plugin. In case of a crash of your server or other it is possible that entities are duplicated. This command deletes them."),
+    DESCRIPTION_CONVERT("Convert your data to another type of storage."),
     DESCRIPTION_GIVE_USE("Show give commands"),
     DESCRIPTION_GIVE_DRAWER("Give a drawer to a player"),
     DESCRIPTION_PLACE("Place a drawer"),

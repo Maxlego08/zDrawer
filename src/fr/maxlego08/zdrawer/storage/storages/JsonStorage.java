@@ -152,4 +152,8 @@ public class JsonStorage extends ZUtils implements IStorage {
     public void update() {
 
     }
+
+    public List<DrawerContainer> getDrawers() {
+        return drawers;
+    }
 }

@@ -16,6 +16,7 @@
 # - /zdrawer place <world name> <x> <y> <z> <block face> [<upgrade name>] [<material>] [<amount>] » Place a drawer - zdrawer.place
 # - /zdrawer purge <world name> <break block> » Delete all the drawer in a specific world - zdrawer.purge
 # - /zdrawer clear » Allows to remove all entities that come from the plugin. In case of a crash of your server or other it is possible that entities are duplicated. This command deletes them. - zdrawer.clear
+# - /zdrawer convert <type> » Convert data to another storage type - zdrawer.convert
 #
 # Placeholders
 # - %zdrawer_content_<index>% » Displays the contents of the drawer with which the player interacts
