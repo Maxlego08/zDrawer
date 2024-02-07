@@ -4,12 +4,14 @@ import fr.maxlego08.menu.api.InventoryManager;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.storage.DrawerStorage;
 import fr.maxlego08.zdrawer.command.commands.CommandDrawer;
+import fr.maxlego08.zdrawer.hook.WorldGuardAccess;
 import fr.maxlego08.zdrawer.save.MessageLoader;
 import fr.maxlego08.zdrawer.storage.StorageManager;
 import fr.maxlego08.zdrawer.zcore.ZPlugin;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import fr.maxlego08.zdrawer.zcore.utils.nms.NmsVersion;
 import fr.maxlego08.zdrawer.zcore.utils.plugins.Metrics;
+import fr.maxlego08.zdrawer.zcore.utils.plugins.Plugins;
 import fr.maxlego08.zdrawer.zcore.utils.plugins.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
@@ -61,6 +63,11 @@ public class DrawerPlugin extends ZPlugin {
         this.loadFiles();
 
         new Metrics(this, 20791);
+
+        System.out.println("Alors ? ! " + this.isEnable(Plugins.WORLDGUARD));
+        if (this.isEnable(Plugins.WORLDGUARD)) {
+            this.manager.addAccess(new WorldGuardAccess());
+        }
 
         this.postEnable();
 

@@ -87,6 +87,8 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
     public void addItem(Player player, ItemStack itemStack, EquipmentSlot hand) {
         if (isFull() || itemStack == null) return;
 
+        long beforeSpace = calculateAvailableSpace();
+
         boolean needUpdate = false;
         if (this.itemStack == null) {
             needUpdate = true;
@@ -98,7 +100,7 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
 
         if (needUpdate) {
             this.drawer.setNeedToUpdate(true);
-            updateInventory(player, itemStack, hand);
+            updateInventory(player, itemStack, hand, beforeSpace);
             updateText();
         }
     }
@@ -121,14 +123,17 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
         return this.drawer.hasLimit() ? this.drawer.getLimit() - this.amount : Long.MAX_VALUE;
     }
 
-    private void updateInventory(Player player, ItemStack itemStack, EquipmentSlot hand) {
-        int remaining = itemStack.getAmount() - (int) Math.min(itemStack.getAmount(), calculateAvailableSpace());
+    private void updateInventory(Player player, ItemStack itemStack, EquipmentSlot hand, long beforeSpace) {
+        long availableSpace = beforeSpace > 0 ? beforeSpace : calculateAvailableSpace();
+        int remaining = itemStack.getAmount() - (int) Math.min(itemStack.getAmount(), availableSpace);
+
         if (remaining > 0) {
             itemStack.setAmount(remaining);
         } else {
             player.getInventory().setItem(hand, new ItemStack(Material.AIR));
         }
     }
+
 
     private void addAllSimilarItems(PlayerInventory inventory) {
         for (int slot = 0; slot != 36; slot++) {

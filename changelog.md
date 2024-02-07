@@ -30,6 +30,14 @@
 
 # Unreleased
 
+# 1.0.2
+
+- Add new command ``/zdrawer convert <type>`` Convert data to another storage type (zdrawer.convert)
+- Add WorldGuard Access Verification
+- Change default configuration to SQLITE
+- Fixed item deletion error when drawer adds item and fills drawer
+- Fixed left click on drawer with item in hand
+
 # 1.0.1
 
 - Add option ``enableBreakMaterial``

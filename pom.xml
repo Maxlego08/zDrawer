@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.maxlego08</groupId>
     <artifactId>zDrawer</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
     <build>
         <sourceDirectory>src</sourceDirectory>
@@ -56,8 +56,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>9</source>
-                    <target>9</target>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -82,6 +82,10 @@
         <repository>
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>sk89q-repo</id>
+            <url>https://maven.enginehub.org/repo/</url>
         </repository>
     </repositories>
     <dependencies>
@@ -118,6 +122,18 @@
             <groupId>com.github.Maxlego08</groupId>
             <artifactId>zMenu-API</artifactId>
             <version>6655d3298d</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>worldguard-bukkit</artifactId>
+            <version>7.0.9</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>7.2.14</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

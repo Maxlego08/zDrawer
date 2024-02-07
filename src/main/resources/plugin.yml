@@ -9,4 +9,5 @@ depend:
   - zMenu
 softdepend:
   - PlaceholderAPI
+  - WorldGuard
 commands:

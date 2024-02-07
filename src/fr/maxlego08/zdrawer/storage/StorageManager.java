@@ -84,4 +84,9 @@ public class StorageManager implements DrawerStorage {
         }
 
     }
+
+    @Override
+    public StorageType getStorageType() {
+        return this.storageType;
+    }
 }

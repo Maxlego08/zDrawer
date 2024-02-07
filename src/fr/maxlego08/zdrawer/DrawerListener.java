@@ -59,9 +59,6 @@ public class DrawerListener extends ListenerAdapter {
     @Override
     protected void onInteract(PlayerInteractEvent event, Player player) {
 
-        System.out.println("A " + event.isCancelled());
-        System.out.println("B " + event.useInteractedBlock());
-        System.out.println("C " + event.useItemInHand());
         if (event.isCancelled()) return;
 
         Block block = event.getClickedBlock();
@@ -73,16 +70,17 @@ public class DrawerListener extends ListenerAdapter {
 
         Drawer drawer = optional.get();
 
+        if (this.manager.getDrawerAccesses().stream().anyMatch(drawerAccess -> !drawerAccess.hasAccess(player, block.getLocation(), drawer))) {
+            event.setCancelled(true);
+            return;
+        }
+
         // The player will type another face than the one in front, so he wants to perform another action, like placing a block. We stop the code here.
         if (event.getBlockFace().getOppositeFace() != drawer.getBlockFace()) return;
 
         event.setCancelled(true);
 
         ItemStack itemStack = event.getItem();
-
-        if (itemStack != null && (Config.breakMaterials.contains(itemStack.getType()) || !Config.enableBreakMaterial) && event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            return;
-        }
 
         if (itemStack != null && Config.blacklistMaterials.contains(itemStack.getType())) return;
 
