@@ -236,5 +236,8 @@ public interface DrawerManager extends Savable {
      */
     DrawerSize getSize(DrawerType drawerType);
 
+    List<DrawerAccess> getDrawerAccesses();
+
+    void addAccess(DrawerAccess drawerAccess);
 
 }

@@ -6,6 +6,7 @@ import fr.maxlego08.menu.exceptions.InventoryException;
 import fr.maxlego08.menu.loader.MenuItemStackLoader;
 import fr.maxlego08.menu.zcore.utils.loader.Loader;
 import fr.maxlego08.zdrawer.api.Drawer;
+import fr.maxlego08.zdrawer.api.DrawerAccess;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.DrawerUpgrade;
 import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
@@ -57,6 +58,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     private final Map<BlockFace, DrawerPosition> drawerPositions = new HashMap<>();
     private final List<DrawerConfiguration> drawerConfigurations = new ArrayList<>();
     private final Map<DrawerType, DrawerSize> drawerSizes = new HashMap<>();
+    private final List<DrawerAccess> drawerAccesses = new ArrayList<>();
 
     public ZDrawerManager(DrawerPlugin plugin) {
         this.plugin = plugin;
@@ -347,5 +349,15 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     @Override
     public DrawerSize getSize(DrawerType drawerType) {
         return this.drawerSizes.get(drawerType);
+    }
+
+    @Override
+    public List<DrawerAccess> getDrawerAccesses() {
+        return this.drawerAccesses;
+    }
+
+    @Override
+    public void addAccess(DrawerAccess drawerAccess) {
+        this.drawerAccesses.add(drawerAccess);
     }
 }

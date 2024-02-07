@@ -9,7 +9,8 @@ public enum Plugins {
 	CITIZENS("Citizens"),
 	TRANSLATIONAPI("TranslationAPI"),
 	ZTRANSLATOR("zTranslator"),
-	
+	WORLDGUARD("WorldGuard"),
+
 	;
 
 	private final String name;

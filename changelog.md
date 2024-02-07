@@ -30,6 +30,8 @@
 
 # Unreleased
 
+- Add WorldGuard Access Verification
+
 # 1.0.1
 
 - Add option ``enableBreakMaterial``
