@@ -53,15 +53,9 @@ public class ZDrawer extends ZUtils implements Drawer {
         this.location = location;
         this.blockFace = blockFace;
 
-        Block block = location.getBlock();
-        block.setType(Material.BARREL);
-        Barrel barrel = (Barrel) block.getBlockData();
-        barrel.setFacing(blockFace.getOppositeFace());
-        block.setBlockData(barrel, false);
-        org.bukkit.block.Barrel blockBarrel = (org.bukkit.block.Barrel) block.getState();
-        blockBarrel.getInventory().setItem(0, new ItemStack(Material.STONE, 2));
-
         if (!location.getChunk().isLoaded()) return;
+
+        this.updateBlockBarrel();
 
         DrawerSize size = this.plugin.getManager().getSize(drawerConfiguration.getDrawerType());
         DrawerSizeDirection drawerSizeDirection = size.getDrawerSizeDirectionMap().get(blockFace);
@@ -85,6 +79,20 @@ public class ZDrawer extends ZUtils implements Drawer {
                 this.drawerCases.add(new ZDrawerCase(plugin, this, amount, material));
             }
         }
+    }
+
+    private void updateBlockBarrel(){
+
+        Block block = location.getBlock();
+        if (block.getType() != Material.BARREL) {
+            block.setType(Material.BARREL);
+            Barrel barrel = (Barrel) block.getBlockData();
+            barrel.setFacing(blockFace.getOppositeFace());
+            block.setBlockData(barrel, false);
+            org.bukkit.block.Barrel blockBarrel = (org.bukkit.block.Barrel) block.getState();
+            blockBarrel.getInventory().setItem(0, new ItemStack(Material.STONE, 2));
+        }
+
     }
 
     public void spawnBorder(DrawerBorder drawerBorder) {
@@ -218,6 +226,7 @@ public class ZDrawer extends ZUtils implements Drawer {
         this.spawnBorder(this.drawerConfiguration.getBorder());
         Optional.ofNullable(this.drawerUpgrade).ifPresent(upgrade -> this.upgradeDisplay.setItemStack(upgrade.getDisplayItemStack()));
         this.drawerCases.forEach(DrawerCase::onLoad);
+        this.updateBlockBarrel();
     }
 
     @Override
