@@ -30,6 +30,10 @@
 
 # Unreleased
 
+# 1.0.3
+
+- Fix drawer load
+
 # 1.0.2
 
 - Add new command ``/zdrawer convert <type>`` Convert data to another storage type (zdrawer.convert)

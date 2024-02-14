@@ -353,7 +353,10 @@ public class DrawerListener extends ListenerAdapter {
     @Override
     public void onLoad(ChunkLoadEvent event, Chunk chunk) {
         clearChunk(this.plugin, chunk);
-        this.manager.getStorage().getDrawers(chunk).forEach(Drawer::onLoad);
+        this.manager.getStorage().getDrawers(chunk).forEach(drawer -> {
+            drawer.onDisable();
+            drawer.onLoad();
+        });
     }
 
     @Override
