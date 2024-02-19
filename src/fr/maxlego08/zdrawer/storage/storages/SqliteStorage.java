@@ -2,7 +2,6 @@ package fr.maxlego08.zdrawer.storage.storages;
 
 import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.api.Drawer;
-import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import fr.maxlego08.zdrawer.api.storage.DrawerContainer;
 import fr.maxlego08.zdrawer.zcore.ZPlugin;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
@@ -59,14 +58,22 @@ public class SqliteStorage extends JsonStorage {
 
     @Override
     public void save() {
-        this.disconnect();
         super.save();
+
+        for (Drawer drawer : this.drawerMap.values()) {
+            if (drawer.needToUpdate()) {
+                drawer.setNeedToUpdate(false);
+                this.updateDrawer(drawer, true);
+            }
+        }
+
+        this.disconnect();
     }
 
     @Override
     public void storeDrawer(Drawer drawer) {
         super.storeDrawer(drawer);
-        this.updateDrawer(drawer);
+        this.updateDrawer(drawer, false);
     }
 
     @Override
@@ -135,8 +142,8 @@ public class SqliteStorage extends JsonStorage {
         }
     }
 
-    private void updateDrawer(Drawer drawer) {
-        ZPlugin.service.execute(() -> {
+    private void updateDrawer(Drawer drawer, boolean sync) {
+        Runnable runnable = () -> {
             String sql = "INSERT INTO " + this.tableName + " (location, blockFace, configurationName, content, upgradeName) " + "VALUES (?, ?, ?, ?, ?) " + "ON CONFLICT(location) DO UPDATE SET " + "blockFace = EXCLUDED.blockFace, " + "configurationName = EXCLUDED.configurationName, " + "content = EXCLUDED.content, " + "upgradeName = EXCLUDED.upgradeName";
 
             try (PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql)) {
@@ -149,7 +156,9 @@ public class SqliteStorage extends JsonStorage {
             } catch (SQLException exception) {
                 Logger.info("Error storing or updating drawer in SQLite: " + exception.getMessage(), Logger.LogType.ERROR);
             }
-        });
+        };
+        if (sync) runnable.run();
+        else ZPlugin.service.execute(runnable);
     }
 
     public void updateDrawer(DrawerContainer drawerContainer) {
@@ -197,7 +206,7 @@ public class SqliteStorage extends JsonStorage {
         for (Drawer drawer : this.drawerMap.values()) {
             if (drawer.needToUpdate()) {
                 drawer.setNeedToUpdate(false);
-                this.updateDrawer(drawer);
+                this.updateDrawer(drawer, false);
             }
         }
     }
