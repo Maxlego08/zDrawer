@@ -9,6 +9,7 @@ import fr.maxlego08.zdrawer.api.configuration.DrawerSize;
 import fr.maxlego08.zdrawer.api.configuration.DrawerSizeDirection;
 import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 import fr.maxlego08.zdrawer.api.utils.DrawerPosition;
+import fr.maxlego08.zdrawer.save.Config;
 import fr.maxlego08.zdrawer.zcore.utils.ZUtils;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
 import net.kyori.adventure.text.Component;
@@ -81,9 +82,12 @@ public class ZDrawer extends ZUtils implements Drawer {
         }
     }
 
-    private void updateBlockBarrel(){
+    private void updateBlockBarrel() {
 
         Block block = location.getBlock();
+        if (Config.enableDebug) {
+            System.out.println(location + " -> " + block + " - " + (block.getType() != Material.BARREL));
+        }
         if (block.getType() != Material.BARREL) {
             block.setType(Material.BARREL);
             Barrel barrel = (Barrel) block.getBlockData();

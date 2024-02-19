@@ -30,6 +30,8 @@
 
 # Unreleased
 
+- Fix save with Sqlite Storage
+
 # 1.0.3
 
 - Fix drawer load

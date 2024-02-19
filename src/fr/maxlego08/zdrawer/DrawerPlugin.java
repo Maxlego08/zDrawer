@@ -34,7 +34,7 @@ public class DrawerPlugin extends ZPlugin {
     public void onEnable() {
 
         if (!NmsVersion.getCurrentVersion().isDisplayVersion()) {
-            Logger.info("The plugin only works from 1.19! We advise you to use the plugin from 1.20", Logger.LogType.ERROR);
+            Logger.info("The plugin only works from 1.19 ! We advise you to use the plugin from 1.20", Logger.LogType.ERROR);
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -64,7 +64,6 @@ public class DrawerPlugin extends ZPlugin {
 
         new Metrics(this, 20791);
 
-        System.out.println("Alors ? ! " + this.isEnable(Plugins.WORLDGUARD));
         if (this.isEnable(Plugins.WORLDGUARD)) {
             this.manager.addAccess(new WorldGuardAccess());
         }
