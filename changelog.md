@@ -30,6 +30,8 @@
 
 # Unreleased
 
+# 1.0.4
+
 - Fix save with Sqlite Storage
 
 # 1.0.3
