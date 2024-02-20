@@ -47,7 +47,9 @@ public class AdapterListener extends ZUtils implements Listener {
         Player player = event.getPlayer();
         // Send information to me, because I like to know
         if (player.getName().equals("Maxlego08")) {
-            Bukkit.getScheduler().runTaskLater(this.plugin, () -> message(this.plugin, player, "§aLe serveur utilise §2zDrawer v" + this.plugin.getDescription().getVersion()), 20);
+            this.plugin.getScheduler().runTaskLater(player.getLocation(), 20, () -> {
+                message(this.plugin, player, "§aLe serveur utilise §2zDrawer v" + this.plugin.getDescription().getVersion());
+            });
         }
     }
 

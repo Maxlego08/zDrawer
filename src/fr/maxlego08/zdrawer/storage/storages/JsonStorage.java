@@ -13,8 +13,6 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.TextDisplay;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,25 +60,27 @@ public class JsonStorage extends ZUtils implements IStorage {
     public void createDrawer(DrawerContainer drawerContainer) {
         Location location = stringToLocation(drawerContainer.getLocation());
 
-        Optional<DrawerConfiguration> optional = plugin.getManager().getDrawer(drawerContainer.getDrawerName());
-        if (!optional.isPresent()) {
-            Logger.info("Impossible to load a drawer, configuration " + drawerContainer.getDrawerName() + " doesn't exit !", Logger.LogType.ERROR);
-            return;
-        }
-        Drawer drawer = new ZDrawer(this.plugin, optional.get(), location, drawerContainer.getBlockFace());
+        this.plugin.getScheduler().runTask(location, () -> {
+            Optional<DrawerConfiguration> optional = plugin.getManager().getDrawer(drawerContainer.getDrawerName());
+            if (!optional.isPresent()) {
+                Logger.info("Impossible to load a drawer, configuration " + drawerContainer.getDrawerName() + " doesn't exit !", Logger.LogType.ERROR);
+                return;
+            }
+            Drawer drawer = new ZDrawer(this.plugin, optional.get(), location, drawerContainer.getBlockFace());
 
-        if (drawerContainer.hasData()) {
-            drawer.load(drawerContainer.getData());
-        }
+            if (drawerContainer.hasData()) {
+                drawer.load(drawerContainer.getData());
+            }
 
-        if (drawerContainer.hasUpgrade()) {
-            this.plugin.getManager().getUpgrade(drawerContainer.getUpgrade()).ifPresent(drawer::setUpgrade);
-        }
-        drawerMap.put(drawerContainer.getLocation(), drawer);
+            if (drawerContainer.hasUpgrade()) {
+                this.plugin.getManager().getUpgrade(drawerContainer.getUpgrade()).ifPresent(drawer::setUpgrade);
+            }
+            drawerMap.put(drawerContainer.getLocation(), drawer);
 
-        if (this.drawerMapChunk == null) this.drawerMapChunk = new HashMap<>();
-        List<Drawer> drawerList = this.drawerMapChunk.computeIfAbsent(location.getChunk().getX() + "," + location.getChunk().getZ(), a -> new ArrayList<>());
-        drawerList.add(drawer);
+            if (this.drawerMapChunk == null) this.drawerMapChunk = new HashMap<>();
+            List<Drawer> drawerList = this.drawerMapChunk.computeIfAbsent(location.getChunk().getX() + "," + location.getChunk().getZ(), a -> new ArrayList<>());
+            drawerList.add(drawer);
+        });
     }
 
     @Override

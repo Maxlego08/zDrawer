@@ -8,8 +8,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
 import java.net.URL;
@@ -71,13 +69,10 @@ public class VersionChecker extends ZUtils implements Listener {
     public void onConnect(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         if (!useLastVersion && event.getPlayer().hasPermission("zplugin.notifs")) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    message(plugin, player, "§cYou do not use the latest version of the plugin! Thank you for taking the latest version to avoid any risk of problem!");
-                    message(plugin, player, "§fDownload plugin here: §a" + String.format(URL_RESOURCE, pluginID));
-                }
-            }.runTaskLater(plugin, 20 * 2);
+            this.plugin.getScheduler().runTaskLater(player.getLocation(), 20 * 2, () -> {
+                message(plugin, player, "§cYou do not use the latest version of the plugin! Thank you for taking the latest version to avoid any risk of problem!");
+                message(plugin, player, "§fDownload plugin here: §a" + String.format(URL_RESOURCE, pluginID));
+            });
         }
     }
 
@@ -87,7 +82,7 @@ public class VersionChecker extends ZUtils implements Listener {
      * @param consumer - Do something after
      */
     public void getVersion(Consumer<String> consumer) {
-        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+        this.plugin.getScheduler().runTaskAsynchronously(() -> {
             final String apiURL = String.format(URL_API, this.pluginID);
             try {
                 URL url = new URL(apiURL);
