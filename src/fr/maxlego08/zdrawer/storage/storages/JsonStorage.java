@@ -86,7 +86,10 @@ public class JsonStorage extends ZUtils implements IStorage {
     @Override
     public void load() {
 
-        Bukkit.getWorlds().forEach(world -> clearWorld(this.plugin, world));
+        Bukkit.getWorlds().forEach(world -> {
+            Location location = world.getSpawnLocation();
+            this.plugin.getScheduler().runTask(location, () -> clearWorld(this.plugin, world));
+        });
 
         this.drawerMap = new HashMap<>();
         Logger.info("Loading " + this.drawers.size() + " drawers.", Logger.LogType.INFO);
