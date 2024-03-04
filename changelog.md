@@ -30,6 +30,12 @@
 
 # Unreleased
 
+# 1.0.5
+
+- Update to zMenu 1.0.2.7
+- Fix folia
+- Fix NMS version
+
 # 1.0.4
 
 - Fix save with Sqlite Storage
