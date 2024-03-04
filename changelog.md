@@ -13,11 +13,11 @@
 - [x] If the configuration wants to drop the items to the floor, add another configuration so that the drawer does not break if it has too many item in. 
 - [x] Add the ability to choose the viewing distance of the display entity 
 - [x] Add the ability to choose to enable or not the default background 
-- [x] Add option for destroy block with purge command 
+- [x] Add buttonOption for destroy block with purge command 
 - [ ] Think about the possibility of creating giant storage blocks
 - [x] Use PersistentDataContainer for entities
-- [x] Add option for enable of disable hopper for each drawer
-- [x] Add an option to blacklist worlds.
+- [x] Add buttonOption for enable of disable hopper for each drawer
+- [x] Add an buttonOption to blacklist worlds.
 - [ ] Fix upgrade display, doesnt appear
 - [ ] Improved default configuration, add more comments
 - [ ] Create log system
@@ -48,7 +48,7 @@
 
 # 1.0.1
 
-- Add option ``enableBreakMaterial``
+- Add buttonOption ``enableBreakMaterial``
 - Fixed duplicate entities
 
 # 1.0.0
