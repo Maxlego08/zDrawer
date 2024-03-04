@@ -11,3 +11,4 @@ softdepend:
   - PlaceholderAPI
   - WorldGuard
 commands:
+folia-supported: true

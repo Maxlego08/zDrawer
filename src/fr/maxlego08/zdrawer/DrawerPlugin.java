@@ -1,6 +1,7 @@
 package fr.maxlego08.zdrawer;
 
 import fr.maxlego08.menu.api.InventoryManager;
+import fr.maxlego08.menu.api.scheduler.ZScheduler;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.storage.DrawerStorage;
 import fr.maxlego08.zdrawer.command.commands.CommandDrawer;
@@ -95,5 +96,9 @@ public class DrawerPlugin extends ZPlugin {
 
     public InventoryManager getInventoryManager() {
         return inventoryManager;
+    }
+
+    public ZScheduler getScheduler() {
+        return this.inventoryManager.getScheduler();
     }
 }

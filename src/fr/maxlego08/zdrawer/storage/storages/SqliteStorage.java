@@ -52,7 +52,7 @@ public class SqliteStorage extends JsonStorage {
             this.initializeDatabase();
             this.drawers = this.getAllDrawers();
 
-            Bukkit.getScheduler().runTask(this.plugin, super::load);
+            super.load();
         });
     }
 
