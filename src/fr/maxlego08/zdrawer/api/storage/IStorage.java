@@ -97,4 +97,5 @@ public interface IStorage {
      */
     void update();
 
+    List<Drawer> getDrawers();
 }

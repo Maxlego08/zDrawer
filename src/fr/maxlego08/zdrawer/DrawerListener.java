@@ -337,8 +337,7 @@ public class DrawerListener extends ListenerAdapter {
 
     @Override
     public void onInventoryOpen(InventoryOpenEvent event, Player player, Inventory inventory) {
-        if (inventory.getHolder() instanceof org.bukkit.block.Barrel) {
-            org.bukkit.block.Barrel barrel = (org.bukkit.block.Barrel) inventory.getHolder();
+        if (inventory.getHolder() instanceof org.bukkit.block.Barrel barrel) {
             this.manager.getStorage().getDrawer(barrel.getLocation()).ifPresent(drawer -> {
                 event.setCancelled(true);
             });

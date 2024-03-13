@@ -38,7 +38,7 @@ public class CommandDrawerConvert extends VCommand {
         JsonStorage jsonStorage = new JsonStorage(plugin);
         jsonStorage = plugin.getPersist().loadOrSaveDefault((JsonStorage) jsonStorage, JsonStorage.class, "drawers");
 
-        jsonStorage.getDrawers().forEach(drawerContainer -> {
+        jsonStorage.getDrawersContainer().forEach(drawerContainer -> {
             SqliteStorage sqliteStorage = (SqliteStorage) plugin.getStorage().getStorage();
             sqliteStorage.updateDrawer(drawerContainer);
             sqliteStorage.createDrawer(drawerContainer);

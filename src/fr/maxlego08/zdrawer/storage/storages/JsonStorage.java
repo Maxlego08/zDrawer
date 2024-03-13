@@ -156,7 +156,12 @@ public class JsonStorage extends ZUtils implements IStorage {
 
     }
 
-    public List<DrawerContainer> getDrawers() {
+    public List<DrawerContainer> getDrawersContainer() {
         return drawers;
+    }
+
+    @Override
+    public List<Drawer> getDrawers() {
+        return new ArrayList<>(this.drawerMap.values());
     }
 }

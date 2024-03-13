@@ -96,7 +96,6 @@ public class ZDrawer extends ZUtils implements Drawer {
             org.bukkit.block.Barrel blockBarrel = (org.bukkit.block.Barrel) block.getState();
             blockBarrel.getInventory().setItem(0, new ItemStack(Material.STONE, 2));
         }
-
     }
 
     public void spawnBorder(DrawerBorder drawerBorder) {

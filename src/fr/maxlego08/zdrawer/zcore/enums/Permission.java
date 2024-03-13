@@ -10,7 +10,7 @@ public enum Permission {
 	ZDRAWER_CLEAR,
 	ZDRAWER_CONVERT,
 	ZDRAWER_PLACE,
-	ZDRAWER_PURGE;
+	ZDRAWER_PURGE, ZDRAWER_DEBUG;
 
 	private String permission;
 
