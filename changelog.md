@@ -30,6 +30,10 @@
 
 # Unreleased
 
+# 1.0.6
+
+- Create /zdrawer debug command
+
 # 1.0.5
 
 - Update to zMenu 1.0.2.7
