@@ -52,6 +52,7 @@ public enum Message {
     DESCRIPTION_PURGE("Delete all the drawer in a specific world"),
     DESCRIPTION_GIVE_CRAFT("Give a custom craft item to a player"),
     DESCRIPTION_VERSION("Show plugin version"),
+    DESCRIPTION_DEBUG("Do a debug thing"),
 
     UPGRADE_ERROR_LIMIT("§cThe drawer already has a larger limit, you can not add this limit."),
 
@@ -77,6 +78,9 @@ public enum Message {
 
     DISABLE_WORLD("§cThe world is disabled. You cannot place a drawer here."),
     BREAK_LIMIT("§cYour drawer contains too many items to be broken, you must empty it before."),
+
+    DRAWER_DEBUG_DISABLE("§cDisable drawers in your chunk. §8(§7Enable draw in 20 ticks§8)"),
+    DRAWER_DEBUG_ENABLE("§eEnable drawers in your chunk !"),
 
     ;
 
