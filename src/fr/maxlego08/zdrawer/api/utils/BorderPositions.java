@@ -94,7 +94,7 @@ public class BorderPositions {
      */
     public void spawn(DrawerPlugin plugin, Drawer drawer, DrawerBorder drawerBorder) {
 
-        ItemStack itemStack = drawerBorder.getMenuItemStack().build(null);
+        ItemStack itemStack = drawerBorder.getMenuItemStack().build(null, false);
         Location location = drawer.getLocation().clone();
 
         Location locationUp = this.up.apply(location.clone());
