@@ -30,6 +30,8 @@
 
 # Unreleased
 
+- Somes fixs with border display entity
+
 # 1.0.6
 
 - Create /zdrawer debug command
