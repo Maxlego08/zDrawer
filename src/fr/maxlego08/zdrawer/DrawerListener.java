@@ -182,6 +182,7 @@ public class DrawerListener extends ListenerAdapter {
 
     @Override
     protected void onBlockPlace(BlockPlaceEvent event, Player player) {
+
         if (event.isCancelled()) return;
 
         Block block = event.getBlock();
