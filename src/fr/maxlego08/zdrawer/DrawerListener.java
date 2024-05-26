@@ -131,6 +131,7 @@ public class DrawerListener extends ListenerAdapter {
 
     @Override
     protected void onBlockBreak(BlockBreakEvent event, Player player) {
+
         if (event.isCancelled()) return;
 
         for (DrawerAccess drawerAccess : this.manager.getDrawerAccesses()) {

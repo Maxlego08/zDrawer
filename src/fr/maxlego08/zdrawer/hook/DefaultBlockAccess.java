@@ -17,6 +17,7 @@ public class DefaultBlockAccess implements DrawerAccess {
     public boolean hasAccess(Player player, Location location, Drawer drawer) {
         BlockBreakEvent event = new BlockBreakEvent(location.getBlock(), player);
         accessCheckBlockBreakEvents.add(event);
+
         return event.callEvent();
     }
 
