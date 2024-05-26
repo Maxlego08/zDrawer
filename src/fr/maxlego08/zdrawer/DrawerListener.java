@@ -1,6 +1,7 @@
 package fr.maxlego08.zdrawer;
 
 import fr.maxlego08.zdrawer.api.Drawer;
+import fr.maxlego08.zdrawer.api.DrawerAccess;
 import fr.maxlego08.zdrawer.api.DrawerCase;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
@@ -8,6 +9,7 @@ import fr.maxlego08.zdrawer.api.enums.Message;
 import fr.maxlego08.zdrawer.api.storage.DrawerContainer;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.api.utils.NamespaceContainer;
+import fr.maxlego08.zdrawer.hook.DefaultBlockAccess;
 import fr.maxlego08.zdrawer.listener.ListenerAdapter;
 import fr.maxlego08.zdrawer.save.Config;
 import fr.maxlego08.zdrawer.zcore.logger.Logger;
@@ -129,12 +131,19 @@ public class DrawerListener extends ListenerAdapter {
 
     @Override
     protected void onBlockBreak(BlockBreakEvent event, Player player) {
+
         if (event.isCancelled()) return;
+
+        for (DrawerAccess drawerAccess : this.manager.getDrawerAccesses()) {
+            if (drawerAccess instanceof DefaultBlockAccess defaultBlockAccess) {
+                if (defaultBlockAccess.isAccessCheckBlockBreakEvent(event)) return;
+            }
+        }
 
         Block block = event.getBlock();
         Optional<Drawer> optional = this.manager.getStorage().getDrawer(block.getLocation());
 
-        if (!optional.isPresent()) return;
+        if (optional.isEmpty()) return;
 
         Drawer drawer = optional.get();
         DrawerConfiguration drawerConfiguration = drawer.getConfiguration();
@@ -151,7 +160,6 @@ public class DrawerListener extends ListenerAdapter {
         ItemStack itemInOffHand = inventory.getItemInOffHand();
 
         if ((Config.breakMaterials.contains(itemInMainHand.getType()) || Config.breakMaterials.contains(itemInOffHand.getType())) || !Config.enableBreakMaterial) {
-
             event.setCancelled(false);
             event.setDropItems(false);
             event.setExpToDrop(0);
@@ -168,7 +176,6 @@ public class DrawerListener extends ListenerAdapter {
                 drawer.dropContent(block.getLocation().add(0.5, 0.1, 0.5));
             }
         } else {
-
             event.setCancelled(true);
         }
     }
