@@ -44,7 +44,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.RayTraceResult;
 
-import javax.swing.text.html.Option;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
