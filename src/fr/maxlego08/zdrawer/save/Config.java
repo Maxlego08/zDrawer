@@ -22,6 +22,7 @@ public class Config {
     public static String defaultFormat = "%amount%";
     public static boolean enableFormatting = false;
     public static boolean enableBreakMaterial = false;
+    public static boolean enableDefaultBlockAccess = false;
     public static DisplaySize itemDisplaySize;
     public static DisplaySize upgradeDisplaySize;
     public static DisplaySize textDisplaySize;
@@ -57,6 +58,7 @@ public class Config {
 
         enableDebug = configuration.getBoolean("enableDebug", false);
         enableDebugTime = configuration.getBoolean("enableDebugTime", false);
+        enableDefaultBlockAccess = configuration.getBoolean("enableDefaultBlockAccess", true);
         enableBreakMaterial = configuration.getBoolean("drawer.enableBreakMaterial", false);
         blacklistMaterials = configuration.getStringList("drawer.blacklistMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
         breakMaterials = configuration.getStringList("drawer.breakMaterials").stream().map(Material::valueOf).collect(Collectors.toList());
