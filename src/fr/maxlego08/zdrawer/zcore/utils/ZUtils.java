@@ -9,7 +9,7 @@ import fr.maxlego08.zdrawer.zcore.enums.Permission;
 import fr.maxlego08.zdrawer.zcore.utils.builder.CooldownBuilder;
 import fr.maxlego08.zdrawer.zcore.utils.builder.TimerBuilder;
 import fr.maxlego08.zdrawer.zcore.utils.nms.ItemStackUtils;
-import fr.maxlego08.zdrawer.zcore.utils.nms.NMSUtils;
+import fr.maxlego08.zdrawer.zcore.utils.nms.NmsVersion;
 import fr.maxlego08.zdrawer.zcore.utils.players.ActionBar;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -69,24 +69,6 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("deprecation")
 public abstract class ZUtils extends MessageUtils {
-
-    private static transient List<String> teleportPlayers = new ArrayList<String>();
-    // For plugin support from 1.8 to 1.12
-    private static transient Material[] byId;
-
-    static {
-        if (!NMSUtils.isNewVersion()) {
-            byId = new Material[0];
-            for (Material material : Material.values()) {
-                if (byId.length > material.getId()) {
-                    byId[material.getId()] = material;
-                } else {
-                    byId = Arrays.copyOfRange(byId, 0, material.getId() + 2);
-                    byId[material.getId()] = material;
-                }
-            }
-        }
-    }
 
     protected void clearWorld(DrawerPlugin plugin, World world) {
         world.getEntitiesByClasses(TextDisplay.class, ItemDisplay.class).forEach(display -> {
@@ -179,7 +161,7 @@ public abstract class ZUtils extends MessageUtils {
      * @return the material according to his id
      */
     protected Material getMaterial(int id) {
-        return byId.length > id && id >= 0 ? byId[id] : Material.AIR;
+        return Material.AIR;
     }
 
     /**
@@ -360,7 +342,7 @@ public abstract class ZUtils extends MessageUtils {
      * @return
      */
     protected double percent(double value, double total) {
-        return (double) ((value * 100) / total);
+        return (value * 100) / total;
     }
 
     /**
@@ -369,7 +351,7 @@ public abstract class ZUtils extends MessageUtils {
      * @return
      */
     protected double percentNum(double total, double percent) {
-        return (double) (total * (percent / 100));
+        return total * (percent / 100);
     }
 
     /**
@@ -512,12 +494,12 @@ public abstract class ZUtils extends MessageUtils {
      */
     protected String color(String message) {
         if (message == null) return null;
-        if (NMSUtils.isHexColor()) {
+        if (NmsVersion.getCurrentVersion().isHexVersion()) {
             Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
             Matcher matcher = pattern.matcher(message);
             while (matcher.find()) {
                 String color = message.substring(matcher.start(), matcher.end());
-                message = message.replace(color, net.md_5.bungee.api.ChatColor.of(color) + "");
+                message = message.replace(color, String.valueOf(net.md_5.bungee.api.ChatColor.of(color)));
                 matcher = pattern.matcher(message);
             }
         }
@@ -648,10 +630,10 @@ public abstract class ZUtils extends MessageUtils {
      */
     protected String getDisplayBalence(double value) {
         if (value < 10000) return format(value, "#.#");
-        else if (value < 1000000) return String.valueOf(Integer.valueOf((int) (value / 1000))) + "k ";
-        else if (value < 1000000000) return String.valueOf(format((value / 1000) / 1000, "#.#")) + "m ";
-        else if (value < 1000000000000l)
-            return String.valueOf(Integer.valueOf((int) (((value / 1000) / 1000) / 1000))) + "M ";
+        else if (value < 1000000) return Integer.valueOf((int) (value / 1000)) + "k ";
+        else if (value < 1000000000) return format((value / 1000) / 1000, "#.#") + "m ";
+        else if (value < 1000000000000L)
+            return Integer.valueOf((int) (((value / 1000) / 1000) / 1000)) + "M ";
         else return "to much";
     }
 
@@ -661,10 +643,10 @@ public abstract class ZUtils extends MessageUtils {
      */
     protected String getDisplayBalence(long value) {
         if (value < 10000) return format(value, "#.#");
-        else if (value < 1000000) return String.valueOf(Integer.valueOf((int) (value / 1000))) + "k ";
-        else if (value < 1000000000) return String.valueOf(format((value / 1000) / 1000, "#.#")) + "m ";
-        else if (value < 1000000000000l)
-            return String.valueOf(Integer.valueOf((int) (((value / 1000) / 1000) / 1000))) + "M ";
+        else if (value < 1000000) return Integer.valueOf((int) (value / 1000)) + "k ";
+        else if (value < 1000000000) return format((value / 1000) / 1000, "#.#") + "m ";
+        else if (value < 1000000000000L)
+            return Integer.valueOf((int) (((value / 1000) / 1000) / 1000)) + "M ";
         else return "to much";
     }
 
@@ -860,7 +842,7 @@ public abstract class ZUtils extends MessageUtils {
      */
     public ItemStack playerHead(ItemStack itemStack, OfflinePlayer player) {
         String name = itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName() ? itemStack.getItemMeta().getDisplayName() : null;
-        if (NMSUtils.isNewVersion()) {
+        if (NmsVersion.nmsVersion.isNewMaterial()) {
             if (itemStack.getType().equals(Material.PLAYER_HEAD) && name != null && name.startsWith("HEAD")) {
                 SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
                 name = name.replace("HEAD", "");
@@ -888,7 +870,7 @@ public abstract class ZUtils extends MessageUtils {
      * @return itemstack
      */
     protected ItemStack playerHead() {
-        return NMSUtils.isNewVersion() ? new ItemStack(Material.PLAYER_HEAD) : new ItemStack(getMaterial(397), 1, (byte) 3);
+        return NmsVersion.nmsVersion.isNewMaterial() ? new ItemStack(Material.PLAYER_HEAD) : new ItemStack(getMaterial(397), 1, (byte) 3);
     }
 
     /**
@@ -901,7 +883,7 @@ public abstract class ZUtils extends MessageUtils {
     protected <T> T getProvider(Plugin plugin, Class<T> classz) {
         RegisteredServiceProvider<T> provider = plugin.getServer().getServicesManager().getRegistration(classz);
         if (provider == null) return null;
-        return provider.getProvider() != null ? (T) provider.getProvider() : null;
+        return provider.getProvider() != null ? provider.getProvider() : null;
     }
 
     /**
@@ -972,7 +954,7 @@ public abstract class ZUtils extends MessageUtils {
      */
     protected boolean isPlayerHead(ItemStack itemStack) {
         Material material = itemStack.getType();
-        if (NMSUtils.isNewVersion()) return material.equals(Material.PLAYER_HEAD);
+        if (NmsVersion.nmsVersion.isNewMaterial()) return material.equals(Material.PLAYER_HEAD);
         return (material.equals(getMaterial(397))) && (itemStack.getDurability() == 3);
     }
 
@@ -987,7 +969,7 @@ public abstract class ZUtils extends MessageUtils {
      */
     protected Object getPrivateField(Object object, String field) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         Class<?> clazz = object.getClass();
-        Field objectField = field.equals("commandMap") ? clazz.getDeclaredField(field) : field.equals("knownCommands") ? NMSUtils.isNewVersion() ? clazz.getSuperclass().getDeclaredField(field) : clazz.getDeclaredField(field) : null;
+        Field objectField = field.equals("commandMap") ? clazz.getDeclaredField(field) : field.equals("knownCommands") ? NmsVersion.nmsVersion.isNewMaterial() ? clazz.getSuperclass().getDeclaredField(field) : clazz.getDeclaredField(field) : null;
         objectField.setAccessible(true);
         Object result = objectField.get(object);
         objectField.setAccessible(false);
@@ -1028,7 +1010,7 @@ public abstract class ZUtils extends MessageUtils {
     public void glow(ItemStack itemStack) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
-        if (NMSUtils.getNMSVersion() != 1.7) itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         itemStack.setItemMeta(itemMeta);
     }
 

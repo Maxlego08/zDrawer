@@ -66,7 +66,7 @@ public class DrawerListener extends ListenerAdapter {
 
         Optional<Drawer> optional = this.manager.getStorage().getDrawer(block.getLocation());
 
-        if (!optional.isPresent()) return;
+        if (optional.isEmpty()) return;
 
         Drawer drawer = optional.get();
 

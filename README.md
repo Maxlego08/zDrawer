@@ -2,7 +2,7 @@
 
 ## Commands and permissions:
 - /zdrawer » Main command (Alaises: /drawer) - zdrawer.use
-- /zdrawer reload » Reload config files - zdrawer.reload
+- /zdrawer reload » Reload auctionConfiguration files - zdrawer.reload
 - /zdrawer give » Give commands - zdrawer.craft.use
 - /zdrawer give drawer <player> [<upgrade name>] [<material>] [<amount>] » Give a drawer - zdrawer.give.drawer
 - /zdrawer give craft <player> [<craft name>] » Give a craft item - zdrawer.give.craft

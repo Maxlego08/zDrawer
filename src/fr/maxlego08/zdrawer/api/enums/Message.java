@@ -1,7 +1,6 @@
 package fr.maxlego08.zdrawer.api.enums;
 
 import fr.maxlego08.zdrawer.zcore.enums.MessageType;
-import fr.maxlego08.zdrawer.zcore.utils.nms.NMSUtils;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -227,7 +226,7 @@ public enum Message {
     }
 
     public MessageType getType() {
-        return type.equals(MessageType.ACTION) && NMSUtils.isVeryOldVersion() ? MessageType.TCHAT : type;
+        return type;
     }
 
     public ItemStack getItemStack() {

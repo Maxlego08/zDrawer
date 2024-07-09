@@ -5,7 +5,9 @@ import fr.maxlego08.menu.api.scheduler.ZScheduler;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.storage.DrawerStorage;
 import fr.maxlego08.zdrawer.command.commands.CommandDrawer;
+import fr.maxlego08.zdrawer.hook.DefaultBlockAccess;
 import fr.maxlego08.zdrawer.hook.WorldGuardAccess;
+import fr.maxlego08.zdrawer.save.Config;
 import fr.maxlego08.zdrawer.save.MessageLoader;
 import fr.maxlego08.zdrawer.storage.StorageManager;
 import fr.maxlego08.zdrawer.zcore.ZPlugin;
@@ -67,6 +69,9 @@ public class DrawerPlugin extends ZPlugin {
 
         if (this.isEnable(Plugins.WORLDGUARD)) {
             this.manager.addAccess(new WorldGuardAccess());
+        }
+        if (Config.enableDefaultBlockAccess) {
+            this.manager.addAccess(new DefaultBlockAccess());
         }
 
         this.postEnable();

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import fr.maxlego08.zdrawer.zcore.utils.nms.NMSUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -110,12 +109,6 @@ public class PlayerSkin {
 	}
 
 	public static String getMethodName() {
-		double version = NMSUtils.getNMSVersion();
-		if (version == 1.18) {
-			return "fp";
-		} else if (version == 1.19) {
-			return "fz";
-		}
 		return "getProfile";
 	}
 

@@ -573,3 +573,6 @@ numberFormat:
       maxAmount: 1000000000000000
     - format: "%.2fQ"
       maxAmount: 1000000000000000000
+
+# Check if the player has access to the drawer using the BlockBreakEvent event
+enableDefaultBlockAccess: true
