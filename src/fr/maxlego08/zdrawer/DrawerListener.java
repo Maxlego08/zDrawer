@@ -5,6 +5,7 @@ import fr.maxlego08.zdrawer.api.DrawerCase;
 import fr.maxlego08.zdrawer.api.DrawerManager;
 import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
 import fr.maxlego08.zdrawer.api.enums.Message;
+import fr.maxlego08.zdrawer.api.events.DrawerBlockBreakEvent;
 import fr.maxlego08.zdrawer.api.storage.DrawerContainer;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.api.utils.NamespaceContainer;
@@ -20,6 +21,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Barrel;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
@@ -59,7 +61,7 @@ public class DrawerListener extends ListenerAdapter {
     @Override
     protected void onInteract(PlayerInteractEvent event, Player player) {
 
-        if (event.isCancelled()) return;
+        if (event.useInteractedBlock() == Event.Result.DENY) return;
 
         Block block = event.getClickedBlock();
         if (block == null) return;
@@ -129,12 +131,14 @@ public class DrawerListener extends ListenerAdapter {
 
     @Override
     protected void onBlockBreak(BlockBreakEvent event, Player player) {
-        if (event.isCancelled()) return;
+
+        if (event.isCancelled() || event instanceof DrawerBlockBreakEvent) return;
 
         Block block = event.getBlock();
         Optional<Drawer> optional = this.manager.getStorage().getDrawer(block.getLocation());
+        System.out.println(optional);
 
-        if (!optional.isPresent()) return;
+        if (optional.isEmpty()) return;
 
         Drawer drawer = optional.get();
         DrawerConfiguration drawerConfiguration = drawer.getConfiguration();
@@ -151,6 +155,8 @@ public class DrawerListener extends ListenerAdapter {
         ItemStack itemInOffHand = inventory.getItemInOffHand();
 
         if ((Config.breakMaterials.contains(itemInMainHand.getType()) || Config.breakMaterials.contains(itemInOffHand.getType())) || !Config.enableBreakMaterial) {
+
+            System.out.println("ici !");
 
             event.setCancelled(false);
             event.setDropItems(false);
@@ -249,7 +255,7 @@ public class DrawerListener extends ListenerAdapter {
 
             org.bukkit.block.Barrel barrel = (org.bukkit.block.Barrel) source.getHolder();
             Optional<Drawer> optional = storage.getDrawer(barrel.getLocation());
-            if (!optional.isPresent()) return;
+            if (optional.isEmpty()) return;
             Drawer drawer = optional.get();
             event.setCancelled(true);
 
@@ -272,7 +278,7 @@ public class DrawerListener extends ListenerAdapter {
 
             org.bukkit.block.Barrel barrel = (org.bukkit.block.Barrel) destination.getHolder();
             Optional<Drawer> optional = storage.getDrawer(barrel.getLocation());
-            if (!optional.isPresent()) return;
+            if (optional.isEmpty()) return;
             Drawer drawer = optional.get();
 
             if (drawer.getConfiguration().isDisableHopper()) {
@@ -283,7 +289,7 @@ public class DrawerListener extends ListenerAdapter {
             ItemStack newItemStack = item.clone();
             Optional<DrawerCase> optionalDrawerCase = drawer.findDrawerCase(newItemStack);
 
-            if (!optionalDrawerCase.isPresent()) {
+            if (optionalDrawerCase.isEmpty()) {
                 event.setCancelled(true);
                 return;
             }

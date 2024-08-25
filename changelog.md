@@ -30,6 +30,16 @@
 
 # Unreleased
 
+# 1.0.9
+
+- Fixed bug with DefaultBlockAccess
+
+# 1.0.8
+
+- Fix 1.20.6 and 1.21
+
+# 1.0.7
+
 - Somes fixs with border display entity
 
 # 1.0.6
