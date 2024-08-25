@@ -30,6 +30,8 @@
 
 # Unreleased
 
+# 1.0.9
+
 - Fixed bug with DefaultBlockAccess
 
 # 1.0.8
