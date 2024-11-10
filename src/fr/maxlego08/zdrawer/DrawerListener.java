@@ -136,7 +136,6 @@ public class DrawerListener extends ListenerAdapter {
 
         Block block = event.getBlock();
         Optional<Drawer> optional = this.manager.getStorage().getDrawer(block.getLocation());
-        System.out.println(optional);
 
         if (optional.isEmpty()) return;
 
@@ -155,9 +154,6 @@ public class DrawerListener extends ListenerAdapter {
         ItemStack itemInOffHand = inventory.getItemInOffHand();
 
         if ((Config.breakMaterials.contains(itemInMainHand.getType()) || Config.breakMaterials.contains(itemInOffHand.getType())) || !Config.enableBreakMaterial) {
-
-            System.out.println("ici !");
-
             event.setCancelled(false);
             event.setDropItems(false);
             event.setExpToDrop(0);
