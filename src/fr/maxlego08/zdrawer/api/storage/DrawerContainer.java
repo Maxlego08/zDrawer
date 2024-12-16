@@ -19,7 +19,7 @@ public class DrawerContainer {
     private final String location;
     private final BlockFace blockFace;
     private final String drawerName;
-    private final String data;
+    private String data;
     private final String upgrade;
 
     /**
@@ -95,5 +95,10 @@ public class DrawerContainer {
      */
     public boolean hasData() {
         return this.data != null;
+    }
+
+
+    public void setData(String data) {
+        this.data = data;
     }
 }
