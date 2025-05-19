@@ -1,6 +1,6 @@
 package fr.maxlego08.zdrawer.api.configuration;
 
-import fr.maxlego08.menu.MenuItemStack;
+import fr.maxlego08.menu.api.MenuItemStack;
 import fr.maxlego08.zdrawer.api.utils.DisplaySize;
 
 /**

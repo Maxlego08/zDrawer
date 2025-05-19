@@ -1,6 +1,6 @@
 package fr.maxlego08.zdrawer.api.craft;
 
-import fr.maxlego08.menu.MenuItemStack;
+import fr.maxlego08.menu.api.MenuItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 

@@ -121,8 +121,9 @@
         <dependency>
             <groupId>com.github.Maxlego08</groupId>
             <artifactId>zMenu-API</artifactId>
-            <version>1.0.2.7</version>
-            <scope>provided</scope>
+            <version>1.0.3.7</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/zMenu-API-1.1.0.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>

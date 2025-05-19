@@ -1,6 +1,5 @@
 package fr.maxlego08.zdrawer.craft;
 
-import fr.maxlego08.menu.exceptions.InventoryException;
 import fr.maxlego08.zdrawer.DrawerPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -13,7 +12,7 @@ import java.io.File;
 
 public class ZCraftUpgrade extends ZCraft {
 
-    public ZCraftUpgrade(DrawerPlugin plugin, String path, YamlConfiguration configuration, String name, File file) throws InventoryException {
+    public ZCraftUpgrade(DrawerPlugin plugin, String path, YamlConfiguration configuration, String name, File file) {
         super(plugin, path, configuration, name, file);
     }
 

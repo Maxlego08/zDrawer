@@ -60,9 +60,9 @@ public class JsonStorage extends ZUtils implements IStorage {
     public void createDrawer(DrawerContainer drawerContainer) {
         Location location = stringToLocation(drawerContainer.getLocation());
 
-        this.plugin.getScheduler().runTask(location, () -> {
+        this.plugin.getScheduler().runAtLocation(location, w -> {
             Optional<DrawerConfiguration> optional = plugin.getManager().getDrawer(drawerContainer.getDrawerName());
-            if (!optional.isPresent()) {
+            if (optional.isEmpty()) {
                 Logger.info("Impossible to load a drawer, configuration " + drawerContainer.getDrawerName() + " doesn't exit !", Logger.LogType.ERROR);
                 return;
             }
@@ -88,7 +88,7 @@ public class JsonStorage extends ZUtils implements IStorage {
 
         Bukkit.getWorlds().forEach(world -> {
             Location location = world.getSpawnLocation();
-            this.plugin.getScheduler().runTask(location, () -> clearWorld(this.plugin, world));
+            this.plugin.getScheduler().runAtLocation(location, w -> clearWorld(this.plugin, world));
         });
 
         this.drawerMap = new HashMap<>();

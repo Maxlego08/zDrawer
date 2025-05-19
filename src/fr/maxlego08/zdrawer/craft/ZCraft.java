@@ -1,9 +1,6 @@
 package fr.maxlego08.zdrawer.craft;
 
-import fr.maxlego08.menu.MenuItemStack;
-import fr.maxlego08.menu.exceptions.InventoryException;
-import fr.maxlego08.menu.loader.MenuItemStackLoader;
-import fr.maxlego08.menu.zcore.utils.loader.Loader;
+import fr.maxlego08.menu.api.MenuItemStack;
 import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.api.craft.Craft;
 import fr.maxlego08.zdrawer.api.craft.Ingredient;
@@ -32,15 +29,14 @@ public class ZCraft implements Craft {
     private final MenuItemStack result;
     private final boolean isEnable;
 
-    public ZCraft(DrawerPlugin plugin, String path, YamlConfiguration configuration, String name, File file) throws InventoryException {
+    public ZCraft(DrawerPlugin plugin, String path, YamlConfiguration configuration, String name, File file) {
         this.plugin = plugin;
         this.name = name;
         this.namespacedKey = new NamespacedKey(plugin, name);
         this.shade = configuration.getStringList(path + "shade").toArray(new String[0]);
         this.isEnable = configuration.getBoolean(path + "enable", true);
 
-        Loader<MenuItemStack> loader = new MenuItemStackLoader(plugin.getInventoryManager());
-        this.result = loader.load(configuration, path + "result.", file);
+        this.result = plugin.getInventoryManager().loadItemStack(configuration, path + "result.", file);
         this.ingredients = new HashMap<>();
         for (String ingredientKey : configuration.getConfigurationSection(path + "ingredients.").getKeys(false)) {
             Ingredient ingredient;
@@ -49,7 +45,7 @@ public class ZCraft implements Craft {
             } else if (configuration.contains(path + ".ingredients." + ingredientKey + ".upgrade")) {
                 ingredient = new ZIngredient(configuration.getString(path + ".ingredients." + ingredientKey + ".upgrade"), plugin);
             } else {
-                ingredient = new ZIngredient(plugin, loader.load(configuration, path + ".ingredients." + ingredientKey + ".", file));
+                ingredient = new ZIngredient(plugin, plugin.getInventoryManager().loadItemStack(configuration, path + ".ingredients." + ingredientKey + ".", file));
             }
             this.ingredients.put(ingredientKey.charAt(0), ingredient);
         }

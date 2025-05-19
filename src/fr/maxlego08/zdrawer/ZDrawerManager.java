@@ -1,10 +1,6 @@
 package fr.maxlego08.zdrawer;
 
-import fr.maxlego08.menu.MenuItemStack;
 import fr.maxlego08.menu.api.InventoryManager;
-import fr.maxlego08.menu.exceptions.InventoryException;
-import fr.maxlego08.menu.loader.MenuItemStackLoader;
-import fr.maxlego08.menu.zcore.utils.loader.Loader;
 import fr.maxlego08.zdrawer.api.Drawer;
 import fr.maxlego08.zdrawer.api.DrawerAccess;
 import fr.maxlego08.zdrawer.api.DrawerManager;
@@ -83,26 +79,21 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         this.drawerConfigurations.clear();
 
         InventoryManager inventoryManager = this.plugin.getInventoryManager();
-        Loader<MenuItemStack> loader = new MenuItemStackLoader(inventoryManager);
         YamlConfiguration configuration = (YamlConfiguration) plugin.getConfig();
 
         File file = new File(this.plugin.getDataFolder(), "config.yml");
 
-        try {
-            for (String drawerName : configuration.getConfigurationSection("drawer.drawers.").getKeys(false)) {
-                String path = "drawer.drawers." + drawerName + ".";
-                DrawerConfiguration drawerConfiguration = new ZDrawerConfiguration(this.plugin, configuration, path, loader, file, drawerName);
-                this.drawerConfigurations.add(drawerConfiguration);
-            }
-
-            // Load custom crafts
-            this.loadCustomCrafts(file, configuration);
-
-            // Load upgrades
-            this.loadUpgrades(file, configuration, loader);
-        } catch (InventoryException exception) {
-            exception.printStackTrace();
+        for (String drawerName : configuration.getConfigurationSection("drawer.drawers.").getKeys(false)) {
+            String path = "drawer.drawers." + drawerName + ".";
+            DrawerConfiguration drawerConfiguration = new ZDrawerConfiguration(this.plugin, configuration, path, inventoryManager, file, drawerName);
+            this.drawerConfigurations.add(drawerConfiguration);
         }
+
+        // Load custom crafts
+        this.loadCustomCrafts(file, configuration);
+
+        // Load upgrades
+        this.loadUpgrades(file, configuration, inventoryManager);
 
         this.drawerSizes.clear();
         for (String drawerTypeKey : configuration.getConfigurationSection("drawer.sizes.").getKeys(false)) {
@@ -152,7 +143,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         return itemStackDrawer;
     }
 
-    private void loadCustomCrafts(File file, YamlConfiguration configuration) throws InventoryException {
+    private void loadCustomCrafts(File file, YamlConfiguration configuration) {
 
         this.crafts.forEach(Craft::unregister);
         this.crafts.clear();
@@ -165,7 +156,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         }
     }
 
-    private void loadUpgrades(File file, YamlConfiguration configuration, Loader<MenuItemStack> loader) throws InventoryException {
+    private void loadUpgrades(File file, YamlConfiguration configuration, InventoryManager inventoryManager) {
 
         this.drawerUpgrades.clear();
 
@@ -178,7 +169,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
 
             long limit = configuration.getLong(path + "limit", 0);
 
-            ItemStack displayItemStack = loader.load(configuration, path + "displayItem.", file).build(null);
+            ItemStack displayItemStack = inventoryManager.loadItemStack(configuration, path + "displayItem.", file).build(null);
             String displayName = configuration.getString(path + "displayName");
             DrawerUpgrade drawerUpgrade = new ZDrawerUpgrade(upgradeName, displayName, craft, limit, displayItemStack);
             this.drawerUpgrades.add(drawerUpgrade);
