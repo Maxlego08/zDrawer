@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.maxlego08</groupId>
     <artifactId>zDrawer</artifactId>
-    <version>1.0.9</version>
+    <version>1.1.0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
@@ -87,6 +87,11 @@
             <id>sk89q-repo</id>
             <url>https://maven.enginehub.org/repo/</url>
         </repository>
+        <repository>
+            <id>groupez-releases</id>
+            <name>GroupeZ Repository</name>
+            <url>https://repo.groupez.dev/releases</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -119,11 +124,10 @@
             <version>9.4.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.Maxlego08</groupId>
-            <artifactId>zMenu-API</artifactId>
-            <version>1.0.3.7</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/zMenu-API-1.1.0.0.jar</systemPath>
+            <groupId>fr.maxlego08.menu</groupId>
+            <artifactId>zmenu-api</artifactId>
+            <version>1.1.0.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
