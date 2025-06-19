@@ -1,8 +1,7 @@
 package fr.maxlego08.zdrawer.configuration;
 
-import fr.maxlego08.menu.MenuItemStack;
-import fr.maxlego08.menu.exceptions.InventoryException;
-import fr.maxlego08.menu.zcore.utils.loader.Loader;
+import fr.maxlego08.menu.api.MenuItemStack;
+import fr.maxlego08.menu.api.InventoryManager;
 import fr.maxlego08.zdrawer.DrawerPlugin;
 import fr.maxlego08.zdrawer.api.configuration.DrawerBorder;
 import fr.maxlego08.zdrawer.api.configuration.DrawerConfiguration;
@@ -29,7 +28,7 @@ public class ZDrawerConfiguration implements DrawerConfiguration {
     private final float viewRange;
 
 
-    public ZDrawerConfiguration(DrawerPlugin plugin, YamlConfiguration configuration, String path, Loader<MenuItemStack> loader, File file, String name) throws InventoryException {
+    public ZDrawerConfiguration(DrawerPlugin plugin, YamlConfiguration configuration, String path, InventoryManager inventoryManager, File file, String name) {
         this.name = name;
         this.drawerType = DrawerType.valueOf(configuration.getString(path + "type", "SIMPLE").toUpperCase());
         this.limit = configuration.getLong(path + "limit", 0);
@@ -38,13 +37,13 @@ public class ZDrawerConfiguration implements DrawerConfiguration {
         this.dropItems = configuration.getBoolean(path + "dropContent.enable", false);
         this.dropItemLimit = configuration.getLong(path + "dropContent.limit", limit / 2);
         this.viewRange = (float) configuration.getDouble(path + "viewRange", 0.5);
-        this.menuItemStack = loader.load(configuration, path + "item.", file);
-        if (!this.menuItemStack.getMaterial().equalsIgnoreCase("barrel")){
+        this.menuItemStack = inventoryManager.loadItemStack(configuration, path + "item.", file);
+        if (!this.menuItemStack.getMaterial().equalsIgnoreCase("barrel")) {
             Logger.info("Attention, it is not possible to use another material for the drawer, please leave the material BARREL", Logger.LogType.WARNING);
         }
         this.craft = new ZCraftDrawer(plugin, path + "craft.", configuration, name, file);
         this.craft.register();
-        this.border = new ZDrawerBorder(configuration, path + "border.", loader, file);
+        this.border = new ZDrawerBorder(configuration, path + "border.", inventoryManager, file);
     }
 
     @Override

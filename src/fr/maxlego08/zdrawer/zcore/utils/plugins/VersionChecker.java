@@ -55,8 +55,7 @@ public class VersionChecker extends ZUtils implements Listener {
             long plVersion = Long.valueOf(pluginVersion.replace(".", ""));
             atomicBoolean.set(plVersion >= ver);
             this.useLastVersion = atomicBoolean.get();
-            if (atomicBoolean.get())
-                Logger.info("No update available.");
+            if (atomicBoolean.get()) Logger.info("No update available.");
             else {
                 Logger.info("New update available. Your version: " + pluginVersion + ", latest version: " + version);
                 Logger.info("Download plugin here: " + String.format(URL_RESOURCE, this.pluginID));
@@ -69,10 +68,10 @@ public class VersionChecker extends ZUtils implements Listener {
     public void onConnect(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         if (!useLastVersion && event.getPlayer().hasPermission("zplugin.notifs")) {
-            this.plugin.getScheduler().runTaskLater(player.getLocation(), 20 * 2, () -> {
-                message(plugin, player, "§cYou do not use the latest version of the plugin! Thank you for taking the latest version to avoid any risk of problem!");
-                message(plugin, player, "§fDownload plugin here: §a" + String.format(URL_RESOURCE, pluginID));
-            });
+            this.plugin.getScheduler().runAtLocationLater(player.getLocation(), () -> {
+                message(plugin, player, "&cYou do not use the latest version of the plugin! Thank you for taking the latest version to avoid any risk of problem!");
+                message(plugin, player, "&fDownload plugin here: &a" + String.format(URL_RESOURCE, pluginID));
+            }, 20 * 2);
         }
     }
 
@@ -82,16 +81,14 @@ public class VersionChecker extends ZUtils implements Listener {
      * @param consumer - Do something after
      */
     public void getVersion(Consumer<String> consumer) {
-        this.plugin.getScheduler().runTaskAsynchronously(() -> {
+        this.plugin.getScheduler().runAsync(w -> {
             final String apiURL = String.format(URL_API, this.pluginID);
             try {
                 URL url = new URL(apiURL);
                 URLConnection hc = url.openConnection();
-                hc.setRequestProperty("User-Agent",
-                        "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+                hc.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
                 Scanner scanner = new Scanner(hc.getInputStream());
-                if (scanner.hasNext())
-                    consumer.accept(scanner.next());
+                if (scanner.hasNext()) consumer.accept(scanner.next());
                 scanner.close();
 
             } catch (IOException exception) {
