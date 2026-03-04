@@ -42,19 +42,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class ZDrawerManager extends ZUtils implements DrawerManager {
 
     private final DrawerPlugin plugin;
     private final NamespaceContainer namespaceContainer;
-    private final Map<UUID, Drawer> currentPlayerDrawer = new HashMap<>();
+    private final Map<UUID, Drawer> currentPlayerDrawer = new ConcurrentHashMap<>();
     private final List<Craft> crafts = new ArrayList<>();
     private final List<DrawerUpgrade> drawerUpgrades = new ArrayList<>();
     private final Map<BlockFace, DrawerPosition> drawerPositions = new HashMap<>();
     private final List<DrawerConfiguration> drawerConfigurations = new ArrayList<>();
     private final Map<DrawerType, DrawerSize> drawerSizes = new HashMap<>();
     private final List<DrawerAccess> drawerAccesses = new ArrayList<>();
+
+    // Lookup maps for O(1) performance
+    private final Map<String, Craft> craftsByName = new HashMap<>();
+    private final Map<String, DrawerUpgrade> upgradesByName = new HashMap<>();
+    private final Map<String, DrawerConfiguration> drawersByName = new HashMap<>();
 
     public ZDrawerManager(DrawerPlugin plugin) {
         this.plugin = plugin;
@@ -77,6 +83,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
     public void load(Persist persist) {
 
         this.drawerConfigurations.clear();
+        this.drawersByName.clear();
 
         InventoryManager inventoryManager = this.plugin.getInventoryManager();
         YamlConfiguration configuration = (YamlConfiguration) plugin.getConfig();
@@ -87,6 +94,7 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
             String path = "drawer.drawers." + drawerName + ".";
             DrawerConfiguration drawerConfiguration = new ZDrawerConfiguration(this.plugin, configuration, path, inventoryManager, file, drawerName);
             this.drawerConfigurations.add(drawerConfiguration);
+            this.drawersByName.put(drawerName.toLowerCase(), drawerConfiguration);
         }
 
         // Load custom crafts
@@ -97,7 +105,12 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
 
         this.drawerSizes.clear();
         for (String drawerTypeKey : configuration.getConfigurationSection("drawer.sizes.").getKeys(false)) {
-            DrawerType drawerType = DrawerType.valueOf(drawerTypeKey.toUpperCase());
+            DrawerType drawerType;
+            try {
+                drawerType = DrawerType.valueOf(drawerTypeKey.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                continue; // Skip invalid drawer types
+            }
             DrawerSize size = new DrawerSize(drawerType, configuration, "drawer.sizes." + drawerTypeKey + ".");
             this.drawerSizes.put(drawerType, size);
         }
@@ -113,8 +126,12 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
         ConfigurationSection section = configuration.getConfigurationSection("drawer.entitiesPosition.");
         if (section == null) return;
         for (String key : section.getKeys(false)) {
-
-            BlockFace blockFace = BlockFace.valueOf(key);
+            BlockFace blockFace;
+            try {
+                blockFace = BlockFace.valueOf(key);
+            } catch (IllegalArgumentException e) {
+                continue; // Skip invalid block faces
+            }
             DrawerPosition drawerPosition = new DrawerPosition(configuration, "drawer.entitiesPosition." + key + ".", blockFace);
             this.drawerPositions.put(blockFace, drawerPosition);
         }
@@ -147,24 +164,28 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
 
         this.crafts.forEach(Craft::unregister);
         this.crafts.clear();
+        this.craftsByName.clear();
 
         for (String craftName : configuration.getConfigurationSection("customCrafts.").getKeys(false)) {
             String path = "customCrafts." + craftName + ".";
             Craft craft = new ZCraft(this.plugin, path, configuration, craftName, file);
             craft.register();
             this.crafts.add(craft);
+            this.craftsByName.put(craftName, craft);
         }
     }
 
     private void loadUpgrades(File file, YamlConfiguration configuration, InventoryManager inventoryManager) {
 
         this.drawerUpgrades.clear();
+        this.upgradesByName.clear();
 
         for (String upgradeName : configuration.getConfigurationSection("upgrades.").getKeys(false)) {
 
             String path = "upgrades." + upgradeName + ".";
             Craft craft = new ZCraftUpgrade(this.plugin, path + "craft.", configuration, upgradeName, file);
             this.crafts.add(craft);
+            this.craftsByName.put(upgradeName, craft);
             craft.register();
 
             long limit = configuration.getLong(path + "limit", 0);
@@ -173,22 +194,23 @@ public class ZDrawerManager extends ZUtils implements DrawerManager {
             String displayName = configuration.getString(path + "displayName");
             DrawerUpgrade drawerUpgrade = new ZDrawerUpgrade(upgradeName, displayName, craft, limit, displayItemStack);
             this.drawerUpgrades.add(drawerUpgrade);
+            this.upgradesByName.put(upgradeName, drawerUpgrade);
         }
     }
 
     @Override
     public Optional<Craft> getCraft(String craftName) {
-        return this.crafts.stream().filter(craft -> craft.getName().equals(craftName)).findFirst();
+        return Optional.ofNullable(this.craftsByName.get(craftName));
     }
 
     @Override
     public Optional<DrawerUpgrade> getUpgrade(String upgradeName) {
-        return this.drawerUpgrades.stream().filter(drawerUpgrade -> drawerUpgrade.getName().equals(upgradeName)).findFirst();
+        return Optional.ofNullable(this.upgradesByName.get(upgradeName));
     }
 
     @Override
     public Optional<DrawerConfiguration> getDrawer(String drawerName) {
-        return this.drawerConfigurations.stream().filter(drawerConfiguration -> drawerConfiguration.getName().equalsIgnoreCase(drawerName)).findFirst();
+        return Optional.ofNullable(this.drawersByName.get(drawerName.toLowerCase()));
     }
 
     @Override

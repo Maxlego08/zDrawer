@@ -6,6 +6,7 @@ import fr.maxlego08.zdrawer.api.storage.DrawerStorage;
 import fr.maxlego08.zdrawer.api.storage.IStorage;
 import fr.maxlego08.zdrawer.storage.storages.JsonStorage;
 import fr.maxlego08.zdrawer.storage.storages.SqliteStorage;
+import fr.maxlego08.zdrawer.zcore.logger.Logger;
 import fr.maxlego08.zdrawer.zcore.utils.storage.Persist;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -19,13 +20,21 @@ public class StorageManager implements DrawerStorage {
     private final DrawerPlugin plugin;
 
     private final StorageType storageType;
+    private final ScheduledExecutorService executorService;
     private final ScheduledFuture<?> scheduledTask;
     private IStorage storage;
 
     public StorageManager(DrawerPlugin plugin) {
         this.plugin = plugin;
         FileConfiguration configuration = plugin.getConfig();
-        this.storageType = StorageType.valueOf(configuration.getString("storage", "JSON"));
+        StorageType type;
+        try {
+            type = StorageType.valueOf(configuration.getString("storage", "JSON").toUpperCase());
+        } catch (IllegalArgumentException e) {
+            Logger.info("Invalid storage type in config, defaulting to JSON", Logger.LogType.WARNING);
+            type = StorageType.JSON;
+        }
+        this.storageType = type;
         long updateInterval = configuration.getLong("updateInterval", 12000);
         switch (this.storageType) {
 
@@ -38,14 +47,24 @@ public class StorageManager implements DrawerStorage {
                 break;
         }
 
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        this.scheduledTask = executorService.scheduleAtFixedRate(this::saveTask, updateInterval, updateInterval, TimeUnit.MILLISECONDS);
+        this.executorService = Executors.newSingleThreadScheduledExecutor();
+        this.scheduledTask = this.executorService.scheduleAtFixedRate(this::saveTask, updateInterval, updateInterval, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void save(Persist persist) {
 
-        this.scheduledTask.cancel(true);
+        this.scheduledTask.cancel(false);
+        this.executorService.shutdown();
+        try {
+            if (!this.executorService.awaitTermination(5, TimeUnit.SECONDS)) {
+                this.executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            this.executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+
         this.storage.save();
 
         if (this.storageType == StorageType.JSON) {

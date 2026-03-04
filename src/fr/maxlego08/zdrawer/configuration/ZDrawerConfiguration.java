@@ -30,7 +30,14 @@ public class ZDrawerConfiguration implements DrawerConfiguration {
 
     public ZDrawerConfiguration(DrawerPlugin plugin, YamlConfiguration configuration, String path, InventoryManager inventoryManager, File file, String name) {
         this.name = name;
-        this.drawerType = DrawerType.valueOf(configuration.getString(path + "type", "SIMPLE").toUpperCase());
+        DrawerType type;
+        try {
+            type = DrawerType.valueOf(configuration.getString(path + "type", "SINGLE").toUpperCase());
+        } catch (IllegalArgumentException e) {
+            Logger.info("Invalid drawer type for " + name + ", defaulting to SINGLE", Logger.LogType.WARNING);
+            type = DrawerType.SINGLE;
+        }
+        this.drawerType = type;
         this.limit = configuration.getLong(path + "limit", 0);
         this.enableHopper = configuration.getBoolean(path + "enableHopper", true);
         this.enableTextBackground = configuration.getBoolean(path + "enableTextBackground", false);

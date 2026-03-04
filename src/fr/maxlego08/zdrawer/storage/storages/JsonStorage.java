@@ -15,17 +15,17 @@ import org.bukkit.Material;
 import org.bukkit.World;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JsonStorage extends ZUtils implements IStorage {
 
     protected transient final List<DrawerContainer> waitingDrawers = new ArrayList<>();
-    protected transient Map<String, List<Drawer>> drawerMapChunk = new HashMap<>();
+    protected transient Map<String, List<Drawer>> drawerMapChunk = new ConcurrentHashMap<>();
     protected transient DrawerPlugin plugin;
-    protected transient Map<String, Drawer> drawerMap = new HashMap<>();
+    protected transient Map<String, Drawer> drawerMap = new ConcurrentHashMap<>();
     protected List<DrawerContainer> drawers = new ArrayList<>();
 
     public JsonStorage(DrawerPlugin plugin) {
@@ -59,6 +59,10 @@ public class JsonStorage extends ZUtils implements IStorage {
     @Override
     public void createDrawer(DrawerContainer drawerContainer) {
         Location location = stringToLocation(drawerContainer.getLocation());
+        if (location == null) {
+            Logger.info("Cannot create drawer: invalid location " + drawerContainer.getLocation(), Logger.LogType.ERROR);
+            return;
+        }
 
         this.plugin.getScheduler().runAtLocation(location, w -> {
             Optional<DrawerConfiguration> optional = plugin.getManager().getDrawer(drawerContainer.getDrawerName());
@@ -77,9 +81,9 @@ public class JsonStorage extends ZUtils implements IStorage {
             }
             drawerMap.put(drawerContainer.getLocation(), drawer);
 
-            if (this.drawerMapChunk == null) this.drawerMapChunk = new HashMap<>();
-            List<Drawer> drawerList = this.drawerMapChunk.computeIfAbsent(location.getChunk().getX() + "," + location.getChunk().getZ(), a -> new ArrayList<>());
-            drawerList.add(drawer);
+            if (this.drawerMapChunk == null) this.drawerMapChunk = new ConcurrentHashMap<>();
+            String chunkKey = location.getChunk().getX() + "," + location.getChunk().getZ();
+            this.drawerMapChunk.computeIfAbsent(chunkKey, a -> new ArrayList<>()).add(drawer);
         });
     }
 
@@ -91,7 +95,7 @@ public class JsonStorage extends ZUtils implements IStorage {
             this.plugin.getScheduler().runAtLocation(location, w -> clearWorld(this.plugin, world));
         });
 
-        this.drawerMap = new HashMap<>();
+        this.drawerMap = new ConcurrentHashMap<>();
         Logger.info("Loading " + this.drawers.size() + " drawers.", Logger.LogType.INFO);
         this.drawers.forEach(drawerContainer -> {
 
@@ -116,9 +120,14 @@ public class JsonStorage extends ZUtils implements IStorage {
 
     @Override
     public void purge(World world, boolean destroyBlock) {
-        this.drawers.removeIf(drawerContainer -> stringToLocation(drawerContainer.getLocation()).getWorld().getName().equals(world.getName()));
+        this.drawers.removeIf(drawerContainer -> {
+            Location location = stringToLocation(drawerContainer.getLocation());
+            return location != null && location.getWorld() != null && location.getWorld().getName().equals(world.getName());
+        });
         this.drawerMap.entrySet().removeIf(entry -> {
-            boolean needToDelete = stringToLocation(entry.getKey()).getWorld().getName().equals(world.getName());
+            Location location = stringToLocation(entry.getKey());
+            if (location == null || location.getWorld() == null) return false;
+            boolean needToDelete = location.getWorld().getName().equals(world.getName());
             if (needToDelete) {
                 Drawer drawer = entry.getValue();
                 drawer.onDisable();
@@ -139,12 +148,21 @@ public class JsonStorage extends ZUtils implements IStorage {
 
     private Location stringToLocation(String string) {
         String[] locationArray = string.split(",");
-        return new Location(Bukkit.getServer().getWorld(locationArray[0]), Integer.parseInt(locationArray[1]), Integer.parseInt(locationArray[2]), Integer.parseInt(locationArray[3]));
+        if (locationArray.length < 4) {
+            Logger.info("Invalid location format: " + string, Logger.LogType.ERROR);
+            return null;
+        }
+        World world = Bukkit.getServer().getWorld(locationArray[0]);
+        if (world == null) {
+            Logger.info("World not found: " + locationArray[0], Logger.LogType.WARNING);
+            return null;
+        }
+        return new Location(world, Integer.parseInt(locationArray[1]), Integer.parseInt(locationArray[2]), Integer.parseInt(locationArray[3]));
     }
 
     public void setPlugin(DrawerPlugin plugin) {
         this.plugin = plugin;
-        this.drawerMapChunk = new HashMap<>();
+        this.drawerMapChunk = new ConcurrentHashMap<>();
     }
 
     public List<Drawer> getDrawers(Chunk chunk) {

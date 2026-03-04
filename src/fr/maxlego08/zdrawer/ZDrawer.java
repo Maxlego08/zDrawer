@@ -251,7 +251,9 @@ public class ZDrawer extends ZUtils implements Drawer {
     public void setUpgrade(DrawerUpgrade drawerUpgrade) {
         this.needToUpdate = true;
         this.drawerUpgrade = drawerUpgrade;
-        this.upgradeDisplay.setItemStack(drawerUpgrade.getDisplayItemStack());
+        if (this.upgradeDisplay != null && drawerUpgrade != null) {
+            this.upgradeDisplay.setItemStack(drawerUpgrade.getDisplayItemStack());
+        }
     }
 
     @Override
@@ -296,23 +298,49 @@ public class ZDrawer extends ZUtils implements Drawer {
 
     @Override
     public void load(String data) {
+        if (data == null || data.isEmpty()) return;
+
         String[] values = data.split(",");
-        int dataAmount = Integer.parseInt(values[0]);
-        for (int index = 1; index < dataAmount + 1; index++) {
+        if (values.length < 1) return;
+
+        int dataAmount;
+        try {
+            dataAmount = Integer.parseInt(values[0]);
+        } catch (NumberFormatException e) {
+            return;
+        }
+
+        for (int index = 1; index < dataAmount + 1 && index < values.length; index++) {
             String[] currentValues = values[index].split(";");
-            ItemStack itemStack = ItemStackUtils.deserializeItemStack(currentValues[0]);
-            int amount = Integer.parseInt(currentValues[1]);
-            setItemStack(index - 1, itemStack);
-            setAmount(index - 1, amount);
+            if (currentValues.length < 2) continue;
+
+            try {
+                ItemStack itemStack = ItemStackUtils.deserializeItemStack(currentValues[0]);
+                long amount = Long.parseLong(currentValues[1]);
+                int caseIndex = index - 1;
+                if (caseIndex < this.drawerCases.size()) {
+                    setItemStack(caseIndex, itemStack);
+                    setAmount(caseIndex, amount);
+                }
+            } catch (NumberFormatException e) {
+                // Skip invalid entries
+            }
         }
     }
 
 
     public Optional<DrawerCase> findDrawerCase(ItemStack itemStack) {
-        return drawerCases.stream()
-                .filter(dCase -> dCase.hasItemStack() && dCase.getItemStack().isSimilar(itemStack) && !dCase.isFull())
-                .findFirst()
-                .or(() -> drawerCases.stream().filter(dCase -> !dCase.hasItemStack()).findFirst());
+        DrawerCase emptyCase = null;
+        for (DrawerCase drawerCase : this.drawerCases) {
+            if (drawerCase.hasItemStack()) {
+                if (drawerCase.getItemStack().isSimilar(itemStack) && !drawerCase.isFull()) {
+                    return Optional.of(drawerCase);
+                }
+            } else if (emptyCase == null) {
+                emptyCase = drawerCase;
+            }
+        }
+        return Optional.ofNullable(emptyCase);
     }
 
 

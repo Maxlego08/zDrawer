@@ -57,7 +57,12 @@ public class CommandDrawerPlace extends VCommand {
         double y = this.argAsDouble(3);
         double z = this.argAsDouble(4);
 
-        BlockFace blockFace = BlockFace.valueOf(this.argAsString(5).toUpperCase());
+        BlockFace blockFace;
+        try {
+            blockFace = BlockFace.valueOf(this.argAsString(5).toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return CommandType.SYNTAX_ERROR;
+        }
         if (!blockFaceAllowed.contains(blockFace)) return CommandType.SYNTAX_ERROR;
 
         String upgradeName = this.argAsString(6);

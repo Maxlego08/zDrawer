@@ -44,7 +44,9 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
     @Override
     public void setItemStack(ItemStack itemStack) {
         this.itemStack = itemStack;
-        this.itemDisplay.setItemStack(itemStack);
+        if (this.itemDisplay != null) {
+            this.itemDisplay.setItemStack(itemStack);
+        }
     }
 
     @Override
@@ -107,7 +109,9 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
 
     private void createNewItemStack(ItemStack itemStack) {
         this.itemStack = itemStack.clone();
-        this.itemDisplay.setItemStack(this.itemStack);
+        if (this.itemDisplay != null) {
+            this.itemDisplay.setItemStack(this.itemStack);
+        }
         this.amount = Math.min(itemStack.getAmount(), calculateAvailableSpace());
     }
 
@@ -136,11 +140,15 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
 
 
     private void addAllSimilarItems(PlayerInventory inventory) {
-        for (int slot = 0; slot != 36; slot++) {
+        int inventorySize = inventory.getStorageContents().length;
+        for (int slot = 0; slot < inventorySize; slot++) {
 
             ItemStack currentItemStack = inventory.getItem(slot);
             if (currentItemStack != null && this.itemStack.isSimilar(currentItemStack)) {
-                int addAmount = (int) Math.min(currentItemStack.getAmount(), this.drawer.getLimit() - this.amount);
+                long availableSpace = this.drawer.hasLimit() ? this.drawer.getLimit() - this.amount : Long.MAX_VALUE;
+                int addAmount = (int) Math.min(currentItemStack.getAmount(), availableSpace);
+                if (addAmount <= 0) break; // No more space available
+
                 this.amount += addAmount;
                 if (addAmount < currentItemStack.getAmount()) {
                     currentItemStack.setAmount(currentItemStack.getAmount() - addAmount);
@@ -186,7 +194,9 @@ public class ZDrawerCase extends ZUtils implements DrawerCase {
 
     @Override
     public void onLoad() {
-        this.itemDisplay.setItemStack(itemStack);
+        if (this.itemDisplay != null) {
+            this.itemDisplay.setItemStack(itemStack);
+        }
         updateText();
     }
 

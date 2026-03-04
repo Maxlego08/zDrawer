@@ -186,7 +186,14 @@ public class SqliteStorage extends JsonStorage {
 
             while (resultSet.next()) {
                 String location = resultSet.getString("location");
-                BlockFace blockFace = BlockFace.valueOf(resultSet.getString("blockFace"));
+                String blockFaceStr = resultSet.getString("blockFace");
+                BlockFace blockFace;
+                try {
+                    blockFace = BlockFace.valueOf(blockFaceStr);
+                } catch (IllegalArgumentException e) {
+                    Logger.info("Invalid BlockFace '" + blockFaceStr + "' for drawer at " + location + ", skipping", Logger.LogType.WARNING);
+                    continue;
+                }
                 String drawerName = resultSet.getString("configurationName");
                 String data = resultSet.getString("content");
                 String upgrade = resultSet.getString("upgradeName");
